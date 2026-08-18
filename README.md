@@ -1,2 +1,2 @@
-# maiasql
-MaiaSQL (WebSQL)
+# MaiaSQL (WebSQL)
+Pure JavaScript implementation of WebSQL.
