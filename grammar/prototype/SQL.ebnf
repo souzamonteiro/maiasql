@@ -1,0 +1,664 @@
+// SQLite SQL grammar for MaiaCC / tREx
+// Derived from the official SQLite syntax diagrams.
+// Target: tREx recursive-descent parser using REx-compatible EBNF.
+//
+// Start rule: SqlScript
+//
+// Design notes:
+// - No direct left recursion.
+// - Expressions are factored by precedence.
+// - SQL keywords are accepted only in uppercase.
+// - Unquoted names use Identifier; quote a name that is also a keyword.
+// - Whitespace and SQL comments are discarded through /* ws: definition */.
+// - UPDATE/DELETE ORDER BY/LIMIT forms are included; their execution may depend
+//   on SQLITE_ENABLE_UPDATE_DELETE_LIMIT in native SQLite builds.
+// - Virtual-table module arguments are necessarily permissive because each
+//   virtual-table module defines its own argument language.
+
+SqlScript
+  ::= ';'*
+      (SqlStatement (';' ';'* SqlStatement)* ';'*)?
+      EOF
+
+SqlStatement
+  ::= ExplainPrefix?
+      ( AlterTableStmt
+      | AnalyzeStmt
+      | AttachStmt
+      | BeginStmt
+      | CommitStmt
+      | CreateIndexStmt
+      | CreateTableStmt
+      | CreateTriggerStmt
+      | CreateViewStmt
+      | CreateVirtualTableStmt
+      | DeleteStmt
+      | DetachStmt
+      | DropIndexStmt
+      | DropTableStmt
+      | DropTriggerStmt
+      | DropViewStmt
+      | InsertStmt
+      | PragmaStmt
+      | ReindexStmt
+      | ReleaseStmt
+      | RollbackStmt
+      | SavepointStmt
+      | SelectStmt
+      | UpdateStmt
+      | VacuumStmt
+      )
+
+ExplainPrefix ::= ('EXPLAIN' | 'explain') (('QUERY' | 'query') ('PLAN' | 'plan'))?
+
+AlterTableStmt
+  ::= ('ALTER' | 'alter') ('TABLE' | 'table') QualifiedTableRef
+      ( ('RENAME' | 'rename') ('TO' | 'to') TableName
+      | ('RENAME' | 'rename') ('COLUMN' | 'column')? ColumnName ('TO' | 'to') ColumnName
+      | ('ADD' | 'add') ('COLUMN' | 'column')? ColumnDef
+      | ('DROP' | 'drop') ('COLUMN' | 'column')? ColumnName
+      )
+
+AnalyzeStmt
+  ::= ('ANALYZE' | 'analyze')
+      ( SchemaName
+      | TableOrIndexName
+      | SchemaName '.' TableOrIndexName
+      )?
+
+AttachStmt ::= (('ATTACH' | 'attach') | 'attach') (('DATABASE' | 'database') | 'database')? Expr (('AS' | 'as') | 'as') SchemaName
+
+BeginStmt
+  ::= ('BEGIN' | 'begin') (('DEFERRED' | 'deferred') | ('IMMEDIATE' | 'immediate') | ('EXCLUSIVE' | 'exclusive'))? ('TRANSACTION' | 'transaction')?
+
+CommitStmt ::= (('COMMIT' | 'commit') | ('END' | 'end')) ('TRANSACTION' | 'transaction')?
+
+RollbackStmt
+  ::= ('ROLLBACK' | 'rollback') ('TRANSACTION' | 'transaction')?
+      (('TO' | 'to') ('SAVEPOINT' | 'savepoint')? SavepointName)?
+
+SavepointStmt ::= ('SAVEPOINT' | 'savepoint') SavepointName
+ReleaseStmt   ::= ('RELEASE' | 'release') ('SAVEPOINT' | 'savepoint')? SavepointName
+
+DetachStmt ::= ('DETACH' | 'detach') ('DATABASE' | 'database')? SchemaName
+
+VacuumStmt ::= ('VACUUM' | 'vacuum') SchemaName? (('INTO' | 'into') Filename)?
+
+ReindexStmt
+  ::= ('REINDEX' | 'reindex')
+      ( CollationName
+      | SchemaName '.' TableOrIndexName
+      | TableOrIndexName
+      )?
+
+PragmaStmt
+  ::= ('PRAGMA' | 'pragma') SchemaQualifier? PragmaName
+      ( '=' PragmaValue
+      | '(' PragmaValue ')'
+      )?
+
+PragmaValue
+  ::= SignedNumber
+  | Name
+  | StringLiteral
+  | ('ON' | 'on')
+  | ('OFF' | 'off')
+  | ('TRUE' | 'true')
+  | ('FALSE' | 'false')
+  | ('YES' | 'yes')
+  | ('NO' | 'no')
+
+CreateIndexStmt
+  ::= ('CREATE' | 'create') ('UNIQUE' | 'unique')? ('INDEX' | 'index') IfNotExists?
+      SchemaQualifier? IndexName
+      ('ON' | 'on') TableName
+      '(' IndexedColumn (',' IndexedColumn)* ')'
+      (('WHERE' | 'where') Expr)?
+
+CreateTableStmt
+  ::= ('CREATE' | 'create') (('TEMP' | 'temp') | ('TEMPORARY' | 'temporary'))? ('TABLE' | 'table') IfNotExists?
+      SchemaQualifier? TableName
+      ( '(' ColumnDef (',' ColumnDef)* (',' TableConstraint)* ')'
+        TableOptions?
+      | ('AS' | 'as') SelectStmt
+      )
+
+ColumnDef ::= ColumnName TypeName? ColumnConstraint*
+
+TypeName ::= Name+ ('(' SignedNumber (',' SignedNumber)? ')')?
+
+ColumnConstraint
+  ::= (('CONSTRAINT' | 'constraint') ConstraintName)?
+      ( ('PRIMARY' | 'primary') ('KEY' | 'key') (('ASC' | 'asc') | ('DESC' | 'desc'))? ConflictClause? ('AUTOINCREMENT' | 'autoincrement')?
+      | ('NOT' | 'not') ('NULL' | 'null') ConflictClause?
+      | ('UNIQUE' | 'unique') ConflictClause?
+      | ('CHECK' | 'check') '(' Expr ')'
+      | ('DEFAULT' | 'default') (SignedNumber | LiteralValue | '(' Expr ')')
+      | ('COLLATE' | 'collate') CollationName
+      | ForeignKeyClause
+      | GeneratedColumnConstraint
+      )
+
+GeneratedColumnConstraint
+  ::= ('GENERATED' | 'generated') ('ALWAYS' | 'always')? ('AS' | 'as') '(' Expr ')' (('STORED' | 'stored') | ('VIRTUAL' | 'virtual'))?
+  | ('AS' | 'as') '(' Expr ')' (('STORED' | 'stored') | ('VIRTUAL' | 'virtual'))?
+
+TableConstraint
+  ::= (('CONSTRAINT' | 'constraint') ConstraintName)?
+      ( (('PRIMARY' | 'primary') ('KEY' | 'key') | ('UNIQUE' | 'unique'))
+        '(' IndexedColumn (',' IndexedColumn)* ')'
+        ConflictClause?
+      | ('CHECK' | 'check') '(' Expr ')'
+      | ('FOREIGN' | 'foreign') ('KEY' | 'key')
+        '(' ColumnName (',' ColumnName)* ')'
+        ForeignKeyClause
+      )
+
+TableOptions ::= TableOption (',' TableOption)*
+TableOption  ::= ('WITHOUT' | 'without') ('ROWID' | 'rowid') | ('STRICT' | 'strict')
+
+ConflictClause ::= ('ON' | 'on') ('CONFLICT' | 'conflict') ConflictAction
+ConflictAction ::= ('ROLLBACK' | 'rollback') | ('ABORT' | 'abort') | ('FAIL' | 'fail') | ('IGNORE' | 'ignore') | ('REPLACE' | 'replace')
+
+ForeignKeyClause
+  ::= ('REFERENCES' | 'references') ForeignTable
+      ('(' ColumnName (',' ColumnName)* ')')?
+      ForeignKeyAction*
+      ForeignKeyMatch?
+      ForeignKeyDeferrable?
+
+ForeignKeyAction
+  ::= ('ON' | 'on') (('DELETE' | 'delete') | ('UPDATE' | 'update'))
+      (('SET' | 'set') ('NULL' | 'null') | ('SET' | 'set') ('DEFAULT' | 'default') | ('CASCADE' | 'cascade') | ('RESTRICT' | 'restrict') | ('NO' | 'no') ('ACTION' | 'action'))
+
+ForeignKeyMatch ::= ('MATCH' | 'match') Name
+
+ForeignKeyDeferrable
+  ::= ('NOT' | 'not')? ('DEFERRABLE' | 'deferrable')
+      (('INITIALLY' | 'initially') (('DEFERRED' | 'deferred') | ('IMMEDIATE' | 'immediate')))?
+
+CreateViewStmt
+  ::= ('CREATE' | 'create') (('TEMP' | 'temp') | ('TEMPORARY' | 'temporary'))? ('VIEW' | 'view') IfNotExists?
+      SchemaQualifier? ViewName
+      ('(' ColumnName (',' ColumnName)* ')')?
+      ('AS' | 'as') SelectStmt
+
+CreateVirtualTableStmt
+  ::= ('CREATE' | 'create') ('VIRTUAL' | 'virtual') ('TABLE' | 'table') IfNotExists?
+      SchemaQualifier? TableName
+      ('USING' | 'using') ModuleName
+      ('(' ModuleArgument (',' ModuleArgument)* ')')?
+
+// SQLite treats module arguments as token sequences interpreted by the module.
+// This lexical approximation accepts balanced-free arguments up to comma or ')'.
+ModuleArgument ::= ModuleArgToken+
+ModuleArgToken
+  ::= Name
+  | NumericLiteral
+  | StringLiteral
+  | BlobLiteral
+  | '.'
+  | '+'
+  | '-'
+  | '*'
+  | '/'
+  | '%'
+  | '='
+  | '<'
+  | '>'
+  | '<='
+  | '>='
+  | '<>'
+  | '!='
+  | '||'
+  | ':'
+  | '@'
+  | '$'
+
+CreateTriggerStmt
+  ::= ('CREATE' | 'create') (('TEMP' | 'temp') | ('TEMPORARY' | 'temporary'))? ('TRIGGER' | 'trigger') IfNotExists?
+      SchemaQualifier? TriggerName
+      (('BEFORE' | 'before') | ('AFTER' | 'after') | ('INSTEAD' | 'instead') ('OF' | 'of'))?
+      (('DELETE' | 'delete')
+      | ('INSERT' | 'insert')
+      | ('UPDATE' | 'update') (('OF' | 'of') ColumnName (',' ColumnName)*)?
+      )
+      ('ON' | 'on') TableName
+      (('FOR' | 'for') ('EACH' | 'each') ('ROW' | 'row'))?
+      (('WHEN' | 'when') Expr)?
+      ('BEGIN' | 'begin')
+      TriggerStep (';' TriggerStep)* ';'?
+      ('END' | 'end')
+
+TriggerStep
+  ::= UpdateStmt
+  | InsertStmt
+  | DeleteStmt
+  | SelectStmt
+
+DropIndexStmt
+  ::= ('DROP' | 'drop') ('INDEX' | 'index') IfExists? SchemaQualifier? IndexName
+
+DropTableStmt
+  ::= ('DROP' | 'drop') ('TABLE' | 'table') IfExists? SchemaQualifier? TableName
+
+DropTriggerStmt
+  ::= ('DROP' | 'drop') ('TRIGGER' | 'trigger') IfExists? SchemaQualifier? TriggerName
+
+DropViewStmt
+  ::= ('DROP' | 'drop') ('VIEW' | 'view') IfExists? SchemaQualifier? ViewName
+
+InsertStmt
+  ::= WithClause?
+      (('INSERT' | 'insert') ConflictModifier? | ('REPLACE' | 'replace'))
+      ('INTO' | 'into') SchemaQualifier? TableName
+      (('AS' | 'as') TableAlias)?
+      ('(' ColumnName (',' ColumnName)* ')')?
+      ( DefaultValues
+      | ValuesClause
+      | SelectStmt
+      )
+      UpsertClause*
+      ReturningClause?
+
+ConflictModifier ::= ('OR' | 'or') ConflictAction
+DefaultValues    ::= ('DEFAULT' | 'default') ('VALUES' | 'values')
+
+ValuesClause
+  ::= ('VALUES' | 'values') ParenthesizedExprList (',' ParenthesizedExprList)*
+
+ParenthesizedExprList ::= '(' Expr (',' Expr)* ')'
+
+UpsertClause
+  ::= ('ON' | 'on') ('CONFLICT' | 'conflict')
+      ('(' IndexedColumn (',' IndexedColumn)* ')' (('WHERE' | 'where') Expr)?)?
+      ('DO' | 'do')
+      ( ('NOTHING' | 'nothing')
+      | ('UPDATE' | 'update') ('SET' | 'set') UpdateAssignment (',' UpdateAssignment)*
+        (('WHERE' | 'where') Expr)?
+      )
+
+UpdateStmt
+  ::= WithClause?
+      ('UPDATE' | 'update') ConflictModifier?
+      QualifiedTableName
+      ('SET' | 'set') UpdateAssignment (',' UpdateAssignment)*
+      UpdateFromClause?
+      (('WHERE' | 'where') Expr)?
+      ReturningClause?
+      UpdateDeleteLimitClause?
+
+UpdateAssignment
+  ::= ColumnName '=' Expr
+  | '(' ColumnName (',' ColumnName)* ')' '=' Expr
+
+UpdateFromClause ::= ('FROM' | 'from') TableOrSubquery (',' TableOrSubquery)*
+
+DeleteStmt
+  ::= WithClause?
+      ('DELETE' | 'delete') ('FROM' | 'from') QualifiedTableName
+      (('WHERE' | 'where') Expr)?
+      ReturningClause?
+      UpdateDeleteLimitClause?
+
+UpdateDeleteLimitClause
+  ::= (('ORDER' | 'order') ('BY' | 'by') OrderingTerm (',' OrderingTerm)*)?
+      ('LIMIT' | 'limit') Expr
+      ( (('OFFSET' | 'offset') Expr) | (',' Expr) )?
+
+QualifiedTableName
+  ::= SchemaQualifier? TableName
+      ( ('INDEXED' | 'indexed') ('BY' | 'by') IndexName
+      | ('NOT' | 'not') ('INDEXED' | 'indexed')
+      )?
+
+ReturningClause
+  ::= ('RETURNING' | 'returning') ResultColumn (',' ResultColumn)*
+
+SelectStmt
+  ::= WithClause?
+      SelectCore
+      (CompoundOperator SelectCore)*
+      (('ORDER' | 'order') ('BY' | 'by') OrderingTerm (',' OrderingTerm)*)?
+      LimitClause?
+
+WithClause
+  ::= ('WITH' | 'with') ('RECURSIVE' | 'recursive')?
+      CommonTableExpression (',' CommonTableExpression)*
+
+CommonTableExpression
+  ::= TableName
+      ('(' ColumnName (',' ColumnName)* ')')?
+      ('AS' | 'as')
+      (('NOT' | 'not') ('MATERIALIZED' | 'materialized') | ('MATERIALIZED' | 'materialized'))?
+      '(' SelectStmt ')'
+
+SelectCore
+  ::= ('SELECT' | 'select') (('DISTINCT' | 'distinct') | ('ALL' | 'all'))?
+      ResultColumn (',' ResultColumn)*
+      FromClause?
+      (('WHERE' | 'where') Expr)?
+      GroupByClause?
+      WindowClause?
+  | ValuesClause
+
+FromClause
+  ::= ('FROM' | 'from') TableOrSubquery (',' TableOrSubquery)*
+  | ('FROM' | 'from') JoinClause
+
+GroupByClause
+  ::= ('GROUP' | 'group') ('BY' | 'by') Expr (',' Expr)*
+      (('HAVING' | 'having') Expr)?
+
+WindowClause
+  ::= ('WINDOW' | 'window') NamedWindow (',' NamedWindow)*
+
+NamedWindow ::= WindowName ('AS' | 'as') WindowDefn
+
+CompoundOperator
+  ::= ('UNION' | 'union') ('ALL' | 'all')?
+  | ('INTERSECT' | 'intersect')
+  | ('EXCEPT' | 'except')
+
+LimitClause
+  ::= ('LIMIT' | 'limit') Expr
+      ( (('OFFSET' | 'offset') Expr) | (',' Expr) )?
+
+ResultColumn
+  ::= '*'
+  | TableName '.' '*'
+  | Expr (('AS' | 'as')? ColumnAlias)?
+
+TableOrSubquery
+  ::= SchemaQualifier? TableFunctionName
+      '(' FunctionArguments? ')'
+      (('AS' | 'as')? TableAlias)?
+  | SchemaQualifier? TableName
+      (('AS' | 'as')? TableAlias)?
+      ( ('INDEXED' | 'indexed') ('BY' | 'by') IndexName
+      | ('NOT' | 'not') ('INDEXED' | 'indexed')
+      )?
+  | '(' SelectStmt ')' (('AS' | 'as')? TableAlias)?
+  | '(' JoinClause ')' (('AS' | 'as')? TableAlias)?
+  | '(' TableOrSubquery (',' TableOrSubquery)+ ')' (('AS' | 'as')? TableAlias)?
+
+JoinClause ::= TableOrSubquery (JoinOperator TableOrSubquery JoinConstraint?)*
+
+JoinOperator
+  ::= ','
+  | ('NATURAL' | 'natural')? (('LEFT' | 'left') | ('RIGHT' | 'right') | ('FULL' | 'full'))? ('OUTER' | 'outer')? ('JOIN' | 'join')
+  | ('INNER' | 'inner')? ('JOIN' | 'join')
+  | ('CROSS' | 'cross') ('JOIN' | 'join')
+
+JoinConstraint
+  ::= ('ON' | 'on') Expr
+  | ('USING' | 'using') '(' ColumnName (',' ColumnName)* ')'
+
+OrderingTerm
+  ::= Expr
+      (('COLLATE' | 'collate') CollationName)?
+      (('ASC' | 'asc') | ('DESC' | 'desc'))?
+      (('NULLS' | 'nulls') (('FIRST' | 'first') | ('LAST' | 'last')))?
+
+IndexedColumn
+  ::= (ColumnName | Expr)
+      (('COLLATE' | 'collate') CollationName)?
+      (('ASC' | 'asc') | ('DESC' | 'desc'))?
+
+WindowDefn
+  ::= '('
+      BaseWindowName?
+      (('PARTITION' | 'partition') ('BY' | 'by') Expr (',' Expr)*)?
+      (('ORDER' | 'order') ('BY' | 'by') OrderingTerm (',' OrderingTerm)*)?
+      FrameSpec?
+      ')'
+
+OverClause
+  ::= ('OVER' | 'over')
+      ( WindowName
+      | WindowDefn
+      )
+
+FilterClause ::= ('FILTER' | 'filter') '(' ('WHERE' | 'where') Expr ')'
+
+FrameSpec
+  ::= FrameUnit
+      FrameExtent
+      FrameExclude?
+
+FrameUnit ::= ('ROWS' | 'rows') | ('RANGE' | 'range') | ('GROUPS' | 'groups')
+
+FrameExtent
+  ::= FrameBoundary
+  | ('BETWEEN' | 'between') FrameBoundary ('AND' | 'and') FrameBoundary
+
+FrameBoundary
+  ::= ('UNBOUNDED' | 'unbounded') (('PRECEDING' | 'preceding') | ('FOLLOWING' | 'following'))
+  | ('CURRENT' | 'current') ('ROW' | 'row')
+  | Expr (('PRECEDING' | 'preceding') | ('FOLLOWING' | 'following'))
+
+FrameExclude
+  ::= ('EXCLUDE' | 'exclude') (('NO' | 'no') ('OTHERS' | 'others') | ('CURRENT' | 'current') ('ROW' | 'row') | ('GROUP' | 'group') | ('TIES' | 'ties'))
+
+// Expression grammar is factored by precedence for deterministic parser generation.
+
+Expr ::= OrExpr
+
+OrExpr ::= AndExpr (('OR' | 'or') AndExpr)*
+
+AndExpr ::= NotExpr (('AND' | 'and') NotExpr)*
+
+NotExpr ::= ('NOT' | 'not')* ComparisonExpr
+
+ComparisonExpr
+  ::= BitOrExpr ComparisonTail*
+
+ComparisonTail
+  ::= ComparisonOperator BitOrExpr
+  | ('IS' | 'is') ('NOT' | 'not')? (('DISTINCT' | 'distinct') ('FROM' | 'from'))? BitOrExpr
+  | ('ISNULL' | 'isnull')
+  | ('NOTNULL' | 'notnull')
+  | ('NOT' | 'not')? ('BETWEEN' | 'between') BitOrExpr ('AND' | 'and') BitOrExpr
+  | ('NOT' | 'not')? ('IN' | 'in') InRhs
+  | ('NOT' | 'not')? ('LIKE' | 'like') BitOrExpr (('ESCAPE' | 'escape') BitOrExpr)?
+  | ('NOT' | 'not')? ('GLOB' | 'glob') BitOrExpr
+  | ('NOT' | 'not')? ('REGEXP' | 'regexp') BitOrExpr
+  | ('NOT' | 'not')? ('MATCH' | 'match') BitOrExpr
+
+ComparisonOperator ::= '=' | '==' | '<>' | '!=' | '<' | '<=' | '>' | '>='
+
+InRhs
+  ::= '(' (SelectStmt | Expr (',' Expr)*)? ')'
+  | SchemaQualifier? TableFunctionName '(' FunctionArguments? ')'
+  | SchemaQualifier? TableName
+
+BitOrExpr ::= BitAndExpr ('|' BitAndExpr)*
+BitAndExpr ::= ShiftExpr ('&' ShiftExpr)*
+ShiftExpr ::= AddExpr (('<<' | '>>') AddExpr)*
+AddExpr ::= MultiplyExpr (('+' | '-') MultiplyExpr)*
+MultiplyExpr ::= ConcatExpr (('*' | '/' | '%') ConcatExpr)*
+ConcatExpr ::= UnaryExpr (('||' | '->' | '->>') UnaryExpr)*
+
+UnaryExpr
+  ::= ('+' | '-' | '~')* CollateExpr
+
+CollateExpr ::= PrimaryExpr (('COLLATE' | 'collate') CollationName)*
+
+PrimaryExpr
+  ::= LiteralValue
+  | BindParameter
+  | FunctionInvocation
+  | QualifiedColumnRef
+  | CastExpr
+  | CaseExpr
+  | ExistsExpr
+  | RaiseFunction
+  | '(' Expr ')'
+  | '(' SelectStmt ')'
+
+QualifiedColumnRef
+  ::= SchemaName '.' TableName '.' ColumnName
+  | TableName '.' ColumnName
+  | ColumnName
+
+FunctionInvocation
+  ::= FunctionName
+      '(' FunctionArguments? ')'
+      FilterClause?
+      OverClause?
+
+FunctionArguments
+  ::= '*'
+  | (('DISTINCT' | 'distinct') | ('ALL' | 'all'))? Expr (',' Expr)*
+    (('ORDER' | 'order') ('BY' | 'by') OrderingTerm (',' OrderingTerm)*)?
+
+CastExpr ::= ('CAST' | 'cast') '(' Expr ('AS' | 'as') TypeName ')'
+
+CaseExpr
+  ::= ('CASE' | 'case') Expr?
+      (('WHEN' | 'when') Expr ('THEN' | 'then') Expr)+
+      (('ELSE' | 'else') Expr)?
+      ('END' | 'end')
+
+ExistsExpr ::= ('EXISTS' | 'exists') '(' SelectStmt ')'
+
+RaiseFunction
+  ::= ('RAISE' | 'raise') '('
+      ( ('IGNORE' | 'ignore')
+      | (('ROLLBACK' | 'rollback') | ('ABORT' | 'abort') | ('FAIL' | 'fail')) ',' Expr
+      )
+      ')'
+
+LiteralValue
+  ::= NumericLiteral
+  | StringLiteral
+  | BlobLiteral
+  | ('NULL' | 'null')
+  | ('TRUE' | 'true')
+  | ('FALSE' | 'false')
+  | ('CURRENT_TIME' | 'current_time')
+  | ('CURRENT_DATE' | 'current_date')
+  | ('CURRENT_TIMESTAMP' | 'current_timestamp')
+
+SignedNumber ::= ('+' | '-')? NumericLiteral
+
+SchemaQualifier ::= SchemaName '.'
+QualifiedTableRef ::= SchemaQualifier? TableName
+
+IfExists    ::= ('IF' | 'if') ('EXISTS' | 'exists')
+IfNotExists ::= ('IF' | 'if') ('NOT' | 'not') ('EXISTS' | 'exists')
+
+// For this tREx-compatible grammar, bare keywords are not identifiers.
+// Use quoted identifiers when an object name coincides with a SQL keyword.
+Name              ::= Identifier
+SchemaName        ::= Name
+TableName         ::= Name
+TableOrIndexName  ::= Name
+IndexName         ::= Name
+ViewName          ::= Name
+TriggerName       ::= Name
+ColumnName        ::= Name
+ColumnAlias       ::= Name | StringLiteral
+TableAlias        ::= Name
+ConstraintName    ::= Name
+CollationName     ::= Name
+ForeignTable      ::= Name
+SavepointName     ::= Name
+PragmaName        ::= Name
+ModuleName        ::= Name
+TableFunctionName ::= Name
+FunctionName      ::= Name
+WindowName        ::= Name
+BaseWindowName    ::= Name
+Filename          ::= StringLiteral | Name
+
+<?TOKENS?>
+
+// SQL keywords are uppercase-only in this compatibility grammar.
+EOF ::= $
+
+Ignore ::= (WhiteSpace | LineComment | BlockComment)+
+           /* ws: definition */
+
+WhiteSpace ::= [#x9#xA#xD#x20]+
+
+NewLine ::= #xA
+          | #xD
+          | #xD #xA
+
+LineComment ::= '--' LineCommentChar* (NewLine | EOF)
+
+LineCommentChar ::= #x9
+                  | [#x20-#xD7FF]
+                  | [#xE000-#xFFFD]
+                  | [#x10000-#x10FFFF]
+
+BlockComment ::= '/*' BlockCommentBody* '*/'
+
+BlockCommentBody ::= (. - '*')
+                   | ('*' (. - '/'))
+
+Identifier ::= UnquotedIdentifier
+             | QuotedIdentifier
+             | BracketIdentifier
+             | BacktickIdentifier
+
+UnquotedIdentifier ::= IdentifierName
+
+IdentifierName ::= IdentifierStart IdentifierPart*
+
+IdentifierStart ::= [A-Z]
+                  | [a-z]
+                  | '_'
+                  | [#x80-#xD7FF]
+                  | [#xE000-#xFFFD]
+                  | [#x10000-#x10FFFF]
+
+IdentifierPart ::= IdentifierStart
+                 | [0-9]
+                 | '$'
+
+QuotedIdentifier ::= '"' QuotedIdentifierChar* '"'
+
+QuotedIdentifierChar ::= '""'
+                       | (. - '"')
+
+BracketIdentifier ::= '[' BracketIdentifierChar* ']'
+
+BracketIdentifierChar ::= . - ']'
+
+BacktickIdentifier ::= '`' BacktickIdentifierChar* '`'
+
+BacktickIdentifierChar ::= '``'
+                         | (. - '`')
+
+StringLiteral ::= "'" StringChar* "'"
+
+StringChar ::= "''"
+             | (. - "'")
+
+BlobLiteral ::= (('X' | 'x') | 'x') "'" HexDigit* "'" 
+
+NumericLiteral ::= HexInteger
+                 | DecimalNumber
+
+HexInteger ::= '0' (('X' | 'x') | 'x') HexDigit+
+
+DecimalNumber ::= Digit+ ('.' Digit*)? ExponentPart?
+                | '.' Digit+ ExponentPart?
+
+ExponentPart ::= (('E' | 'e') | 'e') ('+' | '-')? Digit+
+
+BindParameter ::= '?'
+                | '?' Digit+
+                | (':' | '@' | '$') ParameterName
+                | '$' ParameterName '::' ParameterName
+                  ('(' ParameterSuffixChar* ')')?
+
+ParameterName ::= IdentifierStart IdentifierPart*
+
+ParameterSuffixChar ::= . - ')'
+
+Digit ::= [0-9]
+
+HexDigit ::= [0-9A-Fa-f]

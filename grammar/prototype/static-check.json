@@ -1,0 +1,37 @@
+{
+  "line_count": 664,
+  "production_count": 161,
+  "undefined_candidate_references": [
+    "E",
+    "X"
+  ],
+  "equivalence_directives": [],
+  "syntax_terminal_plus_occurrences": [
+    {
+      "line": 650,
+      "text": "ExponentPart ::= ('E' | 'e') ('+' | '-')? Digit+"
+    }
+  ],
+  "contains_keyword_production": false,
+  "contains_kw_tokens": false,
+  "key_rules_present": {
+    "ExplainPrefix": true,
+    "ConflictAction": true,
+    "CastExpr": true,
+    "CaseExpr": true,
+    "ExistsExpr": true,
+    "GroupByClause": true,
+    "TableConstraint": true,
+    "ForeignKeyClause": true,
+    "WindowDefn": true,
+    "FrameSpec": true,
+    "AlterTableStmt": true,
+    "DropTableStmt": true,
+    "DropIndexStmt": true
+  },
+  "self_hosted_trex_parse": {
+    "status": "ok",
+    "token_count": 2138,
+    "consumed_token_count": 2138
+  }
+}

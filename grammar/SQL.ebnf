@@ -1,0 +1,916 @@
+// SQLite SQL grammar for MaiaCC / tREx
+// Official parse.y adapted to a non-left-recursive, tREx-friendly structure.
+
+SqlScript ::= StatementItem* EOF
+
+StatementItem ::= ';'+
+                | SqlStatement ';'*
+
+SqlStatement ::= ExplainPrefix? StatementCore
+
+StatementCore ::= TransactionStmt
+                | SavepointStmt
+                | ReleaseStmt
+                | SchemaStmt
+                | DataStmt
+                | UtilityStmt
+
+ExplainPrefix ::= KW_EXPLAIN (KW_QUERY KW_PLAN)?
+
+TransactionStmt ::= BeginStmt
+                  | CommitStmt
+                  | RollbackStmt
+
+BeginStmt ::= KW_BEGIN TransactionMode? TransactionKeyword?
+
+TransactionMode ::= KW_DEFERRED
+                  | KW_IMMEDIATE
+                  | KW_EXCLUSIVE
+
+TransactionKeyword ::= KW_TRANSACTION Name?
+
+CommitStmt ::= (KW_COMMIT | KW_END) TransactionKeyword?
+
+RollbackStmt ::= KW_ROLLBACK TransactionKeyword? RollbackTarget?
+
+RollbackTarget ::= KW_TO SavepointKeyword? Name
+
+SavepointStmt ::= KW_SAVEPOINT Name
+
+ReleaseStmt ::= KW_RELEASE SavepointKeyword? Name
+
+SavepointKeyword ::= KW_SAVEPOINT
+
+SchemaStmt ::= AlterTableStmt
+             | CreateTableStmt
+             | CreateIndexStmt
+             | CreateViewStmt
+             | CreateTriggerStmt
+             | CreateVirtualTableStmt
+             | DropTableStmt
+             | DropIndexStmt
+             | DropViewStmt
+             | DropTriggerStmt
+
+DataStmt ::= SelectStmt
+           | InsertStmt
+           | UpdateStmt
+           | DeleteStmt
+
+UtilityStmt ::= AnalyzeStmt
+              | AttachStmt
+              | DetachStmt
+              | PragmaStmt
+              | ReindexStmt
+              | VacuumStmt
+
+AnalyzeStmt ::= KW_ANALYZE AnalyzeTarget?
+
+AnalyzeTarget ::= QualifiedName
+                | Name
+
+AttachStmt ::= KW_ATTACH DatabaseKeyword? Expr KW_AS Expr KeyClause?
+
+DetachStmt ::= KW_DETACH DatabaseKeyword? Expr
+
+DatabaseKeyword ::= KW_DATABASE
+
+KeyClause ::= KW_KEY Expr
+
+VacuumStmt ::= KW_VACUUM Name? VacuumInto?
+
+VacuumInto ::= KW_INTO Expr
+
+ReindexStmt ::= KW_REINDEX ReindexTarget?
+
+ReindexTarget ::= QualifiedName
+                | Name
+
+PragmaStmt ::= KW_PRAGMA QualifiedPragmaName PragmaAssignment?
+
+QualifiedPragmaName ::= Name
+                      | Name '.' Name
+
+PragmaAssignment ::= '=' PragmaValue
+                   | '(' PragmaValue ')'
+
+PragmaValue ::= SignedNumber
+              | LiteralValue
+              | Name
+              | KW_ON
+              | KW_OFF
+              | KW_TRUE
+              | KW_FALSE
+              | KW_YES
+              | KW_NO
+              | KW_DELETE
+              | KW_DEFAULT
+
+AlterTableStmt ::= KW_ALTER KW_TABLE QualifiedName AlterTableAction
+
+AlterTableAction ::= KW_RENAME KW_TO Name
+                   | KW_RENAME ColumnKeyword? Name KW_TO Name
+                   | KW_ADD ColumnKeyword? ColumnDef
+                   | KW_DROP ColumnKeyword? Name
+
+ColumnKeyword ::= KW_COLUMN
+
+CreateTableStmt ::= KW_CREATE TempOpt KW_TABLE IfNotExists QualifiedName CreateTableBody
+
+TempOpt ::= KW_TEMP
+          | KW_TEMPORARY
+          |
+
+IfNotExists ::= KW_IF KW_NOT KW_EXISTS
+              |
+
+IfExists ::= KW_IF KW_EXISTS
+           |
+
+CreateTableBody ::= '(' TableElementList? ')' TableOptionsOpt
+                  | KW_AS SelectStmt
+
+TableElementList ::= TableElement (',' TableElement)*
+
+TableElement ::= ColumnDef
+               | TableConstraint
+
+TableOptionsOpt ::= TableOptions
+                  |
+
+TableOptions ::= TableOption (',' TableOption)*
+
+TableOption ::= KW_WITHOUT KW_ROWID
+              | KW_STRICT
+
+ColumnDef ::= Name TypeSpec? ColumnConstraint*
+
+TypeSpec ::= TypeWord+ TypeSizeOpt
+
+TypeWord ::= Identifier
+           | StringLiteral
+
+TypeSizeOpt ::= '(' SignedNumber (',' SignedNumber)? ')'
+              |
+
+ColumnConstraint ::= ConstraintNameOpt ColumnConstraintBody
+
+ConstraintNameOpt ::= KW_CONSTRAINT Name
+                    |
+
+ColumnConstraintBody ::= KW_PRIMARY KW_KEY SortOrderOpt ConflictClauseOpt AutoIncrementOpt
+                       | KW_NOT KW_NULL ConflictClauseOpt
+                       | KW_UNIQUE ConflictClauseOpt
+                       | KW_CHECK '(' Expr ')'
+                       | KW_DEFAULT DefaultValueExpr
+                       | KW_COLLATE Name
+                       | ForeignKeyClause
+                       | GeneratedColumnConstraint
+
+DefaultValueExpr ::= SignedNumber
+                   | LiteralValue
+                   | '(' Expr ')'
+
+AutoIncrementOpt ::= KW_AUTOINCREMENT
+                   |
+
+GeneratedColumnConstraint ::= KW_GENERATED GeneratedAlwaysOpt KW_AS '(' Expr ')' StorageKindOpt
+                            | KW_AS '(' Expr ')' StorageKindOpt
+
+GeneratedAlwaysOpt ::= KW_ALWAYS
+                     |
+
+StorageKindOpt ::= KW_STORED
+                 | KW_VIRTUAL
+                 |
+
+TableConstraint ::= ConstraintNameOpt TableConstraintBody
+
+TableConstraintBody ::= (KW_PRIMARY KW_KEY | KW_UNIQUE) '(' IndexedColumnList ')' ConflictClauseOpt
+                      | KW_CHECK '(' Expr ')'
+                      | KW_FOREIGN KW_KEY '(' NameList ')' ForeignKeyClause
+
+IndexedColumnList ::= IndexedColumn (',' IndexedColumn)*
+
+IndexedColumn ::= Expr CollateOpt SortOrderOpt
+
+CollateOpt ::= KW_COLLATE Name
+             |
+
+SortOrderOpt ::= KW_ASC
+               | KW_DESC
+               |
+
+ConflictClauseOpt ::= KW_ON KW_CONFLICT ConflictAction
+                    |
+
+ConflictAction ::= KW_ROLLBACK
+                 | KW_ABORT
+                 | KW_FAIL
+                 | KW_IGNORE
+                 | KW_REPLACE
+
+ForeignKeyClause ::= KW_REFERENCES Name ForeignKeyColumns? ForeignKeyArg*
+
+ForeignKeyColumns ::= '(' NameList ')'
+
+ForeignKeyArg ::= ForeignKeyAction
+                | ForeignKeyMatch
+                | ForeignKeyDeferrable
+
+ForeignKeyAction ::= KW_ON (KW_DELETE | KW_UPDATE | KW_INSERT) RefAction
+
+RefAction ::= KW_SET KW_NULL
+            | KW_SET KW_DEFAULT
+            | KW_CASCADE
+            | KW_RESTRICT
+            | KW_NO KW_ACTION
+
+ForeignKeyMatch ::= KW_MATCH Name
+
+ForeignKeyDeferrable ::= KW_DEFERRABLE InitiallyOpt
+                       | KW_NOT KW_DEFERRABLE InitiallyOpt
+
+InitiallyOpt ::= KW_INITIALLY (KW_DEFERRED | KW_IMMEDIATE)
+               |
+
+CreateIndexStmt ::= KW_CREATE UniqueOpt KW_INDEX IfNotExists QualifiedName
+                    KW_ON QualifiedName '(' IndexedColumnList ')' WhereClauseOpt
+
+UniqueOpt ::= KW_UNIQUE
+            |
+
+DropIndexStmt ::= KW_DROP KW_INDEX IfExists QualifiedName
+
+DropTableStmt ::= KW_DROP KW_TABLE IfExists QualifiedName
+
+CreateViewStmt ::= KW_CREATE TempOpt KW_VIEW IfNotExists QualifiedName ViewColumnListOpt KW_AS SelectStmt
+
+ViewColumnListOpt ::= '(' NameList ')'
+                    |
+
+DropViewStmt ::= KW_DROP KW_VIEW IfExists QualifiedName
+
+CreateTriggerStmt ::= KW_CREATE TempOpt KW_TRIGGER IfNotExists QualifiedName
+                      TriggerTimeOpt TriggerEvent KW_ON QualifiedName
+                      ForEachRowOpt WhenClauseOpt
+                      KW_BEGIN TriggerStepList KW_END
+
+TriggerTimeOpt ::= KW_BEFORE
+                 | KW_AFTER
+                 | KW_INSTEAD KW_OF
+                 |
+
+TriggerEvent ::= KW_DELETE
+               | KW_INSERT
+               | KW_UPDATE TriggerUpdateOfOpt
+
+TriggerUpdateOfOpt ::= KW_OF NameList
+                     |
+
+ForEachRowOpt ::= KW_FOR KW_EACH KW_ROW
+                |
+
+WhenClauseOpt ::= KW_WHEN Expr
+                |
+
+TriggerStepList ::= TriggerStep (';' TriggerStep)* ';'?
+
+TriggerStep ::= UpdateStmt
+              | InsertStmt
+              | DeleteStmt
+              | SelectStmt
+
+DropTriggerStmt ::= KW_DROP KW_TRIGGER IfExists QualifiedName
+
+CreateVirtualTableStmt ::= KW_CREATE KW_VIRTUAL KW_TABLE IfNotExists QualifiedName
+                           KW_USING Name ModuleArgumentsOpt
+
+ModuleArgumentsOpt ::= '(' ModuleArgument (',' ModuleArgument)* ')'
+                     |
+
+ModuleArgument ::= ModuleArgToken+
+
+ModuleArgToken ::= Identifier
+                 | NumericLiteral
+                 | StringLiteral
+                 | BlobLiteral
+                 | BindParameter
+                 | '.'
+                 | '+'
+                 | '-'
+                 | '*'
+                 | '/'
+                 | '%'
+                 | '='
+                 | '<'
+                 | '>'
+                 | '<='
+                 | '>='
+                 | '<>'
+                 | '!='
+                 | '||'
+                 | ':'
+                 | '@'
+                 | '$'
+
+SelectStmt ::= WithClauseOpt SelectNoWith
+
+WithClauseOpt ::= WithClause
+                |
+
+WithClause ::= KW_WITH RecursiveOpt CommonTableExpression (',' CommonTableExpression)*
+
+RecursiveOpt ::= KW_RECURSIVE
+               |
+
+CommonTableExpression ::= Name ColumnNameListOpt KW_AS MaterializedOpt '(' SelectStmt ')'
+
+ColumnNameListOpt ::= '(' NameList ')'
+                    |
+
+MaterializedOpt ::= KW_NOT KW_MATERIALIZED
+                  | KW_MATERIALIZED
+                  |
+
+SelectNoWith ::= SelectCore (CompoundOperator SelectCore)* OrderByClauseOpt LimitClauseOpt
+
+SelectCore ::= SimpleSelect
+             | ValuesClause
+
+SimpleSelect ::= KW_SELECT DistinctOpt ResultColumnList FromClauseOpt WhereClauseOpt GroupByClauseOpt HavingClauseOpt WindowClauseOpt
+
+DistinctOpt ::= KW_DISTINCT
+              | KW_ALL
+              |
+
+ResultColumnList ::= ResultColumn (',' ResultColumn)*
+
+ResultColumn ::= '*'
+               | Name '.' '*'
+               | Expr ResultAliasOpt
+
+ResultAliasOpt ::= KW_AS Name
+                 | Name
+                 |
+
+FromClauseOpt ::= FromClause
+                |
+
+FromClause ::= KW_FROM JoinSource
+
+JoinSource ::= TableTerm JoinContinuation*
+
+JoinContinuation ::= ',' TableTerm
+                   | JoinOperator TableTerm JoinConstraintOpt
+
+TableTerm ::= QualifiedName '(' ExprListOpt ')' AliasOpt
+            | QualifiedName AliasOpt IndexedByOpt
+            | '(' SelectStmt ')' AliasOpt
+            | '(' JoinSource ')' AliasOpt
+
+AliasOpt ::= KW_AS Name
+           | Name
+           |
+
+IndexedByOpt ::= KW_INDEXED KW_BY Name
+               | KW_NOT KW_INDEXED
+               |
+
+JoinOperator ::= JoinPrefixOpt KW_JOIN
+               | KW_CROSS KW_JOIN
+
+JoinPrefixOpt ::= KW_NATURAL JoinTypeOpt OuterOpt
+                | JoinTypeOpt OuterOpt
+                | KW_INNER
+
+JoinTypeOpt ::= KW_LEFT
+              | KW_RIGHT
+              | KW_FULL
+              |
+
+OuterOpt ::= KW_OUTER
+           |
+
+JoinConstraintOpt ::= JoinConstraint
+                    |
+
+JoinConstraint ::= KW_ON Expr
+                 | KW_USING '(' NameList ')'
+
+WhereClauseOpt ::= KW_WHERE Expr
+                 |
+
+GroupByClauseOpt ::= KW_GROUP KW_BY ExprList
+                   |
+
+HavingClauseOpt ::= KW_HAVING Expr
+                  |
+
+WindowClauseOpt ::= KW_WINDOW NamedWindow (',' NamedWindow)*
+                  |
+
+NamedWindow ::= Name KW_AS WindowDefn
+
+WindowDefn ::= '(' BaseWindowNameOpt PartitionClauseOpt OrderByClauseOpt FrameClauseOpt ')'
+
+BaseWindowNameOpt ::= Name
+                    |
+
+PartitionClauseOpt ::= KW_PARTITION KW_BY ExprList
+                     |
+
+FrameClauseOpt ::= FrameClause
+                 |
+
+FrameClause ::= FrameUnit FrameSpec FrameExcludeOpt
+
+FrameUnit ::= KW_ROWS
+            | KW_RANGE
+            | KW_GROUPS
+
+FrameSpec ::= FrameBoundary
+            | KW_BETWEEN FrameBoundary KW_AND FrameBoundary
+
+FrameBoundary ::= KW_UNBOUNDED KW_PRECEDING
+                | KW_UNBOUNDED KW_FOLLOWING
+                | KW_CURRENT KW_ROW
+                | Expr KW_PRECEDING
+                | Expr KW_FOLLOWING
+
+FrameExcludeOpt ::= KW_EXCLUDE FrameExcludeMode
+                  |
+
+FrameExcludeMode ::= KW_NO KW_OTHERS
+                   | KW_CURRENT KW_ROW
+                   | KW_GROUP
+                   | KW_TIES
+
+CompoundOperator ::= KW_UNION AllOpt
+                   | KW_INTERSECT
+                   | KW_EXCEPT
+
+AllOpt ::= KW_ALL
+         |
+
+OrderByClauseOpt ::= OrderByClause
+                   |
+
+OrderByClause ::= KW_ORDER KW_BY OrderingTerm (',' OrderingTerm)*
+
+OrderingTerm ::= Expr CollateOpt SortOrderOpt NullsOrderOpt
+
+NullsOrderOpt ::= KW_NULLS (KW_FIRST | KW_LAST)
+                |
+
+LimitClauseOpt ::= LimitClause
+                 |
+
+LimitClause ::= KW_LIMIT Expr LimitTailOpt
+
+LimitTailOpt ::= KW_OFFSET Expr
+               | ',' Expr
+               |
+
+ValuesClause ::= KW_VALUES ValueRow (',' ValueRow)*
+
+ValueRow ::= '(' ExprListOpt ')'
+
+InsertStmt ::= WithClauseOpt InsertVerb KW_INTO QualifiedName AliasOpt ColumnNameListOpt
+               InsertSource UpsertClause* ReturningClauseOpt
+
+InsertVerb ::= KW_INSERT ConflictModifierOpt
+             | KW_REPLACE
+
+ConflictModifierOpt ::= KW_OR ConflictAction
+                      |
+
+InsertSource ::= DefaultValues
+               | ValuesClause
+               | SelectStmt
+
+DefaultValues ::= KW_DEFAULT KW_VALUES
+
+UpsertClause ::= KW_ON KW_CONFLICT UpsertTargetOpt KW_DO UpsertAction
+
+UpsertTargetOpt ::= '(' IndexedColumnList ')' WhereClauseOpt
+                  |
+
+UpsertAction ::= KW_NOTHING
+               | KW_UPDATE KW_SET UpdateAssignmentList WhereClauseOpt
+
+ReturningClauseOpt ::= ReturningClause
+                     |
+
+ReturningClause ::= KW_RETURNING ResultColumnList
+
+UpdateStmt ::= WithClauseOpt KW_UPDATE ConflictModifierOpt QualifiedTableName
+               KW_SET UpdateAssignmentList UpdateFromOpt WhereClauseOpt ReturningClauseOpt OrderByClauseOpt LimitClauseOpt
+
+QualifiedTableName ::= QualifiedName IndexedByOpt
+
+UpdateAssignmentList ::= UpdateAssignment (',' UpdateAssignment)*
+
+UpdateAssignment ::= Name '=' Expr
+                   | '(' NameList ')' '=' Expr
+
+UpdateFromOpt ::= KW_FROM JoinSource
+                |
+
+DeleteStmt ::= WithClauseOpt KW_DELETE KW_FROM QualifiedTableName
+               WhereClauseOpt ReturningClauseOpt OrderByClauseOpt LimitClauseOpt
+
+ExprListOpt ::= ExprList
+              |
+
+ExprList ::= Expr (',' Expr)*
+
+NameList ::= Name (',' Name)*
+
+Expr ::= OrExpr
+
+OrExpr ::= AndExpr (KW_OR AndExpr)*
+
+AndExpr ::= NotExpr (KW_AND NotExpr)*
+
+NotExpr ::= KW_NOT* PredicateExpr
+
+PredicateExpr ::= BitOrExpr PredicateSuffix*
+
+PredicateSuffix ::= ComparisonOperator BitOrExpr
+                  | KW_IS IsPredicateRhs
+                  | KW_ISNULL
+                  | KW_NOTNULL
+                  | KW_NOT KW_NULL
+                  | KW_BETWEEN BitOrExpr KW_AND BitOrExpr
+                  | KW_NOT KW_BETWEEN BitOrExpr KW_AND BitOrExpr
+                  | KW_IN InRhs
+                  | KW_NOT KW_IN InRhs
+                  | KW_LIKE BitOrExpr EscapeOpt
+                  | KW_NOT KW_LIKE BitOrExpr EscapeOpt
+                  | KW_GLOB BitOrExpr
+                  | KW_NOT KW_GLOB BitOrExpr
+                  | KW_MATCH BitOrExpr
+                  | KW_NOT KW_MATCH BitOrExpr
+                  | KW_REGEXP BitOrExpr
+                  | KW_NOT KW_REGEXP BitOrExpr
+
+IsPredicateRhs ::= KW_NOT DistinctFromOrExpr
+                 | DistinctFromOrExpr
+
+DistinctFromOrExpr ::= KW_DISTINCT KW_FROM BitOrExpr
+                     | KW_NULL
+                     | BitOrExpr
+
+EscapeOpt ::= KW_ESCAPE BitOrExpr
+            |
+
+ComparisonOperator ::= '='
+                     | '=='
+                     | '<>'
+                     | '!='
+                     | '<'
+                     | '<='
+                     | '>'
+                     | '>='
+
+InRhs ::= '(' SelectStmt ')'
+        | '(' ExprListOpt ')'
+        | QualifiedName
+        | QualifiedName '(' ExprListOpt ')'
+
+BitOrExpr ::= BitAndExpr ('|' BitAndExpr)*
+
+BitAndExpr ::= ShiftExpr ('&' ShiftExpr)*
+
+ShiftExpr ::= AddExpr (('<<' | '>>') AddExpr)*
+
+AddExpr ::= MultiplyExpr (('+' | '-') MultiplyExpr)*
+
+MultiplyExpr ::= ConcatExpr (('*' | '/' | '%') ConcatExpr)*
+
+ConcatExpr ::= UnaryExpr (('||' | '->' | '->>') UnaryExpr)*
+
+UnaryExpr ::= PrefixOperator* CollateExpr
+
+PrefixOperator ::= '+'
+                 | '-'
+                 | '~'
+
+CollateExpr ::= PrimaryExpr (KW_COLLATE Name)*
+
+PrimaryExpr ::= FunctionInvocation
+              | CastExpr
+              | CaseExpr
+              | ExistsExpr
+              | RaiseFunction
+              | LiteralValue
+              | BindParameter
+              | ColumnRef
+              | '(' Expr ')'
+              | '(' SelectStmt ')'
+
+ColumnRef ::= Name
+            | Name '.' Name
+            | Name '.' Name '.' Name
+
+FunctionInvocation ::= Name '(' FunctionArgumentsOpt ')' FilterClauseOpt OverClauseOpt
+
+FunctionArgumentsOpt ::= FunctionArguments
+                       |
+
+FunctionArguments ::= '*'
+                    | FunctionArgPrefixOpt ExprList FunctionOrderByOpt
+
+FunctionArgPrefixOpt ::= KW_DISTINCT
+                       | KW_ALL
+                       |
+
+FunctionOrderByOpt ::= OrderByClause
+                     |
+
+FilterClauseOpt ::= KW_FILTER '(' KW_WHERE Expr ')'
+                  |
+
+OverClauseOpt ::= KW_OVER WindowReference
+                |
+
+WindowReference ::= Name
+                  | WindowDefn
+
+CastExpr ::= KW_CAST '(' Expr KW_AS TypeSpec ')'
+
+CaseExpr ::= KW_CASE Expr? WhenThenList ElseOpt KW_END
+
+WhenThenList ::= WhenThenPair+
+
+WhenThenPair ::= KW_WHEN Expr KW_THEN Expr
+
+ElseOpt ::= KW_ELSE Expr
+          |
+
+ExistsExpr ::= KW_EXISTS '(' SelectStmt ')'
+
+RaiseFunction ::= KW_RAISE '(' RaiseArgument ')'
+
+RaiseArgument ::= KW_IGNORE
+                | RaiseAction ',' Expr
+
+RaiseAction ::= KW_ROLLBACK
+              | KW_ABORT
+              | KW_FAIL
+
+LiteralValue ::= NumericLiteral
+               | StringLiteral
+               | BlobLiteral
+               | KW_NULL
+               | KW_TRUE
+               | KW_FALSE
+               | KW_CURRENT_TIME
+               | KW_CURRENT_DATE
+               | KW_CURRENT_TIMESTAMP
+
+SignedNumber ::= ('+' | '-')? NumericLiteral
+
+QualifiedName ::= Name
+                | Name '.' Name
+
+Name ::= Identifier
+       | StringLiteral
+
+<?TOKENS?>
+
+EOF ::= $
+
+KW_ABORT ::= 'ABORT'
+KW_ACTION ::= 'ACTION'
+KW_ADD ::= 'ADD'
+KW_AFTER ::= 'AFTER'
+KW_ALL ::= 'ALL'
+KW_ALWAYS ::= 'ALWAYS'
+KW_ALTER ::= 'ALTER'
+KW_ANALYZE ::= 'ANALYZE'
+KW_AND ::= 'AND'
+KW_AS ::= 'AS'
+KW_ASC ::= 'ASC'
+KW_ATTACH ::= 'ATTACH'
+KW_AUTOINCREMENT ::= 'AUTOINCREMENT'
+KW_BEFORE ::= 'BEFORE'
+KW_BEGIN ::= 'BEGIN'
+KW_BETWEEN ::= 'BETWEEN'
+KW_BY ::= 'BY'
+KW_CASCADE ::= 'CASCADE'
+KW_CASE ::= 'CASE'
+KW_CAST ::= 'CAST'
+KW_CHECK ::= 'CHECK'
+KW_COLLATE ::= 'COLLATE'
+KW_COLUMN ::= 'COLUMN'
+KW_COMMIT ::= 'COMMIT'
+KW_CONFLICT ::= 'CONFLICT'
+KW_CONSTRAINT ::= 'CONSTRAINT'
+KW_CREATE ::= 'CREATE'
+KW_CROSS ::= 'CROSS'
+KW_CURRENT ::= 'CURRENT'
+KW_CURRENT_DATE ::= 'CURRENT_DATE'
+KW_CURRENT_TIME ::= 'CURRENT_TIME'
+KW_CURRENT_TIMESTAMP ::= 'CURRENT_TIMESTAMP'
+KW_DATABASE ::= 'DATABASE'
+KW_DEFAULT ::= 'DEFAULT'
+KW_DEFERRABLE ::= 'DEFERRABLE'
+KW_DEFERRED ::= 'DEFERRED'
+KW_DELETE ::= 'DELETE'
+KW_DESC ::= 'DESC'
+KW_DETACH ::= 'DETACH'
+KW_DISTINCT ::= 'DISTINCT'
+KW_DO ::= 'DO'
+KW_DROP ::= 'DROP'
+KW_EACH ::= 'EACH'
+KW_ELSE ::= 'ELSE'
+KW_END ::= 'END'
+KW_ESCAPE ::= 'ESCAPE'
+KW_EXCEPT ::= 'EXCEPT'
+KW_EXCLUSIVE ::= 'EXCLUSIVE'
+KW_EXISTS ::= 'EXISTS'
+KW_EXPLAIN ::= 'EXPLAIN'
+KW_FAIL ::= 'FAIL'
+KW_FALSE ::= 'FALSE'
+KW_FILTER ::= 'FILTER'
+KW_FIRST ::= 'FIRST'
+KW_FOLLOWING ::= 'FOLLOWING'
+KW_FOR ::= 'FOR'
+KW_FOREIGN ::= 'FOREIGN'
+KW_FROM ::= 'FROM'
+KW_FULL ::= 'FULL'
+KW_GENERATED ::= 'GENERATED'
+KW_GLOB ::= 'GLOB'
+KW_GROUP ::= 'GROUP'
+KW_GROUPS ::= 'GROUPS'
+KW_HAVING ::= 'HAVING'
+KW_IF ::= 'IF'
+KW_IGNORE ::= 'IGNORE'
+KW_IMMEDIATE ::= 'IMMEDIATE'
+KW_IN ::= 'IN'
+KW_INDEX ::= 'INDEX'
+KW_INDEXED ::= 'INDEXED'
+KW_INITIALLY ::= 'INITIALLY'
+KW_INNER ::= 'INNER'
+KW_INSERT ::= 'INSERT'
+KW_INSTEAD ::= 'INSTEAD'
+KW_INTERSECT ::= 'INTERSECT'
+KW_INTO ::= 'INTO'
+KW_IS ::= 'IS'
+KW_ISNULL ::= 'ISNULL'
+KW_JOIN ::= 'JOIN'
+KW_KEY ::= 'KEY'
+KW_LAST ::= 'LAST'
+KW_LEFT ::= 'LEFT'
+KW_LIKE ::= 'LIKE'
+KW_LIMIT ::= 'LIMIT'
+KW_MATCH ::= 'MATCH'
+KW_MATERIALIZED ::= 'MATERIALIZED'
+KW_NO ::= 'NO'
+KW_NOT ::= 'NOT'
+KW_NOTHING ::= 'NOTHING'
+KW_NOTNULL ::= 'NOTNULL'
+KW_NULL ::= 'NULL'
+KW_NULLS ::= 'NULLS'
+KW_OF ::= 'OF'
+KW_OFF ::= 'OFF'
+KW_OFFSET ::= 'OFFSET'
+KW_ON ::= 'ON'
+KW_OR ::= 'OR'
+KW_ORDER ::= 'ORDER'
+KW_OTHERS ::= 'OTHERS'
+KW_OUTER ::= 'OUTER'
+KW_OVER ::= 'OVER'
+KW_PARTITION ::= 'PARTITION'
+KW_PLAN ::= 'PLAN'
+KW_PRAGMA ::= 'PRAGMA'
+KW_PRECEDING ::= 'PRECEDING'
+KW_PRIMARY ::= 'PRIMARY'
+KW_QUERY ::= 'QUERY'
+KW_RAISE ::= 'RAISE'
+KW_RANGE ::= 'RANGE'
+KW_RECURSIVE ::= 'RECURSIVE'
+KW_REFERENCES ::= 'REFERENCES'
+KW_REGEXP ::= 'REGEXP'
+KW_REINDEX ::= 'REINDEX'
+KW_RELEASE ::= 'RELEASE'
+KW_RENAME ::= 'RENAME'
+KW_REPLACE ::= 'REPLACE'
+KW_RESTRICT ::= 'RESTRICT'
+KW_RETURNING ::= 'RETURNING'
+KW_RIGHT ::= 'RIGHT'
+KW_ROLLBACK ::= 'ROLLBACK'
+KW_ROW ::= 'ROW'
+KW_ROWID ::= 'ROWID'
+KW_ROWS ::= 'ROWS'
+KW_SAVEPOINT ::= 'SAVEPOINT'
+KW_SELECT ::= 'SELECT'
+KW_SET ::= 'SET'
+KW_STORED ::= 'STORED'
+KW_STRICT ::= 'STRICT'
+KW_TABLE ::= 'TABLE'
+KW_TEMP ::= 'TEMP'
+KW_TEMPORARY ::= 'TEMPORARY'
+KW_THEN ::= 'THEN'
+KW_TIES ::= 'TIES'
+KW_TO ::= 'TO'
+KW_TRANSACTION ::= 'TRANSACTION'
+KW_TRIGGER ::= 'TRIGGER'
+KW_TRUE ::= 'TRUE'
+KW_UNBOUNDED ::= 'UNBOUNDED'
+KW_UNION ::= 'UNION'
+KW_UNIQUE ::= 'UNIQUE'
+KW_UPDATE ::= 'UPDATE'
+KW_USING ::= 'USING'
+KW_VACUUM ::= 'VACUUM'
+KW_VALUES ::= 'VALUES'
+KW_VIEW ::= 'VIEW'
+KW_VIRTUAL ::= 'VIRTUAL'
+KW_WHEN ::= 'WHEN'
+KW_WHERE ::= 'WHERE'
+KW_WINDOW ::= 'WINDOW'
+KW_WITH ::= 'WITH'
+KW_WITHOUT ::= 'WITHOUT'
+KW_YES ::= 'YES'
+
+Ignore ::= (WhiteSpace | LineComment | BlockComment)+
+           /* ws: definition */
+
+WhiteSpace ::= [#x9#xA#xD#x20]+
+
+NewLine ::= #xD #xA
+          | #xA
+          | #xD
+
+LineComment ::= '--' LineCommentChar* (NewLine | EOF)
+
+LineCommentChar ::= #x9
+                  | [#x20-#xD7FF]
+                  | [#xE000-#xFFFD]
+                  | [#x10000-#x10FFFF]
+
+BlockComment ::= '/*' BlockCommentChunk* '*/'
+
+BlockCommentChunk ::= (. - '*')+
+                    | ('*' (. - '/'))
+
+Identifier ::= BareIdentifier
+             | QuotedIdentifier
+             | BracketIdentifier
+             | BacktickIdentifier
+
+BareIdentifier ::= IdentifierStart IdentifierPart*
+
+IdentifierStart ::= [A-Z]
+                  | [a-z]
+                  | '_'
+
+IdentifierPart ::= IdentifierStart
+                 | [0-9]
+                 | '$'
+
+QuotedIdentifier ::= '"' QuotedIdentifierChar* '"'
+
+QuotedIdentifierChar ::= '""'
+                       | (. - '"')
+
+BracketIdentifier ::= '[' BracketIdentifierChar* ']'
+
+BracketIdentifierChar ::= . - ']'
+
+BacktickIdentifier ::= '`' BacktickIdentifierChar* '`'
+
+BacktickIdentifierChar ::= '``'
+                         | (. - '`')
+
+StringLiteral ::= "'" StringChar* "'"
+
+StringChar ::= "''"
+             | (. - "'")
+
+BlobLiteral ::= X_ "'" HexDigit* "'"
+
+NumericLiteral ::= HexInteger
+                 | DecimalNumber
+
+HexInteger ::= '0' X_ HexDigit+
+
+DecimalNumber ::= Digit+ ('.' Digit*)? ExponentPart?
+                | '.' Digit+ ExponentPart?
+
+ExponentPart ::= E_ ('+' | '-')? Digit+
+
+BindParameter ::= '?'
+                | '?' Digit+
+                | (':' | '@' | '$') ParameterName
+                | '$' ParameterName '::' ParameterName ('(' ParameterSuffixChar* ')')?
+
+ParameterName ::= IdentifierStart IdentifierPart*
+
+ParameterSuffixChar ::= . - ')'
+
+Digit ::= [0-9]
+
+HexDigit ::= [0-9A-Fa-f]
