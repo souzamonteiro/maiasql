@@ -1,0 +1,1749 @@
+OK operator-test.sql root=SqlScript tokens=39
+{
+  "kind": "nonterminal",
+  "name": "SqlScript",
+  "children": [
+    {
+      "kind": "nonterminal",
+      "name": "SqlStatement",
+      "children": [
+        {
+          "kind": "nonterminal",
+          "name": "SelectStmt",
+          "children": [
+            {
+              "kind": "nonterminal",
+              "name": "SelectCore",
+              "children": [
+                {
+                  "kind": "terminal",
+                  "token": "KW_SELECT",
+                  "value": "SELECT",
+                  "tokenIndex": 0
+                },
+                {
+                  "kind": "nonterminal",
+                  "name": "ResultColumn",
+                  "children": [
+                    {
+                      "kind": "nonterminal",
+                      "name": "Expr",
+                      "children": [
+                        {
+                          "kind": "nonterminal",
+                          "name": "OrExpr",
+                          "children": [
+                            {
+                              "kind": "nonterminal",
+                              "name": "AndExpr",
+                              "children": [
+                                {
+                                  "kind": "nonterminal",
+                                  "name": "NotExpr",
+                                  "children": [
+                                    {
+                                      "kind": "nonterminal",
+                                      "name": "PredicateExpr",
+                                      "children": [
+                                        {
+                                          "kind": "nonterminal",
+                                          "name": "EqualityExpr",
+                                          "children": [
+                                            {
+                                              "kind": "nonterminal",
+                                              "name": "RelationalExpr",
+                                              "children": [
+                                                {
+                                                  "kind": "nonterminal",
+                                                  "name": "BitwiseExpr",
+                                                  "children": [
+                                                    {
+                                                      "kind": "nonterminal",
+                                                      "name": "AddExpr",
+                                                      "children": [
+                                                        {
+                                                          "kind": "nonterminal",
+                                                          "name": "MultiplyExpr",
+                                                          "children": [
+                                                            {
+                                                              "kind": "nonterminal",
+                                                              "name": "ConcatExpr",
+                                                              "children": [
+                                                                {
+                                                                  "kind": "nonterminal",
+                                                                  "name": "CollateExpr",
+                                                                  "children": [
+                                                                    {
+                                                                      "kind": "nonterminal",
+                                                                      "name": "UnaryExpr",
+                                                                      "children": [
+                                                                        {
+                                                                          "kind": "nonterminal",
+                                                                          "name": "PrimaryExpr",
+                                                                          "children": [
+                                                                            {
+                                                                              "kind": "nonterminal",
+                                                                              "name": "LiteralValue",
+                                                                              "children": [
+                                                                                {
+                                                                                  "kind": "terminal",
+                                                                                  "token": "NumericLiteral",
+                                                                                  "value": "1",
+                                                                                  "tokenIndex": 1
+                                                                                }
+                                                                              ],
+                                                                              "startToken": 1,
+                                                                              "endToken": 2
+                                                                            }
+                                                                          ],
+                                                                          "startToken": 1,
+                                                                          "endToken": 2
+                                                                        }
+                                                                      ],
+                                                                      "startToken": 1,
+                                                                      "endToken": 2
+                                                                    }
+                                                                  ],
+                                                                  "startToken": 1,
+                                                                  "endToken": 2
+                                                                }
+                                                              ],
+                                                              "startToken": 1,
+                                                              "endToken": 2
+                                                            }
+                                                          ],
+                                                          "startToken": 1,
+                                                          "endToken": 2
+                                                        },
+                                                        {
+                                                          "kind": "terminal",
+                                                          "token": "TOKEN__2B_",
+                                                          "value": "+",
+                                                          "tokenIndex": 2
+                                                        },
+                                                        {
+                                                          "kind": "nonterminal",
+                                                          "name": "MultiplyExpr",
+                                                          "children": [
+                                                            {
+                                                              "kind": "nonterminal",
+                                                              "name": "ConcatExpr",
+                                                              "children": [
+                                                                {
+                                                                  "kind": "nonterminal",
+                                                                  "name": "CollateExpr",
+                                                                  "children": [
+                                                                    {
+                                                                      "kind": "nonterminal",
+                                                                      "name": "UnaryExpr",
+                                                                      "children": [
+                                                                        {
+                                                                          "kind": "nonterminal",
+                                                                          "name": "PrimaryExpr",
+                                                                          "children": [
+                                                                            {
+                                                                              "kind": "nonterminal",
+                                                                              "name": "LiteralValue",
+                                                                              "children": [
+                                                                                {
+                                                                                  "kind": "terminal",
+                                                                                  "token": "NumericLiteral",
+                                                                                  "value": "2",
+                                                                                  "tokenIndex": 3
+                                                                                }
+                                                                              ],
+                                                                              "startToken": 3,
+                                                                              "endToken": 4
+                                                                            }
+                                                                          ],
+                                                                          "startToken": 3,
+                                                                          "endToken": 4
+                                                                        }
+                                                                      ],
+                                                                      "startToken": 3,
+                                                                      "endToken": 4
+                                                                    }
+                                                                  ],
+                                                                  "startToken": 3,
+                                                                  "endToken": 4
+                                                                }
+                                                              ],
+                                                              "startToken": 3,
+                                                              "endToken": 4
+                                                            },
+                                                            {
+                                                              "kind": "terminal",
+                                                              "token": "TOKEN__2A_",
+                                                              "value": "*",
+                                                              "tokenIndex": 4
+                                                            },
+                                                            {
+                                                              "kind": "nonterminal",
+                                                              "name": "ConcatExpr",
+                                                              "children": [
+                                                                {
+                                                                  "kind": "nonterminal",
+                                                                  "name": "CollateExpr",
+                                                                  "children": [
+                                                                    {
+                                                                      "kind": "nonterminal",
+                                                                      "name": "UnaryExpr",
+                                                                      "children": [
+                                                                        {
+                                                                          "kind": "nonterminal",
+                                                                          "name": "PrimaryExpr",
+                                                                          "children": [
+                                                                            {
+                                                                              "kind": "nonterminal",
+                                                                              "name": "LiteralValue",
+                                                                              "children": [
+                                                                                {
+                                                                                  "kind": "terminal",
+                                                                                  "token": "NumericLiteral",
+                                                                                  "value": "3",
+                                                                                  "tokenIndex": 5
+                                                                                }
+                                                                              ],
+                                                                              "startToken": 5,
+                                                                              "endToken": 6
+                                                                            }
+                                                                          ],
+                                                                          "startToken": 5,
+                                                                          "endToken": 6
+                                                                        }
+                                                                      ],
+                                                                      "startToken": 5,
+                                                                      "endToken": 6
+                                                                    }
+                                                                  ],
+                                                                  "startToken": 5,
+                                                                  "endToken": 6
+                                                                }
+                                                              ],
+                                                              "startToken": 5,
+                                                              "endToken": 6
+                                                            }
+                                                          ],
+                                                          "startToken": 3,
+                                                          "endToken": 6
+                                                        }
+                                                      ],
+                                                      "startToken": 1,
+                                                      "endToken": 6
+                                                    }
+                                                  ],
+                                                  "startToken": 1,
+                                                  "endToken": 6
+                                                }
+                                              ],
+                                              "startToken": 1,
+                                              "endToken": 6
+                                            }
+                                          ],
+                                          "startToken": 1,
+                                          "endToken": 6
+                                        }
+                                      ],
+                                      "startToken": 1,
+                                      "endToken": 6
+                                    }
+                                  ],
+                                  "startToken": 1,
+                                  "endToken": 6
+                                }
+                              ],
+                              "startToken": 1,
+                              "endToken": 6
+                            }
+                          ],
+                          "startToken": 1,
+                          "endToken": 6
+                        }
+                      ],
+                      "startToken": 1,
+                      "endToken": 6
+                    }
+                  ],
+                  "startToken": 1,
+                  "endToken": 6
+                },
+                {
+                  "kind": "terminal",
+                  "token": "TOKEN__2C_",
+                  "value": ",",
+                  "tokenIndex": 6
+                },
+                {
+                  "kind": "nonterminal",
+                  "name": "ResultColumn",
+                  "children": [
+                    {
+                      "kind": "nonterminal",
+                      "name": "Expr",
+                      "children": [
+                        {
+                          "kind": "nonterminal",
+                          "name": "OrExpr",
+                          "children": [
+                            {
+                              "kind": "nonterminal",
+                              "name": "AndExpr",
+                              "children": [
+                                {
+                                  "kind": "nonterminal",
+                                  "name": "NotExpr",
+                                  "children": [
+                                    {
+                                      "kind": "nonterminal",
+                                      "name": "PredicateExpr",
+                                      "children": [
+                                        {
+                                          "kind": "nonterminal",
+                                          "name": "EqualityExpr",
+                                          "children": [
+                                            {
+                                              "kind": "nonterminal",
+                                              "name": "RelationalExpr",
+                                              "children": [
+                                                {
+                                                  "kind": "nonterminal",
+                                                  "name": "BitwiseExpr",
+                                                  "children": [
+                                                    {
+                                                      "kind": "nonterminal",
+                                                      "name": "AddExpr",
+                                                      "children": [
+                                                        {
+                                                          "kind": "nonterminal",
+                                                          "name": "MultiplyExpr",
+                                                          "children": [
+                                                            {
+                                                              "kind": "nonterminal",
+                                                              "name": "ConcatExpr",
+                                                              "children": [
+                                                                {
+                                                                  "kind": "nonterminal",
+                                                                  "name": "CollateExpr",
+                                                                  "children": [
+                                                                    {
+                                                                      "kind": "nonterminal",
+                                                                      "name": "UnaryExpr",
+                                                                      "children": [
+                                                                        {
+                                                                          "kind": "nonterminal",
+                                                                          "name": "PrimaryExpr",
+                                                                          "children": [
+                                                                            {
+                                                                              "kind": "terminal",
+                                                                              "token": "TOKEN__28_",
+                                                                              "value": "(",
+                                                                              "tokenIndex": 7
+                                                                            },
+                                                                            {
+                                                                              "kind": "nonterminal",
+                                                                              "name": "Expr",
+                                                                              "children": [
+                                                                                {
+                                                                                  "kind": "nonterminal",
+                                                                                  "name": "OrExpr",
+                                                                                  "children": [
+                                                                                    {
+                                                                                      "kind": "nonterminal",
+                                                                                      "name": "AndExpr",
+                                                                                      "children": [
+                                                                                        {
+                                                                                          "kind": "nonterminal",
+                                                                                          "name": "NotExpr",
+                                                                                          "children": [
+                                                                                            {
+                                                                                              "kind": "nonterminal",
+                                                                                              "name": "PredicateExpr",
+                                                                                              "children": [
+                                                                                                {
+                                                                                                  "kind": "nonterminal",
+                                                                                                  "name": "EqualityExpr",
+                                                                                                  "children": [
+                                                                                                    {
+                                                                                                      "kind": "nonterminal",
+                                                                                                      "name": "RelationalExpr",
+                                                                                                      "children": [
+                                                                                                        {
+                                                                                                          "kind": "nonterminal",
+                                                                                                          "name": "BitwiseExpr",
+                                                                                                          "children": [
+                                                                                                            {
+                                                                                                              "kind": "nonterminal",
+                                                                                                              "name": "AddExpr",
+                                                                                                              "children": [
+                                                                                                                {
+                                                                                                                  "kind": "nonterminal",
+                                                                                                                  "name": "MultiplyExpr",
+                                                                                                                  "children": [
+                                                                                                                    {
+                                                                                                                      "kind": "nonterminal",
+                                                                                                                      "name": "ConcatExpr",
+                                                                                                                      "children": [
+                                                                                                                        {
+                                                                                                                          "kind": "nonterminal",
+                                                                                                                          "name": "CollateExpr",
+                                                                                                                          "children": [
+                                                                                                                            {
+                                                                                                                              "kind": "nonterminal",
+                                                                                                                              "name": "UnaryExpr",
+                                                                                                                              "children": [
+                                                                                                                                {
+                                                                                                                                  "kind": "nonterminal",
+                                                                                                                                  "name": "PrimaryExpr",
+                                                                                                                                  "children": [
+                                                                                                                                    {
+                                                                                                                                      "kind": "nonterminal",
+                                                                                                                                      "name": "LiteralValue",
+                                                                                                                                      "children": [
+                                                                                                                                        {
+                                                                                                                                          "kind": "terminal",
+                                                                                                                                          "token": "NumericLiteral",
+                                                                                                                                          "value": "1",
+                                                                                                                                          "tokenIndex": 8
+                                                                                                                                        }
+                                                                                                                                      ],
+                                                                                                                                      "startToken": 8,
+                                                                                                                                      "endToken": 9
+                                                                                                                                    }
+                                                                                                                                  ],
+                                                                                                                                  "startToken": 8,
+                                                                                                                                  "endToken": 9
+                                                                                                                                }
+                                                                                                                              ],
+                                                                                                                              "startToken": 8,
+                                                                                                                              "endToken": 9
+                                                                                                                            }
+                                                                                                                          ],
+                                                                                                                          "startToken": 8,
+                                                                                                                          "endToken": 9
+                                                                                                                        }
+                                                                                                                      ],
+                                                                                                                      "startToken": 8,
+                                                                                                                      "endToken": 9
+                                                                                                                    }
+                                                                                                                  ],
+                                                                                                                  "startToken": 8,
+                                                                                                                  "endToken": 9
+                                                                                                                },
+                                                                                                                {
+                                                                                                                  "kind": "terminal",
+                                                                                                                  "token": "TOKEN__2B_",
+                                                                                                                  "value": "+",
+                                                                                                                  "tokenIndex": 9
+                                                                                                                },
+                                                                                                                {
+                                                                                                                  "kind": "nonterminal",
+                                                                                                                  "name": "MultiplyExpr",
+                                                                                                                  "children": [
+                                                                                                                    {
+                                                                                                                      "kind": "nonterminal",
+                                                                                                                      "name": "ConcatExpr",
+                                                                                                                      "children": [
+                                                                                                                        {
+                                                                                                                          "kind": "nonterminal",
+                                                                                                                          "name": "CollateExpr",
+                                                                                                                          "children": [
+                                                                                                                            {
+                                                                                                                              "kind": "nonterminal",
+                                                                                                                              "name": "UnaryExpr",
+                                                                                                                              "children": [
+                                                                                                                                {
+                                                                                                                                  "kind": "nonterminal",
+                                                                                                                                  "name": "PrimaryExpr",
+                                                                                                                                  "children": [
+                                                                                                                                    {
+                                                                                                                                      "kind": "nonterminal",
+                                                                                                                                      "name": "LiteralValue",
+                                                                                                                                      "children": [
+                                                                                                                                        {
+                                                                                                                                          "kind": "terminal",
+                                                                                                                                          "token": "NumericLiteral",
+                                                                                                                                          "value": "2",
+                                                                                                                                          "tokenIndex": 10
+                                                                                                                                        }
+                                                                                                                                      ],
+                                                                                                                                      "startToken": 10,
+                                                                                                                                      "endToken": 11
+                                                                                                                                    }
+                                                                                                                                  ],
+                                                                                                                                  "startToken": 10,
+                                                                                                                                  "endToken": 11
+                                                                                                                                }
+                                                                                                                              ],
+                                                                                                                              "startToken": 10,
+                                                                                                                              "endToken": 11
+                                                                                                                            }
+                                                                                                                          ],
+                                                                                                                          "startToken": 10,
+                                                                                                                          "endToken": 11
+                                                                                                                        }
+                                                                                                                      ],
+                                                                                                                      "startToken": 10,
+                                                                                                                      "endToken": 11
+                                                                                                                    }
+                                                                                                                  ],
+                                                                                                                  "startToken": 10,
+                                                                                                                  "endToken": 11
+                                                                                                                }
+                                                                                                              ],
+                                                                                                              "startToken": 8,
+                                                                                                              "endToken": 11
+                                                                                                            }
+                                                                                                          ],
+                                                                                                          "startToken": 8,
+                                                                                                          "endToken": 11
+                                                                                                        }
+                                                                                                      ],
+                                                                                                      "startToken": 8,
+                                                                                                      "endToken": 11
+                                                                                                    }
+                                                                                                  ],
+                                                                                                  "startToken": 8,
+                                                                                                  "endToken": 11
+                                                                                                }
+                                                                                              ],
+                                                                                              "startToken": 8,
+                                                                                              "endToken": 11
+                                                                                            }
+                                                                                          ],
+                                                                                          "startToken": 8,
+                                                                                          "endToken": 11
+                                                                                        }
+                                                                                      ],
+                                                                                      "startToken": 8,
+                                                                                      "endToken": 11
+                                                                                    }
+                                                                                  ],
+                                                                                  "startToken": 8,
+                                                                                  "endToken": 11
+                                                                                }
+                                                                              ],
+                                                                              "startToken": 8,
+                                                                              "endToken": 11
+                                                                            },
+                                                                            {
+                                                                              "kind": "terminal",
+                                                                              "token": "TOKEN__29_",
+                                                                              "value": ")",
+                                                                              "tokenIndex": 11
+                                                                            }
+                                                                          ],
+                                                                          "startToken": 7,
+                                                                          "endToken": 12
+                                                                        }
+                                                                      ],
+                                                                      "startToken": 7,
+                                                                      "endToken": 12
+                                                                    }
+                                                                  ],
+                                                                  "startToken": 7,
+                                                                  "endToken": 12
+                                                                }
+                                                              ],
+                                                              "startToken": 7,
+                                                              "endToken": 12
+                                                            },
+                                                            {
+                                                              "kind": "terminal",
+                                                              "token": "TOKEN__2A_",
+                                                              "value": "*",
+                                                              "tokenIndex": 12
+                                                            },
+                                                            {
+                                                              "kind": "nonterminal",
+                                                              "name": "ConcatExpr",
+                                                              "children": [
+                                                                {
+                                                                  "kind": "nonterminal",
+                                                                  "name": "CollateExpr",
+                                                                  "children": [
+                                                                    {
+                                                                      "kind": "nonterminal",
+                                                                      "name": "UnaryExpr",
+                                                                      "children": [
+                                                                        {
+                                                                          "kind": "nonterminal",
+                                                                          "name": "PrimaryExpr",
+                                                                          "children": [
+                                                                            {
+                                                                              "kind": "nonterminal",
+                                                                              "name": "LiteralValue",
+                                                                              "children": [
+                                                                                {
+                                                                                  "kind": "terminal",
+                                                                                  "token": "NumericLiteral",
+                                                                                  "value": "3",
+                                                                                  "tokenIndex": 13
+                                                                                }
+                                                                              ],
+                                                                              "startToken": 13,
+                                                                              "endToken": 14
+                                                                            }
+                                                                          ],
+                                                                          "startToken": 13,
+                                                                          "endToken": 14
+                                                                        }
+                                                                      ],
+                                                                      "startToken": 13,
+                                                                      "endToken": 14
+                                                                    }
+                                                                  ],
+                                                                  "startToken": 13,
+                                                                  "endToken": 14
+                                                                }
+                                                              ],
+                                                              "startToken": 13,
+                                                              "endToken": 14
+                                                            }
+                                                          ],
+                                                          "startToken": 7,
+                                                          "endToken": 14
+                                                        }
+                                                      ],
+                                                      "startToken": 7,
+                                                      "endToken": 14
+                                                    }
+                                                  ],
+                                                  "startToken": 7,
+                                                  "endToken": 14
+                                                }
+                                              ],
+                                              "startToken": 7,
+                                              "endToken": 14
+                                            }
+                                          ],
+                                          "startToken": 7,
+                                          "endToken": 14
+                                        }
+                                      ],
+                                      "startToken": 7,
+                                      "endToken": 14
+                                    }
+                                  ],
+                                  "startToken": 7,
+                                  "endToken": 14
+                                }
+                              ],
+                              "startToken": 7,
+                              "endToken": 14
+                            }
+                          ],
+                          "startToken": 7,
+                          "endToken": 14
+                        }
+                      ],
+                      "startToken": 7,
+                      "endToken": 14
+                    }
+                  ],
+                  "startToken": 7,
+                  "endToken": 14
+                },
+                {
+                  "kind": "terminal",
+                  "token": "TOKEN__2C_",
+                  "value": ",",
+                  "tokenIndex": 14
+                },
+                {
+                  "kind": "nonterminal",
+                  "name": "ResultColumn",
+                  "children": [
+                    {
+                      "kind": "nonterminal",
+                      "name": "Expr",
+                      "children": [
+                        {
+                          "kind": "nonterminal",
+                          "name": "OrExpr",
+                          "children": [
+                            {
+                              "kind": "nonterminal",
+                              "name": "AndExpr",
+                              "children": [
+                                {
+                                  "kind": "nonterminal",
+                                  "name": "NotExpr",
+                                  "children": [
+                                    {
+                                      "kind": "nonterminal",
+                                      "name": "PredicateExpr",
+                                      "children": [
+                                        {
+                                          "kind": "nonterminal",
+                                          "name": "EqualityExpr",
+                                          "children": [
+                                            {
+                                              "kind": "nonterminal",
+                                              "name": "RelationalExpr",
+                                              "children": [
+                                                {
+                                                  "kind": "nonterminal",
+                                                  "name": "BitwiseExpr",
+                                                  "children": [
+                                                    {
+                                                      "kind": "nonterminal",
+                                                      "name": "AddExpr",
+                                                      "children": [
+                                                        {
+                                                          "kind": "nonterminal",
+                                                          "name": "MultiplyExpr",
+                                                          "children": [
+                                                            {
+                                                              "kind": "nonterminal",
+                                                              "name": "ConcatExpr",
+                                                              "children": [
+                                                                {
+                                                                  "kind": "nonterminal",
+                                                                  "name": "CollateExpr",
+                                                                  "children": [
+                                                                    {
+                                                                      "kind": "nonterminal",
+                                                                      "name": "UnaryExpr",
+                                                                      "children": [
+                                                                        {
+                                                                          "kind": "nonterminal",
+                                                                          "name": "PrimaryExpr",
+                                                                          "children": [
+                                                                            {
+                                                                              "kind": "nonterminal",
+                                                                              "name": "LiteralValue",
+                                                                              "children": [
+                                                                                {
+                                                                                  "kind": "terminal",
+                                                                                  "token": "NumericLiteral",
+                                                                                  "value": "8",
+                                                                                  "tokenIndex": 15
+                                                                                }
+                                                                              ],
+                                                                              "startToken": 15,
+                                                                              "endToken": 16
+                                                                            }
+                                                                          ],
+                                                                          "startToken": 15,
+                                                                          "endToken": 16
+                                                                        }
+                                                                      ],
+                                                                      "startToken": 15,
+                                                                      "endToken": 16
+                                                                    }
+                                                                  ],
+                                                                  "startToken": 15,
+                                                                  "endToken": 16
+                                                                }
+                                                              ],
+                                                              "startToken": 15,
+                                                              "endToken": 16
+                                                            }
+                                                          ],
+                                                          "startToken": 15,
+                                                          "endToken": 16
+                                                        }
+                                                      ],
+                                                      "startToken": 15,
+                                                      "endToken": 16
+                                                    },
+                                                    {
+                                                      "kind": "terminal",
+                                                      "token": "TOKEN__7C_",
+                                                      "value": "|",
+                                                      "tokenIndex": 16
+                                                    },
+                                                    {
+                                                      "kind": "nonterminal",
+                                                      "name": "AddExpr",
+                                                      "children": [
+                                                        {
+                                                          "kind": "nonterminal",
+                                                          "name": "MultiplyExpr",
+                                                          "children": [
+                                                            {
+                                                              "kind": "nonterminal",
+                                                              "name": "ConcatExpr",
+                                                              "children": [
+                                                                {
+                                                                  "kind": "nonterminal",
+                                                                  "name": "CollateExpr",
+                                                                  "children": [
+                                                                    {
+                                                                      "kind": "nonterminal",
+                                                                      "name": "UnaryExpr",
+                                                                      "children": [
+                                                                        {
+                                                                          "kind": "nonterminal",
+                                                                          "name": "PrimaryExpr",
+                                                                          "children": [
+                                                                            {
+                                                                              "kind": "nonterminal",
+                                                                              "name": "LiteralValue",
+                                                                              "children": [
+                                                                                {
+                                                                                  "kind": "terminal",
+                                                                                  "token": "NumericLiteral",
+                                                                                  "value": "4",
+                                                                                  "tokenIndex": 17
+                                                                                }
+                                                                              ],
+                                                                              "startToken": 17,
+                                                                              "endToken": 18
+                                                                            }
+                                                                          ],
+                                                                          "startToken": 17,
+                                                                          "endToken": 18
+                                                                        }
+                                                                      ],
+                                                                      "startToken": 17,
+                                                                      "endToken": 18
+                                                                    }
+                                                                  ],
+                                                                  "startToken": 17,
+                                                                  "endToken": 18
+                                                                }
+                                                              ],
+                                                              "startToken": 17,
+                                                              "endToken": 18
+                                                            }
+                                                          ],
+                                                          "startToken": 17,
+                                                          "endToken": 18
+                                                        }
+                                                      ],
+                                                      "startToken": 17,
+                                                      "endToken": 18
+                                                    },
+                                                    {
+                                                      "kind": "terminal",
+                                                      "token": "TOKEN__26_",
+                                                      "value": "&",
+                                                      "tokenIndex": 18
+                                                    },
+                                                    {
+                                                      "kind": "nonterminal",
+                                                      "name": "AddExpr",
+                                                      "children": [
+                                                        {
+                                                          "kind": "nonterminal",
+                                                          "name": "MultiplyExpr",
+                                                          "children": [
+                                                            {
+                                                              "kind": "nonterminal",
+                                                              "name": "ConcatExpr",
+                                                              "children": [
+                                                                {
+                                                                  "kind": "nonterminal",
+                                                                  "name": "CollateExpr",
+                                                                  "children": [
+                                                                    {
+                                                                      "kind": "nonterminal",
+                                                                      "name": "UnaryExpr",
+                                                                      "children": [
+                                                                        {
+                                                                          "kind": "nonterminal",
+                                                                          "name": "PrimaryExpr",
+                                                                          "children": [
+                                                                            {
+                                                                              "kind": "nonterminal",
+                                                                              "name": "LiteralValue",
+                                                                              "children": [
+                                                                                {
+                                                                                  "kind": "terminal",
+                                                                                  "token": "NumericLiteral",
+                                                                                  "value": "2",
+                                                                                  "tokenIndex": 19
+                                                                                }
+                                                                              ],
+                                                                              "startToken": 19,
+                                                                              "endToken": 20
+                                                                            }
+                                                                          ],
+                                                                          "startToken": 19,
+                                                                          "endToken": 20
+                                                                        }
+                                                                      ],
+                                                                      "startToken": 19,
+                                                                      "endToken": 20
+                                                                    }
+                                                                  ],
+                                                                  "startToken": 19,
+                                                                  "endToken": 20
+                                                                }
+                                                              ],
+                                                              "startToken": 19,
+                                                              "endToken": 20
+                                                            }
+                                                          ],
+                                                          "startToken": 19,
+                                                          "endToken": 20
+                                                        }
+                                                      ],
+                                                      "startToken": 19,
+                                                      "endToken": 20
+                                                    }
+                                                  ],
+                                                  "startToken": 15,
+                                                  "endToken": 20
+                                                }
+                                              ],
+                                              "startToken": 15,
+                                              "endToken": 20
+                                            }
+                                          ],
+                                          "startToken": 15,
+                                          "endToken": 20
+                                        }
+                                      ],
+                                      "startToken": 15,
+                                      "endToken": 20
+                                    }
+                                  ],
+                                  "startToken": 15,
+                                  "endToken": 20
+                                }
+                              ],
+                              "startToken": 15,
+                              "endToken": 20
+                            }
+                          ],
+                          "startToken": 15,
+                          "endToken": 20
+                        }
+                      ],
+                      "startToken": 15,
+                      "endToken": 20
+                    }
+                  ],
+                  "startToken": 15,
+                  "endToken": 20
+                },
+                {
+                  "kind": "terminal",
+                  "token": "TOKEN__2C_",
+                  "value": ",",
+                  "tokenIndex": 20
+                },
+                {
+                  "kind": "nonterminal",
+                  "name": "ResultColumn",
+                  "children": [
+                    {
+                      "kind": "nonterminal",
+                      "name": "Expr",
+                      "children": [
+                        {
+                          "kind": "nonterminal",
+                          "name": "OrExpr",
+                          "children": [
+                            {
+                              "kind": "nonterminal",
+                              "name": "AndExpr",
+                              "children": [
+                                {
+                                  "kind": "nonterminal",
+                                  "name": "NotExpr",
+                                  "children": [
+                                    {
+                                      "kind": "nonterminal",
+                                      "name": "PredicateExpr",
+                                      "children": [
+                                        {
+                                          "kind": "nonterminal",
+                                          "name": "EqualityExpr",
+                                          "children": [
+                                            {
+                                              "kind": "nonterminal",
+                                              "name": "RelationalExpr",
+                                              "children": [
+                                                {
+                                                  "kind": "nonterminal",
+                                                  "name": "BitwiseExpr",
+                                                  "children": [
+                                                    {
+                                                      "kind": "nonterminal",
+                                                      "name": "AddExpr",
+                                                      "children": [
+                                                        {
+                                                          "kind": "nonterminal",
+                                                          "name": "MultiplyExpr",
+                                                          "children": [
+                                                            {
+                                                              "kind": "nonterminal",
+                                                              "name": "ConcatExpr",
+                                                              "children": [
+                                                                {
+                                                                  "kind": "nonterminal",
+                                                                  "name": "CollateExpr",
+                                                                  "children": [
+                                                                    {
+                                                                      "kind": "nonterminal",
+                                                                      "name": "UnaryExpr",
+                                                                      "children": [
+                                                                        {
+                                                                          "kind": "terminal",
+                                                                          "token": "TOKEN__2D_",
+                                                                          "value": "-",
+                                                                          "tokenIndex": 21
+                                                                        },
+                                                                        {
+                                                                          "kind": "nonterminal",
+                                                                          "name": "PrimaryExpr",
+                                                                          "children": [
+                                                                            {
+                                                                              "kind": "nonterminal",
+                                                                              "name": "QualifiedColumnRef",
+                                                                              "children": [
+                                                                                {
+                                                                                  "kind": "nonterminal",
+                                                                                  "name": "ColumnName",
+                                                                                  "children": [
+                                                                                    {
+                                                                                      "kind": "nonterminal",
+                                                                                      "name": "Name",
+                                                                                      "children": [
+                                                                                        {
+                                                                                          "kind": "terminal",
+                                                                                          "token": "Identifier",
+                                                                                          "value": "name",
+                                                                                          "tokenIndex": 22
+                                                                                        }
+                                                                                      ],
+                                                                                      "startToken": 22,
+                                                                                      "endToken": 23
+                                                                                    }
+                                                                                  ],
+                                                                                  "startToken": 22,
+                                                                                  "endToken": 23
+                                                                                }
+                                                                              ],
+                                                                              "startToken": 22,
+                                                                              "endToken": 23
+                                                                            }
+                                                                          ],
+                                                                          "startToken": 22,
+                                                                          "endToken": 23
+                                                                        }
+                                                                      ],
+                                                                      "startToken": 21,
+                                                                      "endToken": 23
+                                                                    },
+                                                                    {
+                                                                      "kind": "terminal",
+                                                                      "token": "KW_COLLATE",
+                                                                      "value": "COLLATE",
+                                                                      "tokenIndex": 23
+                                                                    },
+                                                                    {
+                                                                      "kind": "nonterminal",
+                                                                      "name": "CollationName",
+                                                                      "children": [
+                                                                        {
+                                                                          "kind": "nonterminal",
+                                                                          "name": "Name",
+                                                                          "children": [
+                                                                            {
+                                                                              "kind": "terminal",
+                                                                              "token": "Identifier",
+                                                                              "value": "nocase",
+                                                                              "tokenIndex": 24
+                                                                            }
+                                                                          ],
+                                                                          "startToken": 24,
+                                                                          "endToken": 25
+                                                                        }
+                                                                      ],
+                                                                      "startToken": 24,
+                                                                      "endToken": 25
+                                                                    }
+                                                                  ],
+                                                                  "startToken": 21,
+                                                                  "endToken": 25
+                                                                }
+                                                              ],
+                                                              "startToken": 21,
+                                                              "endToken": 25
+                                                            }
+                                                          ],
+                                                          "startToken": 21,
+                                                          "endToken": 25
+                                                        }
+                                                      ],
+                                                      "startToken": 21,
+                                                      "endToken": 25
+                                                    }
+                                                  ],
+                                                  "startToken": 21,
+                                                  "endToken": 25
+                                                }
+                                              ],
+                                              "startToken": 21,
+                                              "endToken": 25
+                                            }
+                                          ],
+                                          "startToken": 21,
+                                          "endToken": 25
+                                        }
+                                      ],
+                                      "startToken": 21,
+                                      "endToken": 25
+                                    }
+                                  ],
+                                  "startToken": 21,
+                                  "endToken": 25
+                                }
+                              ],
+                              "startToken": 21,
+                              "endToken": 25
+                            }
+                          ],
+                          "startToken": 21,
+                          "endToken": 25
+                        }
+                      ],
+                      "startToken": 21,
+                      "endToken": 25
+                    }
+                  ],
+                  "startToken": 21,
+                  "endToken": 25
+                },
+                {
+                  "kind": "nonterminal",
+                  "name": "FromClause",
+                  "children": [
+                    {
+                      "kind": "terminal",
+                      "token": "KW_FROM",
+                      "value": "FROM",
+                      "tokenIndex": 25
+                    },
+                    {
+                      "kind": "nonterminal",
+                      "name": "JoinClause",
+                      "children": [
+                        {
+                          "kind": "nonterminal",
+                          "name": "TableOrSubquery",
+                          "children": [
+                            {
+                              "kind": "nonterminal",
+                              "name": "TableName",
+                              "children": [
+                                {
+                                  "kind": "nonterminal",
+                                  "name": "Name",
+                                  "children": [
+                                    {
+                                      "kind": "terminal",
+                                      "token": "Identifier",
+                                      "value": "people",
+                                      "tokenIndex": 26
+                                    }
+                                  ],
+                                  "startToken": 26,
+                                  "endToken": 27
+                                }
+                              ],
+                              "startToken": 26,
+                              "endToken": 27
+                            }
+                          ],
+                          "startToken": 26,
+                          "endToken": 27
+                        }
+                      ],
+                      "startToken": 26,
+                      "endToken": 27
+                    }
+                  ],
+                  "startToken": 25,
+                  "endToken": 27
+                },
+                {
+                  "kind": "terminal",
+                  "token": "KW_WHERE",
+                  "value": "WHERE",
+                  "tokenIndex": 27
+                },
+                {
+                  "kind": "nonterminal",
+                  "name": "Expr",
+                  "children": [
+                    {
+                      "kind": "nonterminal",
+                      "name": "OrExpr",
+                      "children": [
+                        {
+                          "kind": "nonterminal",
+                          "name": "AndExpr",
+                          "children": [
+                            {
+                              "kind": "nonterminal",
+                              "name": "NotExpr",
+                              "children": [
+                                {
+                                  "kind": "nonterminal",
+                                  "name": "PredicateExpr",
+                                  "children": [
+                                    {
+                                      "kind": "nonterminal",
+                                      "name": "EqualityExpr",
+                                      "children": [
+                                        {
+                                          "kind": "nonterminal",
+                                          "name": "RelationalExpr",
+                                          "children": [
+                                            {
+                                              "kind": "nonterminal",
+                                              "name": "BitwiseExpr",
+                                              "children": [
+                                                {
+                                                  "kind": "nonterminal",
+                                                  "name": "AddExpr",
+                                                  "children": [
+                                                    {
+                                                      "kind": "nonterminal",
+                                                      "name": "MultiplyExpr",
+                                                      "children": [
+                                                        {
+                                                          "kind": "nonterminal",
+                                                          "name": "ConcatExpr",
+                                                          "children": [
+                                                            {
+                                                              "kind": "nonterminal",
+                                                              "name": "CollateExpr",
+                                                              "children": [
+                                                                {
+                                                                  "kind": "nonterminal",
+                                                                  "name": "UnaryExpr",
+                                                                  "children": [
+                                                                    {
+                                                                      "kind": "nonterminal",
+                                                                      "name": "PrimaryExpr",
+                                                                      "children": [
+                                                                        {
+                                                                          "kind": "nonterminal",
+                                                                          "name": "QualifiedColumnRef",
+                                                                          "children": [
+                                                                            {
+                                                                              "kind": "nonterminal",
+                                                                              "name": "ColumnName",
+                                                                              "children": [
+                                                                                {
+                                                                                  "kind": "nonterminal",
+                                                                                  "name": "Name",
+                                                                                  "children": [
+                                                                                    {
+                                                                                      "kind": "terminal",
+                                                                                      "token": "Identifier",
+                                                                                      "value": "age",
+                                                                                      "tokenIndex": 28
+                                                                                    }
+                                                                                  ],
+                                                                                  "startToken": 28,
+                                                                                  "endToken": 29
+                                                                                }
+                                                                              ],
+                                                                              "startToken": 28,
+                                                                              "endToken": 29
+                                                                            }
+                                                                          ],
+                                                                          "startToken": 28,
+                                                                          "endToken": 29
+                                                                        }
+                                                                      ],
+                                                                      "startToken": 28,
+                                                                      "endToken": 29
+                                                                    }
+                                                                  ],
+                                                                  "startToken": 28,
+                                                                  "endToken": 29
+                                                                }
+                                                              ],
+                                                              "startToken": 28,
+                                                              "endToken": 29
+                                                            }
+                                                          ],
+                                                          "startToken": 28,
+                                                          "endToken": 29
+                                                        }
+                                                      ],
+                                                      "startToken": 28,
+                                                      "endToken": 29
+                                                    }
+                                                  ],
+                                                  "startToken": 28,
+                                                  "endToken": 29
+                                                }
+                                              ],
+                                              "startToken": 28,
+                                              "endToken": 29
+                                            }
+                                          ],
+                                          "startToken": 28,
+                                          "endToken": 29
+                                        }
+                                      ],
+                                      "startToken": 28,
+                                      "endToken": 29
+                                    },
+                                    {
+                                      "kind": "nonterminal",
+                                      "name": "PredicateTail",
+                                      "children": [
+                                        {
+                                          "kind": "terminal",
+                                          "token": "KW_BETWEEN",
+                                          "value": "BETWEEN",
+                                          "tokenIndex": 29
+                                        },
+                                        {
+                                          "kind": "nonterminal",
+                                          "name": "EqualityExpr",
+                                          "children": [
+                                            {
+                                              "kind": "nonterminal",
+                                              "name": "RelationalExpr",
+                                              "children": [
+                                                {
+                                                  "kind": "nonterminal",
+                                                  "name": "BitwiseExpr",
+                                                  "children": [
+                                                    {
+                                                      "kind": "nonterminal",
+                                                      "name": "AddExpr",
+                                                      "children": [
+                                                        {
+                                                          "kind": "nonterminal",
+                                                          "name": "MultiplyExpr",
+                                                          "children": [
+                                                            {
+                                                              "kind": "nonterminal",
+                                                              "name": "ConcatExpr",
+                                                              "children": [
+                                                                {
+                                                                  "kind": "nonterminal",
+                                                                  "name": "CollateExpr",
+                                                                  "children": [
+                                                                    {
+                                                                      "kind": "nonterminal",
+                                                                      "name": "UnaryExpr",
+                                                                      "children": [
+                                                                        {
+                                                                          "kind": "nonterminal",
+                                                                          "name": "PrimaryExpr",
+                                                                          "children": [
+                                                                            {
+                                                                              "kind": "nonterminal",
+                                                                              "name": "LiteralValue",
+                                                                              "children": [
+                                                                                {
+                                                                                  "kind": "terminal",
+                                                                                  "token": "NumericLiteral",
+                                                                                  "value": "18",
+                                                                                  "tokenIndex": 30
+                                                                                }
+                                                                              ],
+                                                                              "startToken": 30,
+                                                                              "endToken": 31
+                                                                            }
+                                                                          ],
+                                                                          "startToken": 30,
+                                                                          "endToken": 31
+                                                                        }
+                                                                      ],
+                                                                      "startToken": 30,
+                                                                      "endToken": 31
+                                                                    }
+                                                                  ],
+                                                                  "startToken": 30,
+                                                                  "endToken": 31
+                                                                }
+                                                              ],
+                                                              "startToken": 30,
+                                                              "endToken": 31
+                                                            }
+                                                          ],
+                                                          "startToken": 30,
+                                                          "endToken": 31
+                                                        }
+                                                      ],
+                                                      "startToken": 30,
+                                                      "endToken": 31
+                                                    }
+                                                  ],
+                                                  "startToken": 30,
+                                                  "endToken": 31
+                                                }
+                                              ],
+                                              "startToken": 30,
+                                              "endToken": 31
+                                            }
+                                          ],
+                                          "startToken": 30,
+                                          "endToken": 31
+                                        },
+                                        {
+                                          "kind": "terminal",
+                                          "token": "KW_AND",
+                                          "value": "AND",
+                                          "tokenIndex": 31
+                                        },
+                                        {
+                                          "kind": "nonterminal",
+                                          "name": "EqualityExpr",
+                                          "children": [
+                                            {
+                                              "kind": "nonterminal",
+                                              "name": "RelationalExpr",
+                                              "children": [
+                                                {
+                                                  "kind": "nonterminal",
+                                                  "name": "BitwiseExpr",
+                                                  "children": [
+                                                    {
+                                                      "kind": "nonterminal",
+                                                      "name": "AddExpr",
+                                                      "children": [
+                                                        {
+                                                          "kind": "nonterminal",
+                                                          "name": "MultiplyExpr",
+                                                          "children": [
+                                                            {
+                                                              "kind": "nonterminal",
+                                                              "name": "ConcatExpr",
+                                                              "children": [
+                                                                {
+                                                                  "kind": "nonterminal",
+                                                                  "name": "CollateExpr",
+                                                                  "children": [
+                                                                    {
+                                                                      "kind": "nonterminal",
+                                                                      "name": "UnaryExpr",
+                                                                      "children": [
+                                                                        {
+                                                                          "kind": "nonterminal",
+                                                                          "name": "PrimaryExpr",
+                                                                          "children": [
+                                                                            {
+                                                                              "kind": "nonterminal",
+                                                                              "name": "LiteralValue",
+                                                                              "children": [
+                                                                                {
+                                                                                  "kind": "terminal",
+                                                                                  "token": "NumericLiteral",
+                                                                                  "value": "65",
+                                                                                  "tokenIndex": 32
+                                                                                }
+                                                                              ],
+                                                                              "startToken": 32,
+                                                                              "endToken": 33
+                                                                            }
+                                                                          ],
+                                                                          "startToken": 32,
+                                                                          "endToken": 33
+                                                                        }
+                                                                      ],
+                                                                      "startToken": 32,
+                                                                      "endToken": 33
+                                                                    }
+                                                                  ],
+                                                                  "startToken": 32,
+                                                                  "endToken": 33
+                                                                }
+                                                              ],
+                                                              "startToken": 32,
+                                                              "endToken": 33
+                                                            }
+                                                          ],
+                                                          "startToken": 32,
+                                                          "endToken": 33
+                                                        }
+                                                      ],
+                                                      "startToken": 32,
+                                                      "endToken": 33
+                                                    }
+                                                  ],
+                                                  "startToken": 32,
+                                                  "endToken": 33
+                                                }
+                                              ],
+                                              "startToken": 32,
+                                              "endToken": 33
+                                            }
+                                          ],
+                                          "startToken": 32,
+                                          "endToken": 33
+                                        }
+                                      ],
+                                      "startToken": 29,
+                                      "endToken": 33
+                                    }
+                                  ],
+                                  "startToken": 28,
+                                  "endToken": 33
+                                }
+                              ],
+                              "startToken": 28,
+                              "endToken": 33
+                            },
+                            {
+                              "kind": "terminal",
+                              "token": "KW_AND",
+                              "value": "AND",
+                              "tokenIndex": 33
+                            },
+                            {
+                              "kind": "nonterminal",
+                              "name": "NotExpr",
+                              "children": [
+                                {
+                                  "kind": "nonterminal",
+                                  "name": "PredicateExpr",
+                                  "children": [
+                                    {
+                                      "kind": "nonterminal",
+                                      "name": "EqualityExpr",
+                                      "children": [
+                                        {
+                                          "kind": "nonterminal",
+                                          "name": "RelationalExpr",
+                                          "children": [
+                                            {
+                                              "kind": "nonterminal",
+                                              "name": "BitwiseExpr",
+                                              "children": [
+                                                {
+                                                  "kind": "nonterminal",
+                                                  "name": "AddExpr",
+                                                  "children": [
+                                                    {
+                                                      "kind": "nonterminal",
+                                                      "name": "MultiplyExpr",
+                                                      "children": [
+                                                        {
+                                                          "kind": "nonterminal",
+                                                          "name": "ConcatExpr",
+                                                          "children": [
+                                                            {
+                                                              "kind": "nonterminal",
+                                                              "name": "CollateExpr",
+                                                              "children": [
+                                                                {
+                                                                  "kind": "nonterminal",
+                                                                  "name": "UnaryExpr",
+                                                                  "children": [
+                                                                    {
+                                                                      "kind": "nonterminal",
+                                                                      "name": "PrimaryExpr",
+                                                                      "children": [
+                                                                        {
+                                                                          "kind": "nonterminal",
+                                                                          "name": "QualifiedColumnRef",
+                                                                          "children": [
+                                                                            {
+                                                                              "kind": "nonterminal",
+                                                                              "name": "ColumnName",
+                                                                              "children": [
+                                                                                {
+                                                                                  "kind": "nonterminal",
+                                                                                  "name": "Name",
+                                                                                  "children": [
+                                                                                    {
+                                                                                      "kind": "terminal",
+                                                                                      "token": "Identifier",
+                                                                                      "value": "active",
+                                                                                      "tokenIndex": 34
+                                                                                    }
+                                                                                  ],
+                                                                                  "startToken": 34,
+                                                                                  "endToken": 35
+                                                                                }
+                                                                              ],
+                                                                              "startToken": 34,
+                                                                              "endToken": 35
+                                                                            }
+                                                                          ],
+                                                                          "startToken": 34,
+                                                                          "endToken": 35
+                                                                        }
+                                                                      ],
+                                                                      "startToken": 34,
+                                                                      "endToken": 35
+                                                                    }
+                                                                  ],
+                                                                  "startToken": 34,
+                                                                  "endToken": 35
+                                                                }
+                                                              ],
+                                                              "startToken": 34,
+                                                              "endToken": 35
+                                                            }
+                                                          ],
+                                                          "startToken": 34,
+                                                          "endToken": 35
+                                                        }
+                                                      ],
+                                                      "startToken": 34,
+                                                      "endToken": 35
+                                                    }
+                                                  ],
+                                                  "startToken": 34,
+                                                  "endToken": 35
+                                                }
+                                              ],
+                                              "startToken": 34,
+                                              "endToken": 35
+                                            }
+                                          ],
+                                          "startToken": 34,
+                                          "endToken": 35
+                                        },
+                                        {
+                                          "kind": "nonterminal",
+                                          "name": "EqualityTail",
+                                          "children": [
+                                            {
+                                              "kind": "nonterminal",
+                                              "name": "EqualityOperator",
+                                              "children": [
+                                                {
+                                                  "kind": "terminal",
+                                                  "token": "TOKEN__3D_",
+                                                  "value": "=",
+                                                  "tokenIndex": 35
+                                                }
+                                              ],
+                                              "startToken": 35,
+                                              "endToken": 36
+                                            },
+                                            {
+                                              "kind": "nonterminal",
+                                              "name": "RelationalExpr",
+                                              "children": [
+                                                {
+                                                  "kind": "nonterminal",
+                                                  "name": "BitwiseExpr",
+                                                  "children": [
+                                                    {
+                                                      "kind": "nonterminal",
+                                                      "name": "AddExpr",
+                                                      "children": [
+                                                        {
+                                                          "kind": "nonterminal",
+                                                          "name": "MultiplyExpr",
+                                                          "children": [
+                                                            {
+                                                              "kind": "nonterminal",
+                                                              "name": "ConcatExpr",
+                                                              "children": [
+                                                                {
+                                                                  "kind": "nonterminal",
+                                                                  "name": "CollateExpr",
+                                                                  "children": [
+                                                                    {
+                                                                      "kind": "nonterminal",
+                                                                      "name": "UnaryExpr",
+                                                                      "children": [
+                                                                        {
+                                                                          "kind": "nonterminal",
+                                                                          "name": "PrimaryExpr",
+                                                                          "children": [
+                                                                            {
+                                                                              "kind": "nonterminal",
+                                                                              "name": "LiteralValue",
+                                                                              "children": [
+                                                                                {
+                                                                                  "kind": "terminal",
+                                                                                  "token": "KW_TRUE",
+                                                                                  "value": "TRUE",
+                                                                                  "tokenIndex": 36
+                                                                                }
+                                                                              ],
+                                                                              "startToken": 36,
+                                                                              "endToken": 37
+                                                                            }
+                                                                          ],
+                                                                          "startToken": 36,
+                                                                          "endToken": 37
+                                                                        }
+                                                                      ],
+                                                                      "startToken": 36,
+                                                                      "endToken": 37
+                                                                    }
+                                                                  ],
+                                                                  "startToken": 36,
+                                                                  "endToken": 37
+                                                                }
+                                                              ],
+                                                              "startToken": 36,
+                                                              "endToken": 37
+                                                            }
+                                                          ],
+                                                          "startToken": 36,
+                                                          "endToken": 37
+                                                        }
+                                                      ],
+                                                      "startToken": 36,
+                                                      "endToken": 37
+                                                    }
+                                                  ],
+                                                  "startToken": 36,
+                                                  "endToken": 37
+                                                }
+                                              ],
+                                              "startToken": 36,
+                                              "endToken": 37
+                                            }
+                                          ],
+                                          "startToken": 35,
+                                          "endToken": 37
+                                        }
+                                      ],
+                                      "startToken": 34,
+                                      "endToken": 37
+                                    }
+                                  ],
+                                  "startToken": 34,
+                                  "endToken": 37
+                                }
+                              ],
+                              "startToken": 34,
+                              "endToken": 37
+                            }
+                          ],
+                          "startToken": 28,
+                          "endToken": 37
+                        }
+                      ],
+                      "startToken": 28,
+                      "endToken": 37
+                    }
+                  ],
+                  "startToken": 28,
+                  "endToken": 37
+                }
+              ],
+              "startToken": 0,
+              "endToken": 37
+            }
+          ],
+          "startToken": 0,
+          "endToken": 37
+        }
+      ],
+      "startToken": 0,
+      "endToken": 37
+    },
+    {
+      "kind": "terminal",
+      "token": "EOF",
+      "value": "",
+      "tokenIndex": 38
+    }
+  ],
+  "startToken": 0,
+  "endToken": 39
+}
