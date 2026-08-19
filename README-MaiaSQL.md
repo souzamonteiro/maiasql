@@ -1,8 +1,4 @@
-# MaiaSQL (WebSQL)
-
-![MaiaSQL](images/Squirrel.png)
-
-Pure JavaScript implementation of WebSQL.
+# MaiaSQL
 
 > **Not SQLite compiled to WebAssembly — a browser-native SQL engine designed for the Web.**
 
@@ -1437,4 +1433,4 @@ Its parser is generated from EBNF by MaiaCC, using the same parser-generation in
 
 # License
 
-Apache 2.0
+MIT

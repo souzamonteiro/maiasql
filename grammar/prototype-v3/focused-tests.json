@@ -2576,6 +2576,12 @@ OK focused-tests.sql root=SqlScript tokens=92
                                                   "tokenIndex": 59
                                                 },
                                                 {
+                                                  "kind": "terminal",
+                                                  "token": "KW_NOT",
+                                                  "value": "NOT",
+                                                  "tokenIndex": 60
+                                                },
+                                                {
                                                   "kind": "nonterminal",
                                                   "name": "RelationalExpr",
                                                   "children": [
@@ -3888,6 +3894,12 @@ OK focused-tests.sql root=SqlScript tokens=92
       ],
       "startToken": 84,
       "endToken": 90
+    },
+    {
+      "kind": "terminal",
+      "token": "TOKEN__3B_",
+      "value": ";",
+      "tokenIndex": 90
     },
     {
       "kind": "terminal",

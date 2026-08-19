@@ -1,6 +1,13 @@
+'use strict';
+
 class ParseTreeCollector {
   constructor() {
     this.stack = [];
+    this.root = null;
+  }
+
+  reset() {
+    this.stack.length = 0;
     this.root = null;
   }
 
@@ -9,30 +16,31 @@ class ParseTreeCollector {
       throw new Error('ParseTreeCollector.parse requires a parser instance with parse()');
     }
 
+    this.reset();
+
     const inputText = parser.lexer && typeof parser.lexer.input === 'string'
       ? parser.lexer.input
       : '';
 
     try {
-      return parser.parse();
+      parser.parse();
     } catch (err) {
-      const message = err && err.message ? err.message : String(err);
-      const offset = extractOffsetFromError(err, parser);
-      if (offset === null || inputText.length === 0) {
-        throw new Error(`Parse failed for ${inputLabel}: ${message}`);
-      }
-
-      const loc = offsetToLineColumn(inputText, offset);
-      throw new Error(
-        `Parse failed for ${inputLabel}: ${message} at line ${loc.line}, column ${loc.column} (offset ${loc.offset})`
-      );
+      throw buildParseError(err, parser, inputText, inputLabel);
     }
+
+    if (!this.root) {
+      throw new Error(`Parser completed for ${inputLabel} without producing a parse tree`);
+    }
+
+    return this.root;
   }
 
   checkpoint() {
     return {
       stackLen: this.stack.length,
-      stackChildLens: this.stack.map((node) => (Array.isArray(node.children) ? node.children.length : 0)),
+      stackChildLens: this.stack.map((node) =>
+        Array.isArray(node && node.children) ? node.children.length : 0
+      ),
       root: this.root
     };
   }
@@ -40,44 +48,53 @@ class ParseTreeCollector {
   restore(mark) {
     if (!mark) return;
 
-    const targetLen = Number.isFinite(mark.stackLen) ? mark.stackLen : 0;
+    const targetLen = Number.isInteger(mark.stackLen) ? mark.stackLen : 0;
     const childLens = Array.isArray(mark.stackChildLens) ? mark.stackChildLens : [];
 
-    // Remove speculative nodes created after checkpoint.
+    const sharedLen = Math.min(this.stack.length, targetLen, childLens.length);
+    for (let i = 0; i < sharedLen; i += 1) {
+      const node = this.stack[i];
+      if (node && Array.isArray(node.children)) {
+        node.children.length = childLens[i];
+      }
+    }
+
     if (this.stack.length > targetLen) {
       this.stack.length = targetLen;
     }
 
-    // Truncate children appended during speculative parses.
-    for (let i = 0; i < this.stack.length; i += 1) {
-      const node = this.stack[i];
-      if (!node || !Array.isArray(node.children)) continue;
-      const keep = Number.isFinite(childLens[i]) ? childLens[i] : node.children.length;
-      if (node.children.length > keep) {
-        node.children.length = keep;
-      }
-    }
-
-    this.root = mark.root || null;
+    this.root = Object.prototype.hasOwnProperty.call(mark, 'root')
+      ? mark.root
+      : this.root;
   }
 
-  startNonterminal(name) {
-    this.stack.push({ kind: 'nonterminal', name, children: [] });
+  startNonterminal(name, tokenIndex = null) {
+    const node = { kind: 'nonterminal', name, children: [] };
+    if (Number.isInteger(tokenIndex)) node.startToken = tokenIndex;
+    this.stack.push(node);
   }
 
-  terminal(expectedType, tokenValue) {
+  terminal(expectedType, tokenValue, tokenIndex = null) {
     if (this.stack.length === 0) return;
-    const parent = this.stack[this.stack.length - 1];
-    parent.children.push({
+
+    const terminalNode = {
       kind: 'terminal',
       token: expectedType,
       value: tokenValue
-    });
+    };
+    if (Number.isInteger(tokenIndex)) terminalNode.tokenIndex = tokenIndex;
+
+    this.stack[this.stack.length - 1].children.push(terminalNode);
   }
 
-  endNonterminal() {
+  endNonterminal(name = null, tokenIndex = null) {
     const node = this.stack.pop();
     if (!node) return;
+
+    if (name && node.name !== name) {
+      throw new Error(`Collector stack mismatch: expected ${node.name}, ended ${name}`);
+    }
+    if (Number.isInteger(tokenIndex)) node.endToken = tokenIndex;
 
     if (this.stack.length === 0) {
       this.root = node;
@@ -90,8 +107,26 @@ class ParseTreeCollector {
     this.stack.pop();
   }
 
-  toJSON(space = 2) {
-    return JSON.stringify(this.root, null, space);
+  /** Concrete parse tree (CST) as plain JSON-compatible object. */
+  toObject() {
+    return this.root;
+  }
+
+  /**
+   * Generic structural AST.
+   * This preserves grammar nodes and terminals; it is not yet the semantic
+   * MaiaSQL AST used by the evaluator/planner.
+   */
+  toAst() {
+    if (!this.root) {
+      throw new Error('No parse tree was collected from parser events');
+    }
+    return parseNodeToAst(this.root);
+  }
+
+  toJSON(space = 2, options = {}) {
+    const value = options.ast ? this.toAst() : this.root;
+    return JSON.stringify(value, null, space);
   }
 
   toXml(options = {}) {
@@ -100,11 +135,62 @@ class ParseTreeCollector {
     }
 
     const includeDeclaration = options.includeDeclaration !== false;
-    const xmlBody = serializeNodeAsXml(this.root);
+    const root = options.ast ? this.toAst() : this.root;
+    const xmlBody = options.ast
+      ? serializeAstAsXml(root)
+      : serializeNodeAsXml(root);
+
     return includeDeclaration
       ? `<?xml version="1.0" encoding="UTF-8"?>${xmlBody}`
       : xmlBody;
   }
+}
+
+function buildParseError(err, parser, inputText, inputLabel) {
+  const originalMessage = err && err.message ? err.message : String(err);
+  const diagnostic = selectBestDiagnostic(parser);
+  const offset = diagnostic && Number.isInteger(diagnostic.offset)
+    ? diagnostic.offset
+    : extractOffsetFromError(err, parser);
+
+  const expected = diagnostic && diagnostic.expected
+    ? ` expected ${diagnostic.expected}`
+    : '';
+  const found = diagnostic && diagnostic.found
+    ? `, found ${diagnostic.found}`
+    : '';
+
+  if (offset === null || inputText.length === 0) {
+    return new Error(`Parse failed for ${inputLabel}:${expected}${found}: ${originalMessage}`);
+  }
+
+  const loc = offsetToLineColumn(inputText, offset);
+  const excerpt = sourceExcerpt(inputText, loc.line, loc.column);
+  return new Error(
+    `Parse failed for ${inputLabel} at line ${loc.line}, column ${loc.column} ` +
+    `(offset ${loc.offset}):${expected}${found}: ${originalMessage}` +
+    (excerpt ? `\n${excerpt}` : '')
+  );
+}
+
+function selectBestDiagnostic(parser) {
+  if (!parser || !Array.isArray(parser.errors) || parser.errors.length === 0) {
+    return null;
+  }
+
+  let best = null;
+  for (const item of parser.errors) {
+    if (!item || !Number.isInteger(item.position)) continue;
+    if (!best || item.position > best.position) best = item;
+  }
+  if (!best) return null;
+
+  const token = Array.isArray(parser.tokens) ? parser.tokens[best.position] : null;
+  return {
+    ...best,
+    offset: token && Number.isInteger(token.start) ? token.start : null,
+    found: best.found || (token ? token.type : 'EOF')
+  };
 }
 
 function offsetToLineColumn(text, offset) {
@@ -112,19 +198,17 @@ function offsetToLineColumn(text, offset) {
   let line = 1;
   let column = 1;
 
-  for (let i = 0; i < safeOffset; i++) {
+  for (let i = 0; i < safeOffset; i += 1) {
     const ch = text[i];
     if (ch === '\r') {
-      if (text[i + 1] === '\n') {
-        i++;
-      }
-      line++;
+      if (text[i + 1] === '\n') i += 1;
+      line += 1;
       column = 1;
     } else if (ch === '\n') {
-      line++;
+      line += 1;
       column = 1;
     } else {
-      column++;
+      column += 1;
     }
   }
 
@@ -134,18 +218,19 @@ function offsetToLineColumn(text, offset) {
 function extractOffsetFromError(err, parser) {
   if (parser && Array.isArray(parser.tokens) && Number.isInteger(parser.position)) {
     const token = parser.tokens[parser.position] || null;
-    if (token && Number.isInteger(token.start)) {
-      return token.start;
-    }
+    if (token && Number.isInteger(token.start)) return token.start;
   }
 
   const message = err && err.message ? String(err.message) : '';
   const match = message.match(/\b(?:position|offset)\s+(\d+)\b/i);
-  if (match) {
-    return Number(match[1]);
-  }
+  return match ? Number(match[1]) : null;
+}
 
-  return null;
+function sourceExcerpt(text, line, column) {
+  const lines = text.split(/\r\n|\r|\n/);
+  const sourceLine = lines[line - 1];
+  if (typeof sourceLine !== 'string') return '';
+  return `${String(line).padStart(4, ' ')} | ${sourceLine}\n     | ${' '.repeat(Math.max(0, column - 1))}^`;
 }
 
 function xmlEscape(value) {
@@ -155,29 +240,64 @@ function xmlEscape(value) {
     .replace(/>/g, '&gt;');
 }
 
+function xmlAttributeEscape(value) {
+  return xmlEscape(value)
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&apos;');
+}
+
+function safeXmlName(value, fallback = 'node') {
+  const text = String(value || fallback).replace(/[^A-Za-z0-9_.-]/g, '_');
+  return /^[A-Za-z_]/.test(text) ? text : `_${text}`;
+}
+
 function terminalElementName(tokenType) {
   if (tokenType === 'EOF') return 'EOF';
-  return tokenType.startsWith('TOKEN_') ? 'TOKEN' : tokenType;
+  if (tokenType.startsWith('KW_')) return 'KEYWORD';
+  if (tokenType.startsWith('TOKEN_')) return 'TOKEN';
+  return safeXmlName(tokenType, 'TOKEN');
 }
 
 function serializeNodeAsXml(node) {
   if (!node) return '';
 
   if (node.kind === 'terminal') {
+    if (node.token === 'EOF') return '<EOF/>';
     const elementName = terminalElementName(node.token);
-    if (node.token === 'EOF') {
-      return `<${elementName}/>`;
-    }
-    return `<${elementName}>${xmlEscape(node.value)}</${elementName}>`;
+    const tokenAttr = xmlAttributeEscape(node.token);
+    return `<${elementName} type="${tokenAttr}">${xmlEscape(node.value)}</${elementName}>`;
   }
 
+  const elementName = safeXmlName(node.name, 'nonterminal');
   const children = Array.isArray(node.children) ? node.children : [];
-  if (children.length === 0) {
-    return `<${node.name}/>`;
+  if (children.length === 0) return `<${elementName}/>`;
+  return `<${elementName}>${children.map(serializeNodeAsXml).join('')}</${elementName}>`;
+}
+
+function parseNodeToAst(node) {
+  if (node.kind === 'terminal') {
+    return {
+      type: 'token',
+      token: node.token,
+      value: node.value,
+      ...(Number.isInteger(node.tokenIndex) ? { tokenIndex: node.tokenIndex } : {})
+    };
   }
 
-  const inner = children.map((child) => serializeNodeAsXml(child)).join('');
-  return `<${node.name}>${inner}</${node.name}>`;
+  return {
+    type: node.name,
+    children: (node.children || []).map(parseNodeToAst)
+  };
+}
+
+function serializeAstAsXml(node) {
+  if (!node) return '';
+  if (node.type === 'token') {
+    return `<token type="${xmlAttributeEscape(node.token)}">${xmlEscape(node.value)}</token>`;
+  }
+  const elementName = safeXmlName(node.type, 'node');
+  const children = Array.isArray(node.children) ? node.children : [];
+  return `<${elementName}>${children.map(serializeAstAsXml).join('')}</${elementName}>`;
 }
 
 function getNodeLabel(node) {
@@ -188,26 +308,29 @@ function getNodeLabel(node) {
   return node.name;
 }
 
-function printTree(node, prefix = '', isLast = true, isRoot = true) {
+function printTree(node, prefix = '', isLast = true, isRoot = true, output = console.log) {
   if (!node) return;
 
   const branch = isRoot ? '' : isLast ? '└─ ' : '├─ ';
-  console.log(prefix + branch + getNodeLabel(node));
+  output(prefix + branch + getNodeLabel(node));
 
-  if (!Array.isArray(node.children) || node.children.length === 0) {
-    return;
-  }
+  if (!Array.isArray(node.children) || node.children.length === 0) return;
 
   const childPrefix = isRoot ? '' : prefix + (isLast ? '   ' : '│  ');
-  for (let index = 0; index < node.children.length; index++) {
-    const child = node.children[index];
-    const childIsLast = index === node.children.length - 1;
-    printTree(child, childPrefix, childIsLast, false);
+  for (let index = 0; index < node.children.length; index += 1) {
+    printTree(
+      node.children[index],
+      childPrefix,
+      index === node.children.length - 1,
+      false,
+      output
+    );
   }
 }
 
 module.exports = {
   ParseTreeCollector,
   printTree,
-  getNodeLabel
+  getNodeLabel,
+  offsetToLineColumn
 };

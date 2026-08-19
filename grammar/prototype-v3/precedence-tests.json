@@ -3180,6 +3180,12 @@ OK precedence-tests.sql root=SqlScript tokens=111
                                   "name": "NotExpr",
                                   "children": [
                                     {
+                                      "kind": "terminal",
+                                      "token": "KW_NOT",
+                                      "value": "NOT",
+                                      "tokenIndex": 76
+                                    },
+                                    {
                                       "kind": "nonterminal",
                                       "name": "PredicateExpr",
                                       "children": [
@@ -4316,6 +4322,12 @@ OK precedence-tests.sql root=SqlScript tokens=111
                                                   "tokenIndex": 98
                                                 },
                                                 {
+                                                  "kind": "terminal",
+                                                  "token": "KW_NOT",
+                                                  "value": "NOT",
+                                                  "tokenIndex": 99
+                                                },
+                                                {
                                                   "kind": "nonterminal",
                                                   "name": "RelationalExpr",
                                                   "children": [
@@ -4836,6 +4848,12 @@ OK precedence-tests.sql root=SqlScript tokens=111
       ],
       "startToken": 96,
       "endToken": 109
+    },
+    {
+      "kind": "terminal",
+      "token": "TOKEN__3B_",
+      "value": ";",
+      "tokenIndex": 109
     },
     {
       "kind": "terminal",

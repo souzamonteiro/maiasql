@@ -140,6 +140,12 @@ OK smoke-tests.sql root=SqlScript tokens=471
                       "token": "KW_KEY",
                       "value": "KEY",
                       "tokenIndex": 10
+                    },
+                    {
+                      "kind": "terminal",
+                      "token": "KW_AUTOINCREMENT",
+                      "value": "AUTOINCREMENT",
+                      "tokenIndex": 11
                     }
                   ],
                   "startToken": 9,
@@ -1198,6 +1204,12 @@ OK smoke-tests.sql root=SqlScript tokens=471
                                           "token": "KW_IS",
                                           "value": "IS",
                                           "tokenIndex": 68
+                                        },
+                                        {
+                                          "kind": "terminal",
+                                          "token": "KW_NOT",
+                                          "value": "NOT",
+                                          "tokenIndex": 69
                                         },
                                         {
                                           "kind": "nonterminal",
@@ -3976,6 +3988,12 @@ OK smoke-tests.sql root=SqlScript tokens=471
                       "endToken": 148
                     },
                     {
+                      "kind": "terminal",
+                      "token": "KW_AS",
+                      "value": "AS",
+                      "tokenIndex": 148
+                    },
+                    {
                       "kind": "nonterminal",
                       "name": "ColumnAlias",
                       "children": [
@@ -4666,6 +4684,12 @@ OK smoke-tests.sql root=SqlScript tokens=471
                       ],
                       "startToken": 151,
                       "endToken": 163
+                    },
+                    {
+                      "kind": "terminal",
+                      "token": "KW_AS",
+                      "value": "AS",
+                      "tokenIndex": 163
                     },
                     {
                       "kind": "nonterminal",
@@ -5360,6 +5384,12 @@ OK smoke-tests.sql root=SqlScript tokens=471
                       "endToken": 190
                     },
                     {
+                      "kind": "terminal",
+                      "token": "KW_AS",
+                      "value": "AS",
+                      "tokenIndex": 190
+                    },
+                    {
                       "kind": "nonterminal",
                       "name": "ColumnAlias",
                       "children": [
@@ -5424,6 +5454,12 @@ OK smoke-tests.sql root=SqlScript tokens=471
                               ],
                               "startToken": 193,
                               "endToken": 194
+                            },
+                            {
+                              "kind": "terminal",
+                              "token": "KW_AS",
+                              "value": "AS",
+                              "tokenIndex": 194
                             },
                             {
                               "kind": "nonterminal",
@@ -5620,6 +5656,12 @@ OK smoke-tests.sql root=SqlScript tokens=471
                                               "token": "KW_IS",
                                               "value": "IS",
                                               "tokenIndex": 200
+                                            },
+                                            {
+                                              "kind": "terminal",
+                                              "token": "KW_NOT",
+                                              "value": "NOT",
+                                              "tokenIndex": 201
                                             },
                                             {
                                               "kind": "nonterminal",
@@ -5863,6 +5905,12 @@ OK smoke-tests.sql root=SqlScript tokens=471
                                       "kind": "nonterminal",
                                       "name": "PredicateTail",
                                       "children": [
+                                        {
+                                          "kind": "terminal",
+                                          "token": "KW_NOT",
+                                          "value": "NOT",
+                                          "tokenIndex": 207
+                                        },
                                         {
                                           "kind": "terminal",
                                           "token": "KW_LIKE",
@@ -8888,6 +8936,12 @@ OK smoke-tests.sql root=SqlScript tokens=471
                   "tokenIndex": 279
                 },
                 {
+                  "kind": "terminal",
+                  "token": "KW_RECURSIVE",
+                  "value": "RECURSIVE",
+                  "tokenIndex": 280
+                },
+                {
                   "kind": "nonterminal",
                   "name": "CommonTableExpression",
                   "children": [
@@ -9140,6 +9194,12 @@ OK smoke-tests.sql root=SqlScript tokens=471
                               "token": "KW_UNION",
                               "value": "UNION",
                               "tokenIndex": 291
+                            },
+                            {
+                              "kind": "terminal",
+                              "token": "KW_ALL",
+                              "value": "ALL",
+                              "tokenIndex": 292
                             }
                           ],
                           "startToken": 291,
@@ -10088,6 +10148,12 @@ OK smoke-tests.sql root=SqlScript tokens=471
                       ],
                       "startToken": 318,
                       "endToken": 319
+                    },
+                    {
+                      "kind": "terminal",
+                      "token": "KW_AS",
+                      "value": "AS",
+                      "tokenIndex": 319
                     },
                     {
                       "kind": "nonterminal",
@@ -13313,6 +13379,12 @@ OK smoke-tests.sql root=SqlScript tokens=471
             },
             {
               "kind": "terminal",
+              "token": "TOKEN__3B_",
+              "value": ";",
+              "tokenIndex": 401
+            },
+            {
+              "kind": "terminal",
               "token": "KW_END",
               "value": "END",
               "tokenIndex": 402
@@ -13386,6 +13458,12 @@ OK smoke-tests.sql root=SqlScript tokens=471
               "token": "KW_ADD",
               "value": "ADD",
               "tokenIndex": 407
+            },
+            {
+              "kind": "terminal",
+              "token": "KW_COLUMN",
+              "value": "COLUMN",
+              "tokenIndex": 408
             },
             {
               "kind": "nonterminal",
@@ -13536,6 +13614,12 @@ OK smoke-tests.sql root=SqlScript tokens=471
               "token": "KW_RENAME",
               "value": "RENAME",
               "tokenIndex": 417
+            },
+            {
+              "kind": "terminal",
+              "token": "KW_COLUMN",
+              "value": "COLUMN",
+              "tokenIndex": 418
             },
             {
               "kind": "nonterminal",
@@ -13848,6 +13932,12 @@ OK smoke-tests.sql root=SqlScript tokens=471
               "token": "KW_IMMEDIATE",
               "value": "IMMEDIATE",
               "tokenIndex": 442
+            },
+            {
+              "kind": "terminal",
+              "token": "KW_TRANSACTION",
+              "value": "TRANSACTION",
+              "tokenIndex": 443
             }
           ],
           "startToken": 441,
@@ -13934,6 +14024,12 @@ OK smoke-tests.sql root=SqlScript tokens=471
               "tokenIndex": 449
             },
             {
+              "kind": "terminal",
+              "token": "KW_SAVEPOINT",
+              "value": "SAVEPOINT",
+              "tokenIndex": 450
+            },
+            {
               "kind": "nonterminal",
               "name": "SavepointName",
               "children": [
@@ -13982,6 +14078,12 @@ OK smoke-tests.sql root=SqlScript tokens=471
               "token": "KW_RELEASE",
               "value": "RELEASE",
               "tokenIndex": 453
+            },
+            {
+              "kind": "terminal",
+              "token": "KW_SAVEPOINT",
+              "value": "SAVEPOINT",
+              "tokenIndex": 454
             },
             {
               "kind": "nonterminal",
@@ -14194,6 +14296,12 @@ OK smoke-tests.sql root=SqlScript tokens=471
       ],
       "startToken": 468,
       "endToken": 469
+    },
+    {
+      "kind": "terminal",
+      "token": "TOKEN__3B_",
+      "value": ";",
+      "tokenIndex": 469
     },
     {
       "kind": "terminal",

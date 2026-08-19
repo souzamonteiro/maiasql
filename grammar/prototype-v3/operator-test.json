@@ -1739,6 +1739,12 @@ OK operator-test.sql root=SqlScript tokens=39
     },
     {
       "kind": "terminal",
+      "token": "TOKEN__3B_",
+      "value": ";",
+      "tokenIndex": 37
+    },
+    {
+      "kind": "terminal",
       "token": "EOF",
       "value": "",
       "tokenIndex": 38

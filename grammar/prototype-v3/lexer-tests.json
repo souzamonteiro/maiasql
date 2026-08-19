@@ -4183,6 +4183,12 @@ OK lexer-tests.sql root=SqlScript tokens=93
     },
     {
       "kind": "terminal",
+      "token": "TOKEN__3B_",
+      "value": ";",
+      "tokenIndex": 91
+    },
+    {
+      "kind": "terminal",
       "token": "EOF",
       "value": "",
       "tokenIndex": 92

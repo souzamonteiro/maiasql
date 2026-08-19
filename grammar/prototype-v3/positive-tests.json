@@ -2778,6 +2778,12 @@ OK positive-tests.sql root=SqlScript tokens=1430
                               "endToken": 61
                             },
                             {
+                              "kind": "terminal",
+                              "token": "KW_AS",
+                              "value": "AS",
+                              "tokenIndex": 61
+                            },
+                            {
                               "kind": "nonterminal",
                               "name": "TableAlias",
                               "children": [
@@ -6145,6 +6151,12 @@ OK positive-tests.sql root=SqlScript tokens=1430
                                       "children": [
                                         {
                                           "kind": "terminal",
+                                          "token": "KW_NOT",
+                                          "value": "NOT",
+                                          "tokenIndex": 145
+                                        },
+                                        {
+                                          "kind": "terminal",
                                           "token": "KW_BETWEEN",
                                           "value": "BETWEEN",
                                           "tokenIndex": 146
@@ -7259,6 +7271,12 @@ OK positive-tests.sql root=SqlScript tokens=1430
                                       "kind": "nonterminal",
                                       "name": "PredicateTail",
                                       "children": [
+                                        {
+                                          "kind": "terminal",
+                                          "token": "KW_NOT",
+                                          "value": "NOT",
+                                          "tokenIndex": 172
+                                        },
                                         {
                                           "kind": "terminal",
                                           "token": "KW_IN",
@@ -9602,6 +9620,12 @@ OK positive-tests.sql root=SqlScript tokens=1430
                                               "token": "KW_IS",
                                               "value": "IS",
                                               "tokenIndex": 234
+                                            },
+                                            {
+                                              "kind": "terminal",
+                                              "token": "KW_NOT",
+                                              "value": "NOT",
+                                              "tokenIndex": 235
                                             },
                                             {
                                               "kind": "nonterminal",
@@ -17806,6 +17830,12 @@ OK positive-tests.sql root=SqlScript tokens=1430
                               "endToken": 419
                             },
                             {
+                              "kind": "terminal",
+                              "token": "KW_AS",
+                              "value": "AS",
+                              "tokenIndex": 419
+                            },
+                            {
                               "kind": "nonterminal",
                               "name": "TableAlias",
                               "children": [
@@ -18074,6 +18104,12 @@ OK positive-tests.sql root=SqlScript tokens=1430
                               "token": "TOKEN__29_",
                               "value": ")",
                               "tokenIndex": 428
+                            },
+                            {
+                              "kind": "terminal",
+                              "token": "KW_AS",
+                              "value": "AS",
+                              "tokenIndex": 429
                             },
                             {
                               "kind": "nonterminal",
@@ -18568,6 +18604,12 @@ OK positive-tests.sql root=SqlScript tokens=1430
                               "token": "TOKEN__29_",
                               "value": ")",
                               "tokenIndex": 442
+                            },
+                            {
+                              "kind": "terminal",
+                              "token": "KW_AS",
+                              "value": "AS",
+                              "tokenIndex": 443
                             },
                             {
                               "kind": "nonterminal",
@@ -20378,6 +20420,12 @@ OK positive-tests.sql root=SqlScript tokens=1430
                                       "token": "KW_LEFT",
                                       "value": "LEFT",
                                       "tokenIndex": 506
+                                    },
+                                    {
+                                      "kind": "terminal",
+                                      "token": "KW_OUTER",
+                                      "value": "OUTER",
+                                      "tokenIndex": 507
                                     }
                                   ],
                                   "startToken": 506,
@@ -21370,6 +21418,12 @@ OK positive-tests.sql root=SqlScript tokens=1430
                                       "token": "KW_FULL",
                                       "value": "FULL",
                                       "tokenIndex": 539
+                                    },
+                                    {
+                                      "kind": "terminal",
+                                      "token": "KW_OUTER",
+                                      "value": "OUTER",
+                                      "tokenIndex": 540
                                     }
                                   ],
                                   "startToken": 539,
@@ -22192,6 +22246,12 @@ OK positive-tests.sql root=SqlScript tokens=1430
                                       "token": "KW_LEFT",
                                       "value": "LEFT",
                                       "tokenIndex": 573
+                                    },
+                                    {
+                                      "kind": "terminal",
+                                      "token": "KW_OUTER",
+                                      "value": "OUTER",
+                                      "tokenIndex": 574
                                     }
                                   ],
                                   "startToken": 573,
@@ -25420,6 +25480,12 @@ OK positive-tests.sql root=SqlScript tokens=1430
                   "token": "KW_UNION",
                   "value": "UNION",
                   "tokenIndex": 662
+                },
+                {
+                  "kind": "terminal",
+                  "token": "KW_ALL",
+                  "value": "ALL",
+                  "tokenIndex": 663
                 }
               ],
               "startToken": 662,
@@ -27286,6 +27352,12 @@ OK positive-tests.sql root=SqlScript tokens=1430
                   "tokenIndex": 707
                 },
                 {
+                  "kind": "terminal",
+                  "token": "KW_RECURSIVE",
+                  "value": "RECURSIVE",
+                  "tokenIndex": 708
+                },
+                {
                   "kind": "nonterminal",
                   "name": "CommonTableExpression",
                   "children": [
@@ -27538,6 +27610,12 @@ OK positive-tests.sql root=SqlScript tokens=1430
                               "token": "KW_UNION",
                               "value": "UNION",
                               "tokenIndex": 719
+                            },
+                            {
+                              "kind": "terminal",
+                              "token": "KW_ALL",
+                              "value": "ALL",
+                              "tokenIndex": 720
                             }
                           ],
                           "startToken": 719,
@@ -28942,6 +29020,12 @@ OK positive-tests.sql root=SqlScript tokens=1430
                       "endToken": 760
                     },
                     {
+                      "kind": "terminal",
+                      "token": "KW_AS",
+                      "value": "AS",
+                      "tokenIndex": 760
+                    },
+                    {
                       "kind": "nonterminal",
                       "name": "ColumnAlias",
                       "children": [
@@ -30232,6 +30316,12 @@ OK positive-tests.sql root=SqlScript tokens=1430
                       "token": "KW_KEY",
                       "value": "KEY",
                       "tokenIndex": 814
+                    },
+                    {
+                      "kind": "terminal",
+                      "token": "KW_AUTOINCREMENT",
+                      "value": "AUTOINCREMENT",
+                      "tokenIndex": 815
                     }
                   ],
                   "startToken": 813,
@@ -30984,6 +31074,12 @@ OK positive-tests.sql root=SqlScript tokens=1430
                           "token": "KW_GENERATED",
                           "value": "GENERATED",
                           "tokenIndex": 861
+                        },
+                        {
+                          "kind": "terminal",
+                          "token": "KW_ALWAYS",
+                          "value": "ALWAYS",
+                          "tokenIndex": 862
                         },
                         {
                           "kind": "terminal",
@@ -32862,6 +32958,12 @@ OK positive-tests.sql root=SqlScript tokens=1430
               "token": "KW_CREATE",
               "value": "CREATE",
               "tokenIndex": 957
+            },
+            {
+              "kind": "terminal",
+              "token": "KW_UNIQUE",
+              "value": "UNIQUE",
+              "tokenIndex": 958
             },
             {
               "kind": "terminal",
@@ -37812,6 +37914,12 @@ OK positive-tests.sql root=SqlScript tokens=1430
                                               "tokenIndex": 1140
                                             },
                                             {
+                                              "kind": "terminal",
+                                              "token": "KW_NOT",
+                                              "value": "NOT",
+                                              "tokenIndex": 1141
+                                            },
+                                            {
                                               "kind": "nonterminal",
                                               "name": "RelationalExpr",
                                               "children": [
@@ -40500,6 +40608,12 @@ OK positive-tests.sql root=SqlScript tokens=1430
                       ],
                       "startToken": 1208,
                       "endToken": 1209
+                    },
+                    {
+                      "kind": "terminal",
+                      "token": "KW_AS",
+                      "value": "AS",
+                      "tokenIndex": 1209
                     },
                     {
                       "kind": "nonterminal",
@@ -43617,6 +43731,12 @@ OK positive-tests.sql root=SqlScript tokens=1430
             },
             {
               "kind": "terminal",
+              "token": "TOKEN__3B_",
+              "value": ";",
+              "tokenIndex": 1297
+            },
+            {
+              "kind": "terminal",
               "token": "KW_END",
               "value": "END",
               "tokenIndex": 1298
@@ -43866,6 +43986,12 @@ OK positive-tests.sql root=SqlScript tokens=1430
               "tokenIndex": 1316
             },
             {
+              "kind": "terminal",
+              "token": "KW_COLUMN",
+              "value": "COLUMN",
+              "tokenIndex": 1317
+            },
+            {
               "kind": "nonterminal",
               "name": "ColumnName",
               "children": [
@@ -43984,6 +44110,12 @@ OK positive-tests.sql root=SqlScript tokens=1430
               "token": "KW_ADD",
               "value": "ADD",
               "tokenIndex": 1325
+            },
+            {
+              "kind": "terminal",
+              "token": "KW_COLUMN",
+              "value": "COLUMN",
+              "tokenIndex": 1326
             },
             {
               "kind": "nonterminal",
@@ -44108,6 +44240,12 @@ OK positive-tests.sql root=SqlScript tokens=1430
               "tokenIndex": 1333
             },
             {
+              "kind": "terminal",
+              "token": "KW_COLUMN",
+              "value": "COLUMN",
+              "tokenIndex": 1334
+            },
+            {
               "kind": "nonterminal",
               "name": "ColumnName",
               "children": [
@@ -44156,6 +44294,12 @@ OK positive-tests.sql root=SqlScript tokens=1430
               "token": "KW_BEGIN",
               "value": "BEGIN",
               "tokenIndex": 1337
+            },
+            {
+              "kind": "terminal",
+              "token": "KW_TRANSACTION",
+              "value": "TRANSACTION",
+              "tokenIndex": 1338
             }
           ],
           "startToken": 1337,
@@ -44218,6 +44362,12 @@ OK positive-tests.sql root=SqlScript tokens=1430
               "token": "KW_IMMEDIATE",
               "value": "IMMEDIATE",
               "tokenIndex": 1343
+            },
+            {
+              "kind": "terminal",
+              "token": "KW_TRANSACTION",
+              "value": "TRANSACTION",
+              "tokenIndex": 1344
             }
           ],
           "startToken": 1342,
@@ -44332,6 +44482,12 @@ OK positive-tests.sql root=SqlScript tokens=1430
               "tokenIndex": 1352
             },
             {
+              "kind": "terminal",
+              "token": "KW_SAVEPOINT",
+              "value": "SAVEPOINT",
+              "tokenIndex": 1353
+            },
+            {
               "kind": "nonterminal",
               "name": "SavepointName",
               "children": [
@@ -44380,6 +44536,12 @@ OK positive-tests.sql root=SqlScript tokens=1430
               "token": "KW_RELEASE",
               "value": "RELEASE",
               "tokenIndex": 1356
+            },
+            {
+              "kind": "terminal",
+              "token": "KW_SAVEPOINT",
+              "value": "SAVEPOINT",
+              "tokenIndex": 1357
             },
             {
               "kind": "nonterminal",
@@ -44854,6 +45016,12 @@ OK positive-tests.sql root=SqlScript tokens=1430
               "tokenIndex": 1389
             },
             {
+              "kind": "terminal",
+              "token": "KW_DATABASE",
+              "value": "DATABASE",
+              "tokenIndex": 1390
+            },
+            {
               "kind": "nonterminal",
               "name": "Expr",
               "children": [
@@ -45034,6 +45202,12 @@ OK positive-tests.sql root=SqlScript tokens=1430
               "token": "KW_DETACH",
               "value": "DETACH",
               "tokenIndex": 1395
+            },
+            {
+              "kind": "terminal",
+              "token": "KW_DATABASE",
+              "value": "DATABASE",
+              "tokenIndex": 1396
             },
             {
               "kind": "nonterminal",
@@ -45724,6 +45898,12 @@ OK positive-tests.sql root=SqlScript tokens=1430
       ],
       "startToken": 1417,
       "endToken": 1428
+    },
+    {
+      "kind": "terminal",
+      "token": "TOKEN__3B_",
+      "value": ";",
+      "tokenIndex": 1428
     },
     {
       "kind": "terminal",
