@@ -1,0 +1,1218 @@
+{
+  "type": "SqlScript",
+  "children": [
+    {
+      "type": "SqlStatement",
+      "children": [
+        {
+          "type": "SelectStmt",
+          "children": [
+            {
+              "type": "SelectCore",
+              "children": [
+                {
+                  "type": "token",
+                  "token": "KW_SELECT",
+                  "value": "SELECT",
+                  "tokenIndex": 0
+                },
+                {
+                  "type": "ResultColumn",
+                  "children": [
+                    {
+                      "type": "Expr",
+                      "children": [
+                        {
+                          "type": "OrExpr",
+                          "children": [
+                            {
+                              "type": "AndExpr",
+                              "children": [
+                                {
+                                  "type": "NotExpr",
+                                  "children": [
+                                    {
+                                      "type": "PredicateExpr",
+                                      "children": [
+                                        {
+                                          "type": "IsExpr",
+                                          "children": [
+                                            {
+                                              "type": "EqualityExpr",
+                                              "children": [
+                                                {
+                                                  "type": "RelationalExpr",
+                                                  "children": [
+                                                    {
+                                                      "type": "BitwiseExpr",
+                                                      "children": [
+                                                        {
+                                                          "type": "AddExpr",
+                                                          "children": [
+                                                            {
+                                                              "type": "MultiplyExpr",
+                                                              "children": [
+                                                                {
+                                                                  "type": "ConcatExpr",
+                                                                  "children": [
+                                                                    {
+                                                                      "type": "CollateExpr",
+                                                                      "children": [
+                                                                        {
+                                                                          "type": "UnaryExpr",
+                                                                          "children": [
+                                                                            {
+                                                                              "type": "PrimaryExpr",
+                                                                              "children": [
+                                                                                {
+                                                                                  "type": "LiteralValue",
+                                                                                  "children": [
+                                                                                    {
+                                                                                      "type": "token",
+                                                                                      "token": "NumericLiteral",
+                                                                                      "value": "1",
+                                                                                      "tokenIndex": 1
+                                                                                    }
+                                                                                  ]
+                                                                                }
+                                                                              ]
+                                                                            }
+                                                                          ]
+                                                                        }
+                                                                      ]
+                                                                    }
+                                                                  ]
+                                                                }
+                                                              ]
+                                                            },
+                                                            {
+                                                              "type": "token",
+                                                              "token": "TOKEN__2B_",
+                                                              "value": "+",
+                                                              "tokenIndex": 2
+                                                            },
+                                                            {
+                                                              "type": "MultiplyExpr",
+                                                              "children": [
+                                                                {
+                                                                  "type": "ConcatExpr",
+                                                                  "children": [
+                                                                    {
+                                                                      "type": "CollateExpr",
+                                                                      "children": [
+                                                                        {
+                                                                          "type": "UnaryExpr",
+                                                                          "children": [
+                                                                            {
+                                                                              "type": "PrimaryExpr",
+                                                                              "children": [
+                                                                                {
+                                                                                  "type": "LiteralValue",
+                                                                                  "children": [
+                                                                                    {
+                                                                                      "type": "token",
+                                                                                      "token": "NumericLiteral",
+                                                                                      "value": "2",
+                                                                                      "tokenIndex": 3
+                                                                                    }
+                                                                                  ]
+                                                                                }
+                                                                              ]
+                                                                            }
+                                                                          ]
+                                                                        }
+                                                                      ]
+                                                                    }
+                                                                  ]
+                                                                },
+                                                                {
+                                                                  "type": "token",
+                                                                  "token": "TOKEN__2A_",
+                                                                  "value": "*",
+                                                                  "tokenIndex": 4
+                                                                },
+                                                                {
+                                                                  "type": "ConcatExpr",
+                                                                  "children": [
+                                                                    {
+                                                                      "type": "CollateExpr",
+                                                                      "children": [
+                                                                        {
+                                                                          "type": "UnaryExpr",
+                                                                          "children": [
+                                                                            {
+                                                                              "type": "PrimaryExpr",
+                                                                              "children": [
+                                                                                {
+                                                                                  "type": "LiteralValue",
+                                                                                  "children": [
+                                                                                    {
+                                                                                      "type": "token",
+                                                                                      "token": "NumericLiteral",
+                                                                                      "value": "3",
+                                                                                      "tokenIndex": 5
+                                                                                    }
+                                                                                  ]
+                                                                                }
+                                                                              ]
+                                                                            }
+                                                                          ]
+                                                                        }
+                                                                      ]
+                                                                    }
+                                                                  ]
+                                                                }
+                                                              ]
+                                                            }
+                                                          ]
+                                                        }
+                                                      ]
+                                                    }
+                                                  ]
+                                                }
+                                              ]
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "token",
+                  "token": "TOKEN__2C_",
+                  "value": ",",
+                  "tokenIndex": 6
+                },
+                {
+                  "type": "ResultColumn",
+                  "children": [
+                    {
+                      "type": "Expr",
+                      "children": [
+                        {
+                          "type": "OrExpr",
+                          "children": [
+                            {
+                              "type": "AndExpr",
+                              "children": [
+                                {
+                                  "type": "NotExpr",
+                                  "children": [
+                                    {
+                                      "type": "PredicateExpr",
+                                      "children": [
+                                        {
+                                          "type": "IsExpr",
+                                          "children": [
+                                            {
+                                              "type": "EqualityExpr",
+                                              "children": [
+                                                {
+                                                  "type": "RelationalExpr",
+                                                  "children": [
+                                                    {
+                                                      "type": "BitwiseExpr",
+                                                      "children": [
+                                                        {
+                                                          "type": "AddExpr",
+                                                          "children": [
+                                                            {
+                                                              "type": "MultiplyExpr",
+                                                              "children": [
+                                                                {
+                                                                  "type": "ConcatExpr",
+                                                                  "children": [
+                                                                    {
+                                                                      "type": "CollateExpr",
+                                                                      "children": [
+                                                                        {
+                                                                          "type": "UnaryExpr",
+                                                                          "children": [
+                                                                            {
+                                                                              "type": "PrimaryExpr",
+                                                                              "children": [
+                                                                                {
+                                                                                  "type": "token",
+                                                                                  "token": "TOKEN__28_",
+                                                                                  "value": "(",
+                                                                                  "tokenIndex": 7
+                                                                                },
+                                                                                {
+                                                                                  "type": "Expr",
+                                                                                  "children": [
+                                                                                    {
+                                                                                      "type": "OrExpr",
+                                                                                      "children": [
+                                                                                        {
+                                                                                          "type": "AndExpr",
+                                                                                          "children": [
+                                                                                            {
+                                                                                              "type": "NotExpr",
+                                                                                              "children": [
+                                                                                                {
+                                                                                                  "type": "PredicateExpr",
+                                                                                                  "children": [
+                                                                                                    {
+                                                                                                      "type": "IsExpr",
+                                                                                                      "children": [
+                                                                                                        {
+                                                                                                          "type": "EqualityExpr",
+                                                                                                          "children": [
+                                                                                                            {
+                                                                                                              "type": "RelationalExpr",
+                                                                                                              "children": [
+                                                                                                                {
+                                                                                                                  "type": "BitwiseExpr",
+                                                                                                                  "children": [
+                                                                                                                    {
+                                                                                                                      "type": "AddExpr",
+                                                                                                                      "children": [
+                                                                                                                        {
+                                                                                                                          "type": "MultiplyExpr",
+                                                                                                                          "children": [
+                                                                                                                            {
+                                                                                                                              "type": "ConcatExpr",
+                                                                                                                              "children": [
+                                                                                                                                {
+                                                                                                                                  "type": "CollateExpr",
+                                                                                                                                  "children": [
+                                                                                                                                    {
+                                                                                                                                      "type": "UnaryExpr",
+                                                                                                                                      "children": [
+                                                                                                                                        {
+                                                                                                                                          "type": "PrimaryExpr",
+                                                                                                                                          "children": [
+                                                                                                                                            {
+                                                                                                                                              "type": "LiteralValue",
+                                                                                                                                              "children": [
+                                                                                                                                                {
+                                                                                                                                                  "type": "token",
+                                                                                                                                                  "token": "NumericLiteral",
+                                                                                                                                                  "value": "1",
+                                                                                                                                                  "tokenIndex": 8
+                                                                                                                                                }
+                                                                                                                                              ]
+                                                                                                                                            }
+                                                                                                                                          ]
+                                                                                                                                        }
+                                                                                                                                      ]
+                                                                                                                                    }
+                                                                                                                                  ]
+                                                                                                                                }
+                                                                                                                              ]
+                                                                                                                            }
+                                                                                                                          ]
+                                                                                                                        },
+                                                                                                                        {
+                                                                                                                          "type": "token",
+                                                                                                                          "token": "TOKEN__2B_",
+                                                                                                                          "value": "+",
+                                                                                                                          "tokenIndex": 9
+                                                                                                                        },
+                                                                                                                        {
+                                                                                                                          "type": "MultiplyExpr",
+                                                                                                                          "children": [
+                                                                                                                            {
+                                                                                                                              "type": "ConcatExpr",
+                                                                                                                              "children": [
+                                                                                                                                {
+                                                                                                                                  "type": "CollateExpr",
+                                                                                                                                  "children": [
+                                                                                                                                    {
+                                                                                                                                      "type": "UnaryExpr",
+                                                                                                                                      "children": [
+                                                                                                                                        {
+                                                                                                                                          "type": "PrimaryExpr",
+                                                                                                                                          "children": [
+                                                                                                                                            {
+                                                                                                                                              "type": "LiteralValue",
+                                                                                                                                              "children": [
+                                                                                                                                                {
+                                                                                                                                                  "type": "token",
+                                                                                                                                                  "token": "NumericLiteral",
+                                                                                                                                                  "value": "2",
+                                                                                                                                                  "tokenIndex": 10
+                                                                                                                                                }
+                                                                                                                                              ]
+                                                                                                                                            }
+                                                                                                                                          ]
+                                                                                                                                        }
+                                                                                                                                      ]
+                                                                                                                                    }
+                                                                                                                                  ]
+                                                                                                                                }
+                                                                                                                              ]
+                                                                                                                            }
+                                                                                                                          ]
+                                                                                                                        }
+                                                                                                                      ]
+                                                                                                                    }
+                                                                                                                  ]
+                                                                                                                }
+                                                                                                              ]
+                                                                                                            }
+                                                                                                          ]
+                                                                                                        }
+                                                                                                      ]
+                                                                                                    }
+                                                                                                  ]
+                                                                                                }
+                                                                                              ]
+                                                                                            }
+                                                                                          ]
+                                                                                        }
+                                                                                      ]
+                                                                                    }
+                                                                                  ]
+                                                                                },
+                                                                                {
+                                                                                  "type": "token",
+                                                                                  "token": "TOKEN__29_",
+                                                                                  "value": ")",
+                                                                                  "tokenIndex": 11
+                                                                                }
+                                                                              ]
+                                                                            }
+                                                                          ]
+                                                                        }
+                                                                      ]
+                                                                    }
+                                                                  ]
+                                                                },
+                                                                {
+                                                                  "type": "token",
+                                                                  "token": "TOKEN__2A_",
+                                                                  "value": "*",
+                                                                  "tokenIndex": 12
+                                                                },
+                                                                {
+                                                                  "type": "ConcatExpr",
+                                                                  "children": [
+                                                                    {
+                                                                      "type": "CollateExpr",
+                                                                      "children": [
+                                                                        {
+                                                                          "type": "UnaryExpr",
+                                                                          "children": [
+                                                                            {
+                                                                              "type": "PrimaryExpr",
+                                                                              "children": [
+                                                                                {
+                                                                                  "type": "LiteralValue",
+                                                                                  "children": [
+                                                                                    {
+                                                                                      "type": "token",
+                                                                                      "token": "NumericLiteral",
+                                                                                      "value": "3",
+                                                                                      "tokenIndex": 13
+                                                                                    }
+                                                                                  ]
+                                                                                }
+                                                                              ]
+                                                                            }
+                                                                          ]
+                                                                        }
+                                                                      ]
+                                                                    }
+                                                                  ]
+                                                                }
+                                                              ]
+                                                            }
+                                                          ]
+                                                        }
+                                                      ]
+                                                    }
+                                                  ]
+                                                }
+                                              ]
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "token",
+                  "token": "TOKEN__2C_",
+                  "value": ",",
+                  "tokenIndex": 14
+                },
+                {
+                  "type": "ResultColumn",
+                  "children": [
+                    {
+                      "type": "Expr",
+                      "children": [
+                        {
+                          "type": "OrExpr",
+                          "children": [
+                            {
+                              "type": "AndExpr",
+                              "children": [
+                                {
+                                  "type": "NotExpr",
+                                  "children": [
+                                    {
+                                      "type": "PredicateExpr",
+                                      "children": [
+                                        {
+                                          "type": "IsExpr",
+                                          "children": [
+                                            {
+                                              "type": "EqualityExpr",
+                                              "children": [
+                                                {
+                                                  "type": "RelationalExpr",
+                                                  "children": [
+                                                    {
+                                                      "type": "BitwiseExpr",
+                                                      "children": [
+                                                        {
+                                                          "type": "AddExpr",
+                                                          "children": [
+                                                            {
+                                                              "type": "MultiplyExpr",
+                                                              "children": [
+                                                                {
+                                                                  "type": "ConcatExpr",
+                                                                  "children": [
+                                                                    {
+                                                                      "type": "CollateExpr",
+                                                                      "children": [
+                                                                        {
+                                                                          "type": "UnaryExpr",
+                                                                          "children": [
+                                                                            {
+                                                                              "type": "PrimaryExpr",
+                                                                              "children": [
+                                                                                {
+                                                                                  "type": "LiteralValue",
+                                                                                  "children": [
+                                                                                    {
+                                                                                      "type": "token",
+                                                                                      "token": "NumericLiteral",
+                                                                                      "value": "8",
+                                                                                      "tokenIndex": 15
+                                                                                    }
+                                                                                  ]
+                                                                                }
+                                                                              ]
+                                                                            }
+                                                                          ]
+                                                                        }
+                                                                      ]
+                                                                    }
+                                                                  ]
+                                                                }
+                                                              ]
+                                                            }
+                                                          ]
+                                                        },
+                                                        {
+                                                          "type": "token",
+                                                          "token": "TOKEN__7C_",
+                                                          "value": "|",
+                                                          "tokenIndex": 16
+                                                        },
+                                                        {
+                                                          "type": "AddExpr",
+                                                          "children": [
+                                                            {
+                                                              "type": "MultiplyExpr",
+                                                              "children": [
+                                                                {
+                                                                  "type": "ConcatExpr",
+                                                                  "children": [
+                                                                    {
+                                                                      "type": "CollateExpr",
+                                                                      "children": [
+                                                                        {
+                                                                          "type": "UnaryExpr",
+                                                                          "children": [
+                                                                            {
+                                                                              "type": "PrimaryExpr",
+                                                                              "children": [
+                                                                                {
+                                                                                  "type": "LiteralValue",
+                                                                                  "children": [
+                                                                                    {
+                                                                                      "type": "token",
+                                                                                      "token": "NumericLiteral",
+                                                                                      "value": "4",
+                                                                                      "tokenIndex": 17
+                                                                                    }
+                                                                                  ]
+                                                                                }
+                                                                              ]
+                                                                            }
+                                                                          ]
+                                                                        }
+                                                                      ]
+                                                                    }
+                                                                  ]
+                                                                }
+                                                              ]
+                                                            }
+                                                          ]
+                                                        },
+                                                        {
+                                                          "type": "token",
+                                                          "token": "TOKEN__26_",
+                                                          "value": "&",
+                                                          "tokenIndex": 18
+                                                        },
+                                                        {
+                                                          "type": "AddExpr",
+                                                          "children": [
+                                                            {
+                                                              "type": "MultiplyExpr",
+                                                              "children": [
+                                                                {
+                                                                  "type": "ConcatExpr",
+                                                                  "children": [
+                                                                    {
+                                                                      "type": "CollateExpr",
+                                                                      "children": [
+                                                                        {
+                                                                          "type": "UnaryExpr",
+                                                                          "children": [
+                                                                            {
+                                                                              "type": "PrimaryExpr",
+                                                                              "children": [
+                                                                                {
+                                                                                  "type": "LiteralValue",
+                                                                                  "children": [
+                                                                                    {
+                                                                                      "type": "token",
+                                                                                      "token": "NumericLiteral",
+                                                                                      "value": "2",
+                                                                                      "tokenIndex": 19
+                                                                                    }
+                                                                                  ]
+                                                                                }
+                                                                              ]
+                                                                            }
+                                                                          ]
+                                                                        }
+                                                                      ]
+                                                                    }
+                                                                  ]
+                                                                }
+                                                              ]
+                                                            }
+                                                          ]
+                                                        }
+                                                      ]
+                                                    }
+                                                  ]
+                                                }
+                                              ]
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "token",
+                  "token": "TOKEN__2C_",
+                  "value": ",",
+                  "tokenIndex": 20
+                },
+                {
+                  "type": "ResultColumn",
+                  "children": [
+                    {
+                      "type": "Expr",
+                      "children": [
+                        {
+                          "type": "OrExpr",
+                          "children": [
+                            {
+                              "type": "AndExpr",
+                              "children": [
+                                {
+                                  "type": "NotExpr",
+                                  "children": [
+                                    {
+                                      "type": "PredicateExpr",
+                                      "children": [
+                                        {
+                                          "type": "IsExpr",
+                                          "children": [
+                                            {
+                                              "type": "EqualityExpr",
+                                              "children": [
+                                                {
+                                                  "type": "RelationalExpr",
+                                                  "children": [
+                                                    {
+                                                      "type": "BitwiseExpr",
+                                                      "children": [
+                                                        {
+                                                          "type": "AddExpr",
+                                                          "children": [
+                                                            {
+                                                              "type": "MultiplyExpr",
+                                                              "children": [
+                                                                {
+                                                                  "type": "ConcatExpr",
+                                                                  "children": [
+                                                                    {
+                                                                      "type": "CollateExpr",
+                                                                      "children": [
+                                                                        {
+                                                                          "type": "UnaryExpr",
+                                                                          "children": [
+                                                                            {
+                                                                              "type": "token",
+                                                                              "token": "TOKEN__2D_",
+                                                                              "value": "-",
+                                                                              "tokenIndex": 21
+                                                                            },
+                                                                            {
+                                                                              "type": "PrimaryExpr",
+                                                                              "children": [
+                                                                                {
+                                                                                  "type": "QualifiedColumnRef",
+                                                                                  "children": [
+                                                                                    {
+                                                                                      "type": "ColumnName",
+                                                                                      "children": [
+                                                                                        {
+                                                                                          "type": "Name",
+                                                                                          "children": [
+                                                                                            {
+                                                                                              "type": "token",
+                                                                                              "token": "Identifier",
+                                                                                              "value": "name",
+                                                                                              "tokenIndex": 22
+                                                                                            }
+                                                                                          ]
+                                                                                        }
+                                                                                      ]
+                                                                                    }
+                                                                                  ]
+                                                                                }
+                                                                              ]
+                                                                            }
+                                                                          ]
+                                                                        },
+                                                                        {
+                                                                          "type": "token",
+                                                                          "token": "KW_COLLATE",
+                                                                          "value": "COLLATE",
+                                                                          "tokenIndex": 23
+                                                                        },
+                                                                        {
+                                                                          "type": "CollationName",
+                                                                          "children": [
+                                                                            {
+                                                                              "type": "Name",
+                                                                              "children": [
+                                                                                {
+                                                                                  "type": "token",
+                                                                                  "token": "Identifier",
+                                                                                  "value": "nocase",
+                                                                                  "tokenIndex": 24
+                                                                                }
+                                                                              ]
+                                                                            }
+                                                                          ]
+                                                                        }
+                                                                      ]
+                                                                    }
+                                                                  ]
+                                                                }
+                                                              ]
+                                                            }
+                                                          ]
+                                                        }
+                                                      ]
+                                                    }
+                                                  ]
+                                                }
+                                              ]
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "FromClause",
+                  "children": [
+                    {
+                      "type": "token",
+                      "token": "KW_FROM",
+                      "value": "FROM",
+                      "tokenIndex": 25
+                    },
+                    {
+                      "type": "JoinClause",
+                      "children": [
+                        {
+                          "type": "TableOrSubquery",
+                          "children": [
+                            {
+                              "type": "TableName",
+                              "children": [
+                                {
+                                  "type": "Name",
+                                  "children": [
+                                    {
+                                      "type": "token",
+                                      "token": "Identifier",
+                                      "value": "people",
+                                      "tokenIndex": 26
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "token",
+                  "token": "KW_WHERE",
+                  "value": "WHERE",
+                  "tokenIndex": 27
+                },
+                {
+                  "type": "Expr",
+                  "children": [
+                    {
+                      "type": "OrExpr",
+                      "children": [
+                        {
+                          "type": "AndExpr",
+                          "children": [
+                            {
+                              "type": "NotExpr",
+                              "children": [
+                                {
+                                  "type": "PredicateExpr",
+                                  "children": [
+                                    {
+                                      "type": "IsExpr",
+                                      "children": [
+                                        {
+                                          "type": "EqualityExpr",
+                                          "children": [
+                                            {
+                                              "type": "RelationalExpr",
+                                              "children": [
+                                                {
+                                                  "type": "BitwiseExpr",
+                                                  "children": [
+                                                    {
+                                                      "type": "AddExpr",
+                                                      "children": [
+                                                        {
+                                                          "type": "MultiplyExpr",
+                                                          "children": [
+                                                            {
+                                                              "type": "ConcatExpr",
+                                                              "children": [
+                                                                {
+                                                                  "type": "CollateExpr",
+                                                                  "children": [
+                                                                    {
+                                                                      "type": "UnaryExpr",
+                                                                      "children": [
+                                                                        {
+                                                                          "type": "PrimaryExpr",
+                                                                          "children": [
+                                                                            {
+                                                                              "type": "QualifiedColumnRef",
+                                                                              "children": [
+                                                                                {
+                                                                                  "type": "ColumnName",
+                                                                                  "children": [
+                                                                                    {
+                                                                                      "type": "Name",
+                                                                                      "children": [
+                                                                                        {
+                                                                                          "type": "token",
+                                                                                          "token": "Identifier",
+                                                                                          "value": "age",
+                                                                                          "tokenIndex": 28
+                                                                                        }
+                                                                                      ]
+                                                                                    }
+                                                                                  ]
+                                                                                }
+                                                                              ]
+                                                                            }
+                                                                          ]
+                                                                        }
+                                                                      ]
+                                                                    }
+                                                                  ]
+                                                                }
+                                                              ]
+                                                            }
+                                                          ]
+                                                        }
+                                                      ]
+                                                    }
+                                                  ]
+                                                }
+                                              ]
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "PredicateTail",
+                                      "children": [
+                                        {
+                                          "type": "token",
+                                          "token": "KW_BETWEEN",
+                                          "value": "BETWEEN",
+                                          "tokenIndex": 29
+                                        },
+                                        {
+                                          "type": "IsExpr",
+                                          "children": [
+                                            {
+                                              "type": "EqualityExpr",
+                                              "children": [
+                                                {
+                                                  "type": "RelationalExpr",
+                                                  "children": [
+                                                    {
+                                                      "type": "BitwiseExpr",
+                                                      "children": [
+                                                        {
+                                                          "type": "AddExpr",
+                                                          "children": [
+                                                            {
+                                                              "type": "MultiplyExpr",
+                                                              "children": [
+                                                                {
+                                                                  "type": "ConcatExpr",
+                                                                  "children": [
+                                                                    {
+                                                                      "type": "CollateExpr",
+                                                                      "children": [
+                                                                        {
+                                                                          "type": "UnaryExpr",
+                                                                          "children": [
+                                                                            {
+                                                                              "type": "PrimaryExpr",
+                                                                              "children": [
+                                                                                {
+                                                                                  "type": "LiteralValue",
+                                                                                  "children": [
+                                                                                    {
+                                                                                      "type": "token",
+                                                                                      "token": "NumericLiteral",
+                                                                                      "value": "18",
+                                                                                      "tokenIndex": 30
+                                                                                    }
+                                                                                  ]
+                                                                                }
+                                                                              ]
+                                                                            }
+                                                                          ]
+                                                                        }
+                                                                      ]
+                                                                    }
+                                                                  ]
+                                                                }
+                                                              ]
+                                                            }
+                                                          ]
+                                                        }
+                                                      ]
+                                                    }
+                                                  ]
+                                                }
+                                              ]
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "type": "token",
+                                          "token": "KW_AND",
+                                          "value": "AND",
+                                          "tokenIndex": 31
+                                        },
+                                        {
+                                          "type": "IsExpr",
+                                          "children": [
+                                            {
+                                              "type": "EqualityExpr",
+                                              "children": [
+                                                {
+                                                  "type": "RelationalExpr",
+                                                  "children": [
+                                                    {
+                                                      "type": "BitwiseExpr",
+                                                      "children": [
+                                                        {
+                                                          "type": "AddExpr",
+                                                          "children": [
+                                                            {
+                                                              "type": "MultiplyExpr",
+                                                              "children": [
+                                                                {
+                                                                  "type": "ConcatExpr",
+                                                                  "children": [
+                                                                    {
+                                                                      "type": "CollateExpr",
+                                                                      "children": [
+                                                                        {
+                                                                          "type": "UnaryExpr",
+                                                                          "children": [
+                                                                            {
+                                                                              "type": "PrimaryExpr",
+                                                                              "children": [
+                                                                                {
+                                                                                  "type": "LiteralValue",
+                                                                                  "children": [
+                                                                                    {
+                                                                                      "type": "token",
+                                                                                      "token": "NumericLiteral",
+                                                                                      "value": "65",
+                                                                                      "tokenIndex": 32
+                                                                                    }
+                                                                                  ]
+                                                                                }
+                                                                              ]
+                                                                            }
+                                                                          ]
+                                                                        }
+                                                                      ]
+                                                                    }
+                                                                  ]
+                                                                }
+                                                              ]
+                                                            }
+                                                          ]
+                                                        }
+                                                      ]
+                                                    }
+                                                  ]
+                                                }
+                                              ]
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "token",
+                              "token": "KW_AND",
+                              "value": "AND",
+                              "tokenIndex": 33
+                            },
+                            {
+                              "type": "NotExpr",
+                              "children": [
+                                {
+                                  "type": "PredicateExpr",
+                                  "children": [
+                                    {
+                                      "type": "IsExpr",
+                                      "children": [
+                                        {
+                                          "type": "EqualityExpr",
+                                          "children": [
+                                            {
+                                              "type": "RelationalExpr",
+                                              "children": [
+                                                {
+                                                  "type": "BitwiseExpr",
+                                                  "children": [
+                                                    {
+                                                      "type": "AddExpr",
+                                                      "children": [
+                                                        {
+                                                          "type": "MultiplyExpr",
+                                                          "children": [
+                                                            {
+                                                              "type": "ConcatExpr",
+                                                              "children": [
+                                                                {
+                                                                  "type": "CollateExpr",
+                                                                  "children": [
+                                                                    {
+                                                                      "type": "UnaryExpr",
+                                                                      "children": [
+                                                                        {
+                                                                          "type": "PrimaryExpr",
+                                                                          "children": [
+                                                                            {
+                                                                              "type": "QualifiedColumnRef",
+                                                                              "children": [
+                                                                                {
+                                                                                  "type": "ColumnName",
+                                                                                  "children": [
+                                                                                    {
+                                                                                      "type": "Name",
+                                                                                      "children": [
+                                                                                        {
+                                                                                          "type": "token",
+                                                                                          "token": "Identifier",
+                                                                                          "value": "active",
+                                                                                          "tokenIndex": 34
+                                                                                        }
+                                                                                      ]
+                                                                                    }
+                                                                                  ]
+                                                                                }
+                                                                              ]
+                                                                            }
+                                                                          ]
+                                                                        }
+                                                                      ]
+                                                                    }
+                                                                  ]
+                                                                }
+                                                              ]
+                                                            }
+                                                          ]
+                                                        }
+                                                      ]
+                                                    }
+                                                  ]
+                                                }
+                                              ]
+                                            },
+                                            {
+                                              "type": "EqualityOperator",
+                                              "children": [
+                                                {
+                                                  "type": "token",
+                                                  "token": "TOKEN__3D_",
+                                                  "value": "=",
+                                                  "tokenIndex": 35
+                                                }
+                                              ]
+                                            },
+                                            {
+                                              "type": "RelationalExpr",
+                                              "children": [
+                                                {
+                                                  "type": "BitwiseExpr",
+                                                  "children": [
+                                                    {
+                                                      "type": "AddExpr",
+                                                      "children": [
+                                                        {
+                                                          "type": "MultiplyExpr",
+                                                          "children": [
+                                                            {
+                                                              "type": "ConcatExpr",
+                                                              "children": [
+                                                                {
+                                                                  "type": "CollateExpr",
+                                                                  "children": [
+                                                                    {
+                                                                      "type": "UnaryExpr",
+                                                                      "children": [
+                                                                        {
+                                                                          "type": "PrimaryExpr",
+                                                                          "children": [
+                                                                            {
+                                                                              "type": "LiteralValue",
+                                                                              "children": [
+                                                                                {
+                                                                                  "type": "token",
+                                                                                  "token": "KW_TRUE",
+                                                                                  "value": "TRUE",
+                                                                                  "tokenIndex": 36
+                                                                                }
+                                                                              ]
+                                                                            }
+                                                                          ]
+                                                                        }
+                                                                      ]
+                                                                    }
+                                                                  ]
+                                                                }
+                                                              ]
+                                                            }
+                                                          ]
+                                                        }
+                                                      ]
+                                                    }
+                                                  ]
+                                                }
+                                              ]
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "token",
+      "token": "EOF",
+      "value": "",
+      "tokenIndex": 38
+    }
+  ]
+}

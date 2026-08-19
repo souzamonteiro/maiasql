@@ -1,0 +1,20 @@
+{
+  "version": "3.0",
+  "source": "/mnt/data/maiasql_ebnf_v2/SQL.ebnf",
+  "line_count": 987,
+  "production_count": 362,
+  "keyword_token_count": 189,
+  "undefined_keyword_references": [],
+  "remaining_uppercase_keyword_literals": [],
+  "test_files": {
+    "positive": "positive-tests.sql",
+    "negative": "negative-tests.sql",
+    "lexer": "lexer-tests.sql",
+    "precedence": "precedence-tests.sql"
+  },
+  "self_hosted_trex_parse": {
+    "status": "ok",
+    "tokenCount": 7092,
+    "consumedTokenCount": 7092
+  }
+}

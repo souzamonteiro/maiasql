@@ -1,0 +1,241 @@
+OK operator-test.sql root=SqlScript tokens=39
+
+=== TREE operator-test.sql ===
+SqlScript
+├─ SqlStatement
+│  └─ SelectStmt
+│     └─ SelectCore
+│        ├─ KW_SELECT: "SELECT"
+│        ├─ ResultColumn
+│        │  └─ Expr
+│        │     └─ OrExpr
+│        │        └─ AndExpr
+│        │           └─ NotExpr
+│        │              └─ PredicateExpr
+│        │                 └─ IsExpr
+│        │                    └─ EqualityExpr
+│        │                       └─ RelationalExpr
+│        │                          └─ BitwiseExpr
+│        │                             └─ AddExpr
+│        │                                ├─ MultiplyExpr
+│        │                                │  └─ ConcatExpr
+│        │                                │     └─ CollateExpr
+│        │                                │        └─ UnaryExpr
+│        │                                │           └─ PrimaryExpr
+│        │                                │              └─ LiteralValue
+│        │                                │                 └─ NumericLiteral: "1"
+│        │                                ├─ TOKEN__2B_: "+"
+│        │                                └─ MultiplyExpr
+│        │                                   ├─ ConcatExpr
+│        │                                   │  └─ CollateExpr
+│        │                                   │     └─ UnaryExpr
+│        │                                   │        └─ PrimaryExpr
+│        │                                   │           └─ LiteralValue
+│        │                                   │              └─ NumericLiteral: "2"
+│        │                                   ├─ TOKEN__2A_: "*"
+│        │                                   └─ ConcatExpr
+│        │                                      └─ CollateExpr
+│        │                                         └─ UnaryExpr
+│        │                                            └─ PrimaryExpr
+│        │                                               └─ LiteralValue
+│        │                                                  └─ NumericLiteral: "3"
+│        ├─ TOKEN__2C_: ","
+│        ├─ ResultColumn
+│        │  └─ Expr
+│        │     └─ OrExpr
+│        │        └─ AndExpr
+│        │           └─ NotExpr
+│        │              └─ PredicateExpr
+│        │                 └─ IsExpr
+│        │                    └─ EqualityExpr
+│        │                       └─ RelationalExpr
+│        │                          └─ BitwiseExpr
+│        │                             └─ AddExpr
+│        │                                └─ MultiplyExpr
+│        │                                   ├─ ConcatExpr
+│        │                                   │  └─ CollateExpr
+│        │                                   │     └─ UnaryExpr
+│        │                                   │        └─ PrimaryExpr
+│        │                                   │           ├─ TOKEN__28_: "("
+│        │                                   │           ├─ Expr
+│        │                                   │           │  └─ OrExpr
+│        │                                   │           │     └─ AndExpr
+│        │                                   │           │        └─ NotExpr
+│        │                                   │           │           └─ PredicateExpr
+│        │                                   │           │              └─ IsExpr
+│        │                                   │           │                 └─ EqualityExpr
+│        │                                   │           │                    └─ RelationalExpr
+│        │                                   │           │                       └─ BitwiseExpr
+│        │                                   │           │                          └─ AddExpr
+│        │                                   │           │                             ├─ MultiplyExpr
+│        │                                   │           │                             │  └─ ConcatExpr
+│        │                                   │           │                             │     └─ CollateExpr
+│        │                                   │           │                             │        └─ UnaryExpr
+│        │                                   │           │                             │           └─ PrimaryExpr
+│        │                                   │           │                             │              └─ LiteralValue
+│        │                                   │           │                             │                 └─ NumericLiteral: "1"
+│        │                                   │           │                             ├─ TOKEN__2B_: "+"
+│        │                                   │           │                             └─ MultiplyExpr
+│        │                                   │           │                                └─ ConcatExpr
+│        │                                   │           │                                   └─ CollateExpr
+│        │                                   │           │                                      └─ UnaryExpr
+│        │                                   │           │                                         └─ PrimaryExpr
+│        │                                   │           │                                            └─ LiteralValue
+│        │                                   │           │                                               └─ NumericLiteral: "2"
+│        │                                   │           └─ TOKEN__29_: ")"
+│        │                                   ├─ TOKEN__2A_: "*"
+│        │                                   └─ ConcatExpr
+│        │                                      └─ CollateExpr
+│        │                                         └─ UnaryExpr
+│        │                                            └─ PrimaryExpr
+│        │                                               └─ LiteralValue
+│        │                                                  └─ NumericLiteral: "3"
+│        ├─ TOKEN__2C_: ","
+│        ├─ ResultColumn
+│        │  └─ Expr
+│        │     └─ OrExpr
+│        │        └─ AndExpr
+│        │           └─ NotExpr
+│        │              └─ PredicateExpr
+│        │                 └─ IsExpr
+│        │                    └─ EqualityExpr
+│        │                       └─ RelationalExpr
+│        │                          └─ BitwiseExpr
+│        │                             ├─ AddExpr
+│        │                             │  └─ MultiplyExpr
+│        │                             │     └─ ConcatExpr
+│        │                             │        └─ CollateExpr
+│        │                             │           └─ UnaryExpr
+│        │                             │              └─ PrimaryExpr
+│        │                             │                 └─ LiteralValue
+│        │                             │                    └─ NumericLiteral: "8"
+│        │                             ├─ TOKEN__7C_: "|"
+│        │                             ├─ AddExpr
+│        │                             │  └─ MultiplyExpr
+│        │                             │     └─ ConcatExpr
+│        │                             │        └─ CollateExpr
+│        │                             │           └─ UnaryExpr
+│        │                             │              └─ PrimaryExpr
+│        │                             │                 └─ LiteralValue
+│        │                             │                    └─ NumericLiteral: "4"
+│        │                             ├─ TOKEN__26_: "&"
+│        │                             └─ AddExpr
+│        │                                └─ MultiplyExpr
+│        │                                   └─ ConcatExpr
+│        │                                      └─ CollateExpr
+│        │                                         └─ UnaryExpr
+│        │                                            └─ PrimaryExpr
+│        │                                               └─ LiteralValue
+│        │                                                  └─ NumericLiteral: "2"
+│        ├─ TOKEN__2C_: ","
+│        ├─ ResultColumn
+│        │  └─ Expr
+│        │     └─ OrExpr
+│        │        └─ AndExpr
+│        │           └─ NotExpr
+│        │              └─ PredicateExpr
+│        │                 └─ IsExpr
+│        │                    └─ EqualityExpr
+│        │                       └─ RelationalExpr
+│        │                          └─ BitwiseExpr
+│        │                             └─ AddExpr
+│        │                                └─ MultiplyExpr
+│        │                                   └─ ConcatExpr
+│        │                                      └─ CollateExpr
+│        │                                         ├─ UnaryExpr
+│        │                                         │  ├─ TOKEN__2D_: "-"
+│        │                                         │  └─ PrimaryExpr
+│        │                                         │     └─ QualifiedColumnRef
+│        │                                         │        └─ ColumnName
+│        │                                         │           └─ Name
+│        │                                         │              └─ Identifier: "name"
+│        │                                         ├─ KW_COLLATE: "COLLATE"
+│        │                                         └─ CollationName
+│        │                                            └─ Name
+│        │                                               └─ Identifier: "nocase"
+│        ├─ FromClause
+│        │  ├─ KW_FROM: "FROM"
+│        │  └─ JoinClause
+│        │     └─ TableOrSubquery
+│        │        └─ TableName
+│        │           └─ Name
+│        │              └─ Identifier: "people"
+│        ├─ KW_WHERE: "WHERE"
+│        └─ Expr
+│           └─ OrExpr
+│              └─ AndExpr
+│                 ├─ NotExpr
+│                 │  └─ PredicateExpr
+│                 │     ├─ IsExpr
+│                 │     │  └─ EqualityExpr
+│                 │     │     └─ RelationalExpr
+│                 │     │        └─ BitwiseExpr
+│                 │     │           └─ AddExpr
+│                 │     │              └─ MultiplyExpr
+│                 │     │                 └─ ConcatExpr
+│                 │     │                    └─ CollateExpr
+│                 │     │                       └─ UnaryExpr
+│                 │     │                          └─ PrimaryExpr
+│                 │     │                             └─ QualifiedColumnRef
+│                 │     │                                └─ ColumnName
+│                 │     │                                   └─ Name
+│                 │     │                                      └─ Identifier: "age"
+│                 │     └─ PredicateTail
+│                 │        ├─ KW_BETWEEN: "BETWEEN"
+│                 │        ├─ IsExpr
+│                 │        │  └─ EqualityExpr
+│                 │        │     └─ RelationalExpr
+│                 │        │        └─ BitwiseExpr
+│                 │        │           └─ AddExpr
+│                 │        │              └─ MultiplyExpr
+│                 │        │                 └─ ConcatExpr
+│                 │        │                    └─ CollateExpr
+│                 │        │                       └─ UnaryExpr
+│                 │        │                          └─ PrimaryExpr
+│                 │        │                             └─ LiteralValue
+│                 │        │                                └─ NumericLiteral: "18"
+│                 │        ├─ KW_AND: "AND"
+│                 │        └─ IsExpr
+│                 │           └─ EqualityExpr
+│                 │              └─ RelationalExpr
+│                 │                 └─ BitwiseExpr
+│                 │                    └─ AddExpr
+│                 │                       └─ MultiplyExpr
+│                 │                          └─ ConcatExpr
+│                 │                             └─ CollateExpr
+│                 │                                └─ UnaryExpr
+│                 │                                   └─ PrimaryExpr
+│                 │                                      └─ LiteralValue
+│                 │                                         └─ NumericLiteral: "65"
+│                 ├─ KW_AND: "AND"
+│                 └─ NotExpr
+│                    └─ PredicateExpr
+│                       └─ IsExpr
+│                          └─ EqualityExpr
+│                             ├─ RelationalExpr
+│                             │  └─ BitwiseExpr
+│                             │     └─ AddExpr
+│                             │        └─ MultiplyExpr
+│                             │           └─ ConcatExpr
+│                             │              └─ CollateExpr
+│                             │                 └─ UnaryExpr
+│                             │                    └─ PrimaryExpr
+│                             │                       └─ QualifiedColumnRef
+│                             │                          └─ ColumnName
+│                             │                             └─ Name
+│                             │                                └─ Identifier: "active"
+│                             ├─ EqualityOperator
+│                             │  └─ TOKEN__3D_: "="
+│                             └─ RelationalExpr
+│                                └─ BitwiseExpr
+│                                   └─ AddExpr
+│                                      └─ MultiplyExpr
+│                                         └─ ConcatExpr
+│                                            └─ CollateExpr
+│                                               └─ UnaryExpr
+│                                                  └─ PrimaryExpr
+│                                                     └─ LiteralValue
+│                                                        └─ KW_TRUE: "TRUE"
+└─ EOF: ""
+WROTE /mnt/data/parser-test-output/operator-test.ast.json
+WROTE /mnt/data/parser-test-output/operator-test.ast.xml

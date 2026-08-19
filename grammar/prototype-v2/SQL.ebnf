@@ -1,0 +1,987 @@
+// SQLite SQL grammar for MaiaCC / tREx
+// Derived from the official SQLite syntax diagrams.
+// Target: tREx recursive-descent parser using REx-compatible EBNF.
+//
+// Version: 3.0 (KW_* case-insensitive lexical tokens)
+// Start rule: SqlScript
+//
+// Design notes:
+// - No direct left recursion.
+// - Expressions are factored by precedence.
+// - SQL keywords are recognized by explicit case-insensitive KW_* tokens.
+// - Unquoted names use Identifier; quote a name that is also a keyword.
+// - Whitespace and SQL comments are discarded through /* ws: definition */.
+// - UPDATE/DELETE ORDER BY/LIMIT forms are included; their execution may depend
+//   on SQLITE_ENABLE_UPDATE_DELETE_LIMIT in native SQLite builds.
+// - Virtual-table module arguments are necessarily permissive because each
+//   virtual-table module defines its own argument language.
+
+SqlScript
+  ::= ';'*
+      (SqlStatement (';' ';'* SqlStatement)* ';'*)?
+      EOF
+
+SqlStatement
+  ::= ExplainPrefix?
+      ( AlterTableStmt
+      | AnalyzeStmt
+      | AttachStmt
+      | BeginStmt
+      | CommitStmt
+      | CreateIndexStmt
+      | CreateTableStmt
+      | CreateTriggerStmt
+      | CreateViewStmt
+      | CreateVirtualTableStmt
+      | DeleteStmt
+      | DetachStmt
+      | DropIndexStmt
+      | DropTableStmt
+      | DropTriggerStmt
+      | DropViewStmt
+      | InsertStmt
+      | PragmaStmt
+      | ReindexStmt
+      | ReleaseStmt
+      | RollbackStmt
+      | SavepointStmt
+      | SelectStmt
+      | UpdateStmt
+      | VacuumStmt
+      )
+
+ExplainPrefix ::= KW_EXPLAIN (KW_QUERY KW_PLAN)?
+
+AlterTableStmt
+  ::= KW_ALTER KW_TABLE QualifiedTableRef
+      ( KW_RENAME KW_TO TableName
+      | KW_RENAME KW_COLUMN? ColumnName KW_TO ColumnName
+      | KW_ADD KW_COLUMN? ColumnDef
+      | KW_DROP KW_COLUMN? ColumnName
+      )
+
+AnalyzeStmt
+  ::= KW_ANALYZE
+      ( SchemaName
+      | TableOrIndexName
+      | SchemaName '.' TableOrIndexName
+      )?
+
+AttachStmt ::= KW_ATTACH KW_DATABASE? Expr KW_AS SchemaName
+
+BeginStmt
+  ::= KW_BEGIN (KW_DEFERRED | KW_IMMEDIATE | KW_EXCLUSIVE)? KW_TRANSACTION?
+
+CommitStmt ::= (KW_COMMIT | KW_END) KW_TRANSACTION?
+
+RollbackStmt
+  ::= KW_ROLLBACK KW_TRANSACTION?
+      (KW_TO KW_SAVEPOINT? SavepointName)?
+
+SavepointStmt ::= KW_SAVEPOINT SavepointName
+ReleaseStmt   ::= KW_RELEASE KW_SAVEPOINT? SavepointName
+
+DetachStmt ::= KW_DETACH KW_DATABASE? SchemaName
+
+VacuumStmt ::= KW_VACUUM SchemaName? (KW_INTO Filename)?
+
+ReindexStmt
+  ::= KW_REINDEX
+      ( CollationName
+      | SchemaName '.' TableOrIndexName
+      | TableOrIndexName
+      )?
+
+PragmaStmt
+  ::= KW_PRAGMA SchemaQualifier? PragmaName
+      ( '=' PragmaValue
+      | '(' PragmaValue ')'
+      )?
+
+PragmaValue
+  ::= SignedNumber
+  | Name
+  | StringLiteral
+  | KW_ON
+  | KW_OFF
+  | KW_TRUE
+  | KW_FALSE
+  | KW_YES
+  | KW_NO
+
+CreateIndexStmt
+  ::= KW_CREATE KW_UNIQUE? KW_INDEX IfNotExists?
+      SchemaQualifier? IndexName
+      KW_ON TableName
+      '(' IndexedColumn (',' IndexedColumn)* ')'
+      (KW_WHERE Expr)?
+
+CreateTableStmt
+  ::= KW_CREATE (KW_TEMP | KW_TEMPORARY)? KW_TABLE IfNotExists?
+      SchemaQualifier? TableName
+      ( '(' ColumnDef (',' ColumnDef)* (',' TableConstraint)* ')'
+        TableOptions?
+      | KW_AS SelectStmt
+      )
+
+ColumnDef ::= ColumnName TypeName? ColumnConstraint*
+
+// SQLite accepts arbitrary declared type names. TypeNameWord explicitly
+// includes common SQL-92 and SQLite type words that may otherwise be tokenized
+// as keywords, while still allowing custom identifiers.
+TypeName ::= TypeNameWord+ TypeParameters?
+
+TypeNameWord
+  ::= Identifier
+  | KW_BIG
+  | KW_BIGINT
+  | KW_BINARY
+  | KW_BIT
+  | KW_BLOB
+  | KW_BOOLEAN
+  | KW_CHAR
+  | KW_CHARACTER
+  | KW_CLOB
+  | KW_DATE
+  | KW_DATETIME
+  | KW_DECIMAL
+  | KW_DOUBLE
+  | KW_FLOAT
+  | KW_INT
+  | KW_INTEGER
+  | KW_MEDIUMINT
+  | KW_NATIONAL
+  | KW_NATIVE
+  | KW_NCHAR
+  | KW_NUMERIC
+  | KW_NVARCHAR
+  | KW_PRECISION
+  | KW_REAL
+  | KW_SMALLINT
+  | KW_TEXT
+  | KW_TIME
+  | KW_TIMESTAMP
+  | KW_TINYINT
+  | KW_UNSIGNED
+  | KW_VARBINARY
+  | KW_VARCHAR
+  | KW_VARYING
+
+TypeParameters
+  ::= '(' SignedNumber (',' SignedNumber)? ')'
+
+ColumnConstraint
+  ::= (KW_CONSTRAINT ConstraintName)?
+      ( KW_PRIMARY KW_KEY (KW_ASC | KW_DESC)? ConflictClause? KW_AUTOINCREMENT?
+      | KW_NOT KW_NULL ConflictClause?
+      | KW_UNIQUE ConflictClause?
+      | KW_CHECK '(' Expr ')'
+      | KW_DEFAULT (SignedNumber | LiteralValue | '(' Expr ')')
+      | KW_COLLATE CollationName
+      | ForeignKeyClause
+      | GeneratedColumnConstraint
+      )
+
+GeneratedColumnConstraint
+  ::= KW_GENERATED KW_ALWAYS? KW_AS '(' Expr ')' (KW_STORED | KW_VIRTUAL)?
+  | KW_AS '(' Expr ')' (KW_STORED | KW_VIRTUAL)?
+
+TableConstraint
+  ::= (KW_CONSTRAINT ConstraintName)?
+      ( (KW_PRIMARY KW_KEY | KW_UNIQUE)
+        '(' IndexedColumn (',' IndexedColumn)* ')'
+        ConflictClause?
+      | KW_CHECK '(' Expr ')'
+      | KW_FOREIGN KW_KEY
+        '(' ColumnName (',' ColumnName)* ')'
+        ForeignKeyClause
+      )
+
+TableOptions ::= TableOption (',' TableOption)*
+TableOption  ::= KW_WITHOUT KW_ROWID | KW_STRICT
+
+ConflictClause ::= KW_ON KW_CONFLICT ConflictAction
+ConflictAction ::= KW_ROLLBACK | KW_ABORT | KW_FAIL | KW_IGNORE | KW_REPLACE
+
+ForeignKeyClause
+  ::= KW_REFERENCES ForeignTable
+      ('(' ColumnName (',' ColumnName)* ')')?
+      ForeignKeyAction*
+      ForeignKeyMatch?
+      ForeignKeyDeferrable?
+
+ForeignKeyAction
+  ::= KW_ON (KW_DELETE | KW_UPDATE)
+      (KW_SET KW_NULL | KW_SET KW_DEFAULT | KW_CASCADE | KW_RESTRICT | KW_NO KW_ACTION)
+
+ForeignKeyMatch ::= KW_MATCH Name
+
+ForeignKeyDeferrable
+  ::= KW_NOT? KW_DEFERRABLE
+      (KW_INITIALLY (KW_DEFERRED | KW_IMMEDIATE))?
+
+CreateViewStmt
+  ::= KW_CREATE (KW_TEMP | KW_TEMPORARY)? KW_VIEW IfNotExists?
+      SchemaQualifier? ViewName
+      ('(' ColumnName (',' ColumnName)* ')')?
+      KW_AS SelectStmt
+
+CreateVirtualTableStmt
+  ::= KW_CREATE KW_VIRTUAL KW_TABLE IfNotExists?
+      SchemaQualifier? TableName
+      KW_USING ModuleName
+      ('(' ModuleArgument (',' ModuleArgument)* ')')?
+
+// SQLite treats module arguments as token sequences interpreted by the module.
+// This lexical approximation accepts balanced-free arguments up to comma or ')'.
+ModuleArgument ::= ModuleArgToken+
+ModuleArgToken
+  ::= Name
+  | NumericLiteral
+  | StringLiteral
+  | BlobLiteral
+  | '.'
+  | '+'
+  | '-'
+  | '*'
+  | '/'
+  | '%'
+  | '='
+  | '<'
+  | '>'
+  | '<='
+  | '>='
+  | '<>'
+  | '!='
+  | '||'
+  | ':'
+  | '@'
+  | '$'
+
+CreateTriggerStmt
+  ::= KW_CREATE (KW_TEMP | KW_TEMPORARY)? KW_TRIGGER IfNotExists?
+      SchemaQualifier? TriggerName
+      (KW_BEFORE | KW_AFTER | KW_INSTEAD KW_OF)?
+      (KW_DELETE
+      | KW_INSERT
+      | KW_UPDATE (KW_OF ColumnName (',' ColumnName)*)?
+      )
+      KW_ON TableName
+      (KW_FOR KW_EACH KW_ROW)?
+      (KW_WHEN Expr)?
+      KW_BEGIN
+      TriggerStep (';' TriggerStep)* ';'?
+      KW_END
+
+TriggerStep
+  ::= UpdateStmt
+  | InsertStmt
+  | DeleteStmt
+  | SelectStmt
+
+DropIndexStmt
+  ::= KW_DROP KW_INDEX IfExists? SchemaQualifier? IndexName
+
+DropTableStmt
+  ::= KW_DROP KW_TABLE IfExists? SchemaQualifier? TableName
+
+DropTriggerStmt
+  ::= KW_DROP KW_TRIGGER IfExists? SchemaQualifier? TriggerName
+
+DropViewStmt
+  ::= KW_DROP KW_VIEW IfExists? SchemaQualifier? ViewName
+
+InsertStmt
+  ::= WithClause?
+      (KW_INSERT ConflictModifier? | KW_REPLACE)
+      KW_INTO SchemaQualifier? TableName
+      (KW_AS TableAlias)?
+      ('(' ColumnName (',' ColumnName)* ')')?
+      ( DefaultValues
+      | ValuesClause
+      | SelectStmt
+      )
+      UpsertClause*
+      ReturningClause?
+
+ConflictModifier ::= KW_OR ConflictAction
+DefaultValues    ::= KW_DEFAULT KW_VALUES
+
+ValuesClause
+  ::= KW_VALUES ParenthesizedExprList (',' ParenthesizedExprList)*
+
+ParenthesizedExprList ::= '(' Expr (',' Expr)* ')'
+
+UpsertClause
+  ::= KW_ON KW_CONFLICT
+      ('(' IndexedColumn (',' IndexedColumn)* ')' (KW_WHERE Expr)?)?
+      KW_DO
+      ( KW_NOTHING
+      | KW_UPDATE KW_SET UpdateAssignment (',' UpdateAssignment)*
+        (KW_WHERE Expr)?
+      )
+
+UpdateStmt
+  ::= WithClause?
+      KW_UPDATE ConflictModifier?
+      QualifiedTableName
+      KW_SET UpdateAssignment (',' UpdateAssignment)*
+      UpdateFromClause?
+      (KW_WHERE Expr)?
+      ReturningClause?
+      UpdateDeleteLimitClause?
+
+UpdateAssignment
+  ::= ColumnName '=' Expr
+  | '(' ColumnName (',' ColumnName)* ')' '=' Expr
+
+UpdateFromClause ::= KW_FROM TableOrSubquery (',' TableOrSubquery)*
+
+DeleteStmt
+  ::= WithClause?
+      KW_DELETE KW_FROM QualifiedTableName
+      (KW_WHERE Expr)?
+      ReturningClause?
+      UpdateDeleteLimitClause?
+
+UpdateDeleteLimitClause
+  ::= (KW_ORDER KW_BY OrderingTerm (',' OrderingTerm)*)?
+      KW_LIMIT Expr
+      ( (KW_OFFSET Expr) | (',' Expr) )?
+
+QualifiedTableName
+  ::= SchemaQualifier? TableName
+      ( KW_INDEXED KW_BY IndexName
+      | KW_NOT KW_INDEXED
+      )?
+
+ReturningClause
+  ::= KW_RETURNING ResultColumn (',' ResultColumn)*
+
+SelectStmt
+  ::= WithClause?
+      SelectCore
+      (CompoundOperator SelectCore)*
+      (KW_ORDER KW_BY OrderingTerm (',' OrderingTerm)*)?
+      LimitClause?
+
+WithClause
+  ::= KW_WITH KW_RECURSIVE?
+      CommonTableExpression (',' CommonTableExpression)*
+
+CommonTableExpression
+  ::= TableName
+      ('(' ColumnName (',' ColumnName)* ')')?
+      KW_AS
+      (KW_NOT KW_MATERIALIZED | KW_MATERIALIZED)?
+      '(' SelectStmt ')'
+
+SelectCore
+  ::= KW_SELECT (KW_DISTINCT | KW_ALL)?
+      ResultColumn (',' ResultColumn)*
+      FromClause?
+      (KW_WHERE Expr)?
+      GroupByClause?
+      WindowClause?
+  | ValuesClause
+
+FromClause ::= KW_FROM JoinClause
+
+GroupByClause
+  ::= KW_GROUP KW_BY Expr (',' Expr)*
+      (KW_HAVING Expr)?
+
+WindowClause
+  ::= KW_WINDOW NamedWindow (',' NamedWindow)*
+
+NamedWindow ::= WindowName KW_AS WindowDefn
+
+CompoundOperator
+  ::= KW_UNION KW_ALL?
+  | KW_INTERSECT
+  | KW_EXCEPT
+
+LimitClause
+  ::= KW_LIMIT Expr
+      ( (KW_OFFSET Expr) | (',' Expr) )?
+
+ResultColumn
+  ::= '*'
+  | TableName '.' '*'
+  | Expr (KW_AS? ColumnAlias)?
+
+TableOrSubquery
+  ::= SchemaQualifier? TableFunctionName
+      '(' FunctionArguments? ')'
+      (KW_AS? TableAlias)?
+  | SchemaQualifier? TableName
+      (KW_AS? TableAlias)?
+      ( KW_INDEXED KW_BY IndexName
+      | KW_NOT KW_INDEXED
+      )?
+  | '(' SelectStmt ')' (KW_AS? TableAlias)?
+  | '(' JoinClause ')' (KW_AS? TableAlias)?
+  | '(' TableOrSubquery (',' TableOrSubquery)+ ')' (KW_AS? TableAlias)?
+
+JoinClause ::= TableOrSubquery JoinTail*
+
+JoinTail
+  ::= ',' TableOrSubquery
+  | CrossJoinTail
+  | NaturalJoinTail
+  | QualifiedJoinTail
+
+CrossJoinTail
+  ::= KW_CROSS KW_JOIN TableOrSubquery
+
+NaturalJoinTail
+  ::= KW_NATURAL NaturalJoinType? KW_JOIN TableOrSubquery
+
+NaturalJoinType
+  ::= KW_INNER
+  | KW_LEFT KW_OUTER?
+  | KW_RIGHT KW_OUTER?
+  | KW_FULL KW_OUTER?
+
+QualifiedJoinTail
+  ::= QualifiedJoinType? KW_JOIN TableOrSubquery JoinConstraint?
+
+QualifiedJoinType
+  ::= KW_INNER
+  | KW_LEFT KW_OUTER?
+  | KW_RIGHT KW_OUTER?
+  | KW_FULL KW_OUTER?
+
+JoinConstraint
+  ::= KW_ON Expr
+  | KW_USING '(' ColumnName (',' ColumnName)* ')'
+
+OrderingTerm
+  ::= Expr
+      (KW_COLLATE CollationName)?
+      (KW_ASC | KW_DESC)?
+      (KW_NULLS (KW_FIRST | KW_LAST))?
+
+IndexedColumn
+  ::= (ColumnName | Expr)
+      (KW_COLLATE CollationName)?
+      (KW_ASC | KW_DESC)?
+
+WindowDefn
+  ::= '('
+      BaseWindowName?
+      (KW_PARTITION KW_BY Expr (',' Expr)*)?
+      (KW_ORDER KW_BY OrderingTerm (',' OrderingTerm)*)?
+      FrameSpec?
+      ')'
+
+OverClause
+  ::= KW_OVER
+      ( WindowName
+      | WindowDefn
+      )
+
+FilterClause ::= KW_FILTER '(' KW_WHERE Expr ')'
+
+FrameSpec
+  ::= FrameUnit
+      FrameExtent
+      FrameExclude?
+
+FrameUnit ::= KW_ROWS | KW_RANGE | KW_GROUPS
+
+FrameExtent
+  ::= FrameBoundary
+  | KW_BETWEEN FrameBoundary KW_AND FrameBoundary
+
+FrameBoundary
+  ::= KW_UNBOUNDED (KW_PRECEDING | KW_FOLLOWING)
+  | KW_CURRENT KW_ROW
+  | Expr (KW_PRECEDING | KW_FOLLOWING)
+
+FrameExclude
+  ::= KW_EXCLUDE (KW_NO KW_OTHERS | KW_CURRENT KW_ROW | KW_GROUP | KW_TIES)
+
+// Expression grammar is factored by precedence for recursive-descent generation.
+
+Expr ::= OrExpr
+
+OrExpr ::= AndExpr (KW_OR AndExpr)*
+
+AndExpr ::= NotExpr (KW_AND NotExpr)*
+
+NotExpr ::= KW_NOT* PredicateExpr
+
+PredicateExpr ::= IsExpr PredicateTail*
+
+PredicateTail
+  ::= QuantifiedComparisonTail
+  | KW_ISNULL
+  | KW_NOTNULL
+  | KW_NOT KW_NULL
+  | KW_NOT? KW_BETWEEN IsExpr KW_AND IsExpr
+  | KW_NOT? KW_IN InRhs
+  | KW_NOT? KW_LIKE IsExpr (KW_ESCAPE IsExpr)?
+  | KW_NOT? KW_GLOB IsExpr
+  | KW_NOT? KW_REGEXP IsExpr
+  | KW_NOT? KW_MATCH IsExpr
+
+QuantifiedComparisonTail
+  ::= (EqualityOperator | RelationalOperator)
+      (KW_ALL | KW_ANY | KW_SOME)
+      '(' SelectStmt ')'
+
+IsExpr ::= EqualityExpr IsTail*
+
+IsTail
+  ::= KW_IS KW_NOT? (KW_DISTINCT KW_FROM)? EqualityExpr
+
+EqualityExpr
+  ::= RelationalExpr
+      (EqualityOperator RelationalExpr)*
+
+EqualityOperator ::= '=' | '==' | '<>' | '!='
+
+RelationalExpr
+  ::= BitwiseExpr
+      (RelationalOperator BitwiseExpr)*
+
+RelationalOperator ::= '<' | '<=' | '>' | '>='
+
+InRhs
+  ::= '(' (SelectStmt | Expr (',' Expr)*)? ')'
+  | SchemaQualifier? TableFunctionName '(' FunctionArguments? ')'
+  | SchemaQualifier? TableName
+
+// SQLite assigns &, |, << and >> the same precedence and evaluates them
+// from left to right.
+BitwiseExpr
+  ::= AddExpr
+      (('&' | '|' | '<<' | '>>') AddExpr)*
+
+AddExpr
+  ::= MultiplyExpr
+      (('+' | '-') MultiplyExpr)*
+
+MultiplyExpr
+  ::= ConcatExpr
+      (('*' | '/' | '%') ConcatExpr)*
+
+ConcatExpr
+  ::= CollateExpr
+      (('||' | '->' | '->>') CollateExpr)*
+
+// COLLATE is a postfix operator below the unary prefix operators.
+CollateExpr ::= UnaryExpr (KW_COLLATE CollationName)*
+
+UnaryExpr ::= ('+' | '-' | '~')* PrimaryExpr
+
+PrimaryExpr
+  ::= LiteralValue
+  | BindParameter
+  | FunctionInvocation
+  | QualifiedColumnRef
+  | CastExpr
+  | CaseExpr
+  | ExistsExpr
+  | RaiseFunction
+  | '(' SelectStmt ')'
+  | RowValueExpr
+  | '(' Expr ')'
+
+RowValueExpr
+  ::= '(' Expr ',' Expr (',' Expr)* ')'
+
+QualifiedColumnRef
+  ::= SchemaName '.' TableName '.' ColumnName
+  | TableName '.' ColumnName
+  | ColumnName
+
+FunctionInvocation
+  | QualifiedColumnRef
+  | CastExpr
+  | CaseExpr
+  | ExistsExpr
+  | RaiseFunction
+  | '(' Expr ')'
+  | '(' SelectStmt ')'
+
+QualifiedColumnRef
+  ::= SchemaName '.' TableName '.' ColumnName
+  | TableName '.' ColumnName
+  | ColumnName
+
+FunctionInvocation
+  ::= FunctionName
+      '(' FunctionArguments? ')'
+      FilterClause?
+      OverClause?
+
+FunctionArguments
+  ::= '*'
+  | (KW_DISTINCT | KW_ALL)? Expr (',' Expr)*
+    (KW_ORDER KW_BY OrderingTerm (',' OrderingTerm)*)?
+
+CastExpr ::= KW_CAST '(' Expr KW_AS TypeName ')'
+
+CaseExpr
+  ::= KW_CASE Expr?
+      (KW_WHEN Expr KW_THEN Expr)+
+      (KW_ELSE Expr)?
+      KW_END
+
+ExistsExpr ::= KW_EXISTS '(' SelectStmt ')'
+
+RaiseFunction
+  ::= KW_RAISE '('
+      ( KW_IGNORE
+      | (KW_ROLLBACK | KW_ABORT | KW_FAIL) ',' Expr
+      )
+      ')'
+
+LiteralValue
+  ::= NumericLiteral
+  | StringLiteral
+  | BlobLiteral
+  | KW_NULL
+  | KW_TRUE
+  | KW_FALSE
+  | KW_CURRENT_TIME
+  | KW_CURRENT_DATE
+  | KW_CURRENT_TIMESTAMP
+
+SignedNumber ::= ('+' | '-')? NumericLiteral
+
+SchemaQualifier ::= SchemaName '.'
+QualifiedTableRef ::= SchemaQualifier? TableName
+
+IfExists    ::= KW_IF KW_EXISTS
+IfNotExists ::= KW_IF KW_NOT KW_EXISTS
+
+// For this tREx-compatible grammar, bare keywords are not identifiers.
+// Use quoted identifiers when an object name coincides with a SQL keyword.
+Name              ::= Identifier
+SchemaName        ::= Name
+TableName         ::= Name
+TableOrIndexName  ::= Name
+IndexName         ::= Name
+ViewName          ::= Name
+TriggerName       ::= Name
+ColumnName        ::= Name
+ColumnAlias       ::= Name | StringLiteral
+TableAlias        ::= Name
+ConstraintName    ::= Name
+CollationName     ::= Name
+ForeignTable      ::= Name
+SavepointName     ::= Name
+PragmaName        ::= Name
+ModuleName        ::= Name
+TableFunctionName ::= Name
+FunctionName      ::= Name
+WindowName        ::= Name
+BaseWindowName    ::= Name
+Filename          ::= StringLiteral | Name
+
+<?TOKENS?>
+
+// SQL keywords are defined as case-insensitive lexical KW_* tokens.
+EOF ::= $
+
+// Case-insensitive SQL keyword tokens.
+// They precede Identifier so equal-length matches prefer the keyword.
+// Query keywords
+KW_SELECT ::= [sS] [eE] [lL] [eE] [cC] [tT]
+KW_FROM ::= [fF] [rR] [oO] [mM]
+KW_WHERE ::= [wW] [hH] [eE] [rR] [eE]
+KW_GROUP ::= [gG] [rR] [oO] [uU] [pP]
+KW_HAVING ::= [hH] [aA] [vV] [iI] [nN] [gG]
+KW_ORDER ::= [oO] [rR] [dD] [eE] [rR]
+KW_BY ::= [bB] [yY]
+KW_LIMIT ::= [lL] [iI] [mM] [iI] [tT]
+KW_OFFSET ::= [oO] [fF] [fF] [sS] [eE] [tT]
+KW_DISTINCT ::= [dD] [iI] [sS] [tT] [iI] [nN] [cC] [tT]
+KW_ALL ::= [aA] [lL] [lL]
+KW_AS ::= [aA] [sS]
+KW_WINDOW ::= [wW] [iI] [nN] [dD] [oO] [wW]
+KW_PARTITION ::= [pP] [aA] [rR] [tT] [iI] [tT] [iI] [oO] [nN]
+KW_OVER ::= [oO] [vV] [eE] [rR]
+KW_FILTER ::= [fF] [iI] [lL] [tT] [eE] [rR]
+
+// Join keywords
+KW_JOIN ::= [jJ] [oO] [iI] [nN]
+KW_INNER ::= [iI] [nN] [nN] [eE] [rR]
+KW_LEFT ::= [lL] [eE] [fF] [tT]
+KW_RIGHT ::= [rR] [iI] [gG] [hH] [tT]
+KW_FULL ::= [fF] [uU] [lL] [lL]
+KW_OUTER ::= [oO] [uU] [tT] [eE] [rR]
+KW_CROSS ::= [cC] [rR] [oO] [sS] [sS]
+KW_NATURAL ::= [nN] [aA] [tT] [uU] [rR] [aA] [lL]
+KW_ON ::= [oO] [nN]
+KW_USING ::= [uU] [sS] [iI] [nN] [gG]
+
+// DML keywords
+KW_INSERT ::= [iI] [nN] [sS] [eE] [rR] [tT]
+KW_INTO ::= [iI] [nN] [tT] [oO]
+KW_VALUES ::= [vV] [aA] [lL] [uU] [eE] [sS]
+KW_UPDATE ::= [uU] [pP] [dD] [aA] [tT] [eE]
+KW_SET ::= [sS] [eE] [tT]
+KW_DELETE ::= [dD] [eE] [lL] [eE] [tT] [eE]
+KW_REPLACE ::= [rR] [eE] [pP] [lL] [aA] [cC] [eE]
+KW_RETURNING ::= [rR] [eE] [tT] [uU] [rR] [nN] [iI] [nN] [gG]
+KW_DO ::= [dD] [oO]
+KW_NOTHING ::= [nN] [oO] [tT] [hH] [iI] [nN] [gG]
+KW_CONFLICT ::= [cC] [oO] [nN] [fF] [lL] [iI] [cC] [tT]
+
+// DDL keywords
+KW_CREATE ::= [cC] [rR] [eE] [aA] [tT] [eE]
+KW_ALTER ::= [aA] [lL] [tT] [eE] [rR]
+KW_DROP ::= [dD] [rR] [oO] [pP]
+KW_TABLE ::= [tT] [aA] [bB] [lL] [eE]
+KW_INDEX ::= [iI] [nN] [dD] [eE] [xX]
+KW_VIEW ::= [vV] [iI] [eE] [wW]
+KW_TRIGGER ::= [tT] [rR] [iI] [gG] [gG] [eE] [rR]
+KW_VIRTUAL ::= [vV] [iI] [rR] [tT] [uU] [aA] [lL]
+KW_TEMP ::= [tT] [eE] [mM] [pP]
+KW_TEMPORARY ::= [tT] [eE] [mM] [pP] [oO] [rR] [aA] [rR] [yY]
+KW_RENAME ::= [rR] [eE] [nN] [aA] [mM] [eE]
+KW_COLUMN ::= [cC] [oO] [lL] [uU] [mM] [nN]
+KW_ADD ::= [aA] [dD] [dD]
+
+// Constraints keywords
+KW_PRIMARY ::= [pP] [rR] [iI] [mM] [aA] [rR] [yY]
+KW_KEY ::= [kK] [eE] [yY]
+KW_UNIQUE ::= [uU] [nN] [iI] [qQ] [uU] [eE]
+KW_CHECK ::= [cC] [hH] [eE] [cC] [kK]
+KW_DEFAULT ::= [dD] [eE] [fF] [aA] [uU] [lL] [tT]
+KW_COLLATE ::= [cC] [oO] [lL] [lL] [aA] [tT] [eE]
+KW_REFERENCES ::= [rR] [eE] [fF] [eE] [rR] [eE] [nN] [cC] [eE] [sS]
+KW_FOREIGN ::= [fF] [oO] [rR] [eE] [iI] [gG] [nN]
+KW_AUTOINCREMENT ::= [aA] [uU] [tT] [oO] [iI] [nN] [cC] [rR] [eE] [mM] [eE] [nN] [tT]
+KW_CONSTRAINT ::= [cC] [oO] [nN] [sS] [tT] [rR] [aA] [iI] [nN] [tT]
+KW_DEFERRABLE ::= [dD] [eE] [fF] [eE] [rR] [rR] [aA] [bB] [lL] [eE]
+KW_INITIALLY ::= [iI] [nN] [iI] [tT] [iI] [aA] [lL] [lL] [yY]
+KW_DEFERRED ::= [dD] [eE] [fF] [eE] [rR] [rR] [eE] [dD]
+KW_IMMEDIATE ::= [iI] [mM] [mM] [eE] [dD] [iI] [aA] [tT] [eE]
+KW_CASCADE ::= [cC] [aA] [sS] [cC] [aA] [dD] [eE]
+KW_RESTRICT ::= [rR] [eE] [sS] [tT] [rR] [iI] [cC] [tT]
+KW_ACTION ::= [aA] [cC] [tT] [iI] [oO] [nN]
+KW_GENERATED ::= [gG] [eE] [nN] [eE] [rR] [aA] [tT] [eE] [dD]
+KW_ALWAYS ::= [aA] [lL] [wW] [aA] [yY] [sS]
+KW_STORED ::= [sS] [tT] [oO] [rR] [eE] [dD]
+KW_STRICT ::= [sS] [tT] [rR] [iI] [cC] [tT]
+KW_WITHOUT ::= [wW] [iI] [tT] [hH] [oO] [uU] [tT]
+KW_ROWID ::= [rR] [oO] [wW] [iI] [dD]
+
+// Predicates keywords
+KW_AND ::= [aA] [nN] [dD]
+KW_OR ::= [oO] [rR]
+KW_NOT ::= [nN] [oO] [tT]
+KW_IS ::= [iI] [sS]
+KW_NULL ::= [nN] [uU] [lL] [lL]
+KW_ISNULL ::= [iI] [sS] [nN] [uU] [lL] [lL]
+KW_NOTNULL ::= [nN] [oO] [tT] [nN] [uU] [lL] [lL]
+KW_BETWEEN ::= [bB] [eE] [tT] [wW] [eE] [eE] [nN]
+KW_IN ::= [iI] [nN]
+KW_LIKE ::= [lL] [iI] [kK] [eE]
+KW_GLOB ::= [gG] [lL] [oO] [bB]
+KW_REGEXP ::= [rR] [eE] [gG] [eE] [xX] [pP]
+KW_MATCH ::= [mM] [aA] [tT] [cC] [hH]
+KW_ESCAPE ::= [eE] [sS] [cC] [aA] [pP] [eE]
+KW_EXISTS ::= [eE] [xX] [iI] [sS] [tT] [sS]
+KW_TRUE ::= [tT] [rR] [uU] [eE]
+KW_FALSE ::= [fF] [aA] [lL] [sS] [eE]
+KW_ANY ::= [aA] [nN] [yY]
+KW_SOME ::= [sS] [oO] [mM] [eE]
+
+// Expressions keywords
+KW_CASE ::= [cC] [aA] [sS] [eE]
+KW_WHEN ::= [wW] [hH] [eE] [nN]
+KW_THEN ::= [tT] [hH] [eE] [nN]
+KW_ELSE ::= [eE] [lL] [sS] [eE]
+KW_END ::= [eE] [nN] [dD]
+KW_CAST ::= [cC] [aA] [sS] [tT]
+KW_RAISE ::= [rR] [aA] [iI] [sS] [eE]
+KW_CURRENT_DATE ::= [cC] [uU] [rR] [rR] [eE] [nN] [tT] '_' [dD] [aA] [tT] [eE]
+KW_CURRENT_TIME ::= [cC] [uU] [rR] [rR] [eE] [nN] [tT] '_' [tT] [iI] [mM] [eE]
+KW_CURRENT_TIMESTAMP ::= [cC] [uU] [rR] [rR] [eE] [nN] [tT] '_' [tT] [iI] [mM] [eE] [sS] [tT] [aA] [mM] [pP]
+
+// Transactions keywords
+KW_BEGIN ::= [bB] [eE] [gG] [iI] [nN]
+KW_COMMIT ::= [cC] [oO] [mM] [mM] [iI] [tT]
+KW_ROLLBACK ::= [rR] [oO] [lL] [lL] [bB] [aA] [cC] [kK]
+KW_SAVEPOINT ::= [sS] [aA] [vV] [eE] [pP] [oO] [iI] [nN] [tT]
+KW_RELEASE ::= [rR] [eE] [lL] [eE] [aA] [sS] [eE]
+KW_TRANSACTION ::= [tT] [rR] [aA] [nN] [sS] [aA] [cC] [tT] [iI] [oO] [nN]
+KW_EXCLUSIVE ::= [eE] [xX] [cC] [lL] [uU] [sS] [iI] [vV] [eE]
+
+// Maintenance keywords
+KW_PRAGMA ::= [pP] [rR] [aA] [gG] [mM] [aA]
+KW_VACUUM ::= [vV] [aA] [cC] [uU] [uU] [mM]
+KW_ANALYZE ::= [aA] [nN] [aA] [lL] [yY] [zZ] [eE]
+KW_REINDEX ::= [rR] [eE] [iI] [nN] [dD] [eE] [xX]
+KW_ATTACH ::= [aA] [tT] [tT] [aA] [cC] [hH]
+KW_DETACH ::= [dD] [eE] [tT] [aA] [cC] [hH]
+KW_DATABASE ::= [dD] [aA] [tT] [aA] [bB] [aA] [sS] [eE]
+KW_EXPLAIN ::= [eE] [xX] [pP] [lL] [aA] [iI] [nN]
+KW_QUERY ::= [qQ] [uU] [eE] [rR] [yY]
+KW_PLAN ::= [pP] [lL] [aA] [nN]
+
+// Window frames keywords
+KW_ROWS ::= [rR] [oO] [wW] [sS]
+KW_RANGE ::= [rR] [aA] [nN] [gG] [eE]
+KW_GROUPS ::= [gG] [rR] [oO] [uU] [pP] [sS]
+KW_UNBOUNDED ::= [uU] [nN] [bB] [oO] [uU] [nN] [dD] [eE] [dD]
+KW_PRECEDING ::= [pP] [rR] [eE] [cC] [eE] [dD] [iI] [nN] [gG]
+KW_FOLLOWING ::= [fF] [oO] [lL] [lL] [oO] [wW] [iI] [nN] [gG]
+KW_CURRENT ::= [cC] [uU] [rR] [rR] [eE] [nN] [tT]
+KW_ROW ::= [rR] [oO] [wW]
+KW_EXCLUDE ::= [eE] [xX] [cC] [lL] [uU] [dD] [eE]
+KW_NO ::= [nN] [oO]
+KW_OTHERS ::= [oO] [tT] [hH] [eE] [rR] [sS]
+KW_TIES ::= [tT] [iI] [eE] [sS]
+KW_FIRST ::= [fF] [iI] [rR] [sS] [tT]
+KW_LAST ::= [lL] [aA] [sS] [tT]
+KW_NULLS ::= [nN] [uU] [lL] [lL] [sS]
+
+// Other SQLite keywords
+KW_ABORT ::= [aA] [bB] [oO] [rR] [tT]
+KW_AFTER ::= [aA] [fF] [tT] [eE] [rR]
+KW_ASC ::= [aA] [sS] [cC]
+KW_BEFORE ::= [bB] [eE] [fF] [oO] [rR] [eE]
+KW_BIG ::= [bB] [iI] [gG]
+KW_BIGINT ::= [bB] [iI] [gG] [iI] [nN] [tT]
+KW_BINARY ::= [bB] [iI] [nN] [aA] [rR] [yY]
+KW_BIT ::= [bB] [iI] [tT]
+KW_BLOB ::= [bB] [lL] [oO] [bB]
+KW_BOOLEAN ::= [bB] [oO] [oO] [lL] [eE] [aA] [nN]
+KW_CHAR ::= [cC] [hH] [aA] [rR]
+KW_CHARACTER ::= [cC] [hH] [aA] [rR] [aA] [cC] [tT] [eE] [rR]
+KW_CLOB ::= [cC] [lL] [oO] [bB]
+KW_DATE ::= [dD] [aA] [tT] [eE]
+KW_DATETIME ::= [dD] [aA] [tT] [eE] [tT] [iI] [mM] [eE]
+KW_DECIMAL ::= [dD] [eE] [cC] [iI] [mM] [aA] [lL]
+KW_DESC ::= [dD] [eE] [sS] [cC]
+KW_DOUBLE ::= [dD] [oO] [uU] [bB] [lL] [eE]
+KW_EACH ::= [eE] [aA] [cC] [hH]
+KW_EXCEPT ::= [eE] [xX] [cC] [eE] [pP] [tT]
+KW_FAIL ::= [fF] [aA] [iI] [lL]
+KW_FLOAT ::= [fF] [lL] [oO] [aA] [tT]
+KW_FOR ::= [fF] [oO] [rR]
+KW_IF ::= [iI] [fF]
+KW_IGNORE ::= [iI] [gG] [nN] [oO] [rR] [eE]
+KW_INDEXED ::= [iI] [nN] [dD] [eE] [xX] [eE] [dD]
+KW_INSTEAD ::= [iI] [nN] [sS] [tT] [eE] [aA] [dD]
+KW_INT ::= [iI] [nN] [tT]
+KW_INTEGER ::= [iI] [nN] [tT] [eE] [gG] [eE] [rR]
+KW_INTERSECT ::= [iI] [nN] [tT] [eE] [rR] [sS] [eE] [cC] [tT]
+KW_MATERIALIZED ::= [mM] [aA] [tT] [eE] [rR] [iI] [aA] [lL] [iI] [zZ] [eE] [dD]
+KW_MEDIUMINT ::= [mM] [eE] [dD] [iI] [uU] [mM] [iI] [nN] [tT]
+KW_NATIONAL ::= [nN] [aA] [tT] [iI] [oO] [nN] [aA] [lL]
+KW_NATIVE ::= [nN] [aA] [tT] [iI] [vV] [eE]
+KW_NCHAR ::= [nN] [cC] [hH] [aA] [rR]
+KW_NUMERIC ::= [nN] [uU] [mM] [eE] [rR] [iI] [cC]
+KW_NVARCHAR ::= [nN] [vV] [aA] [rR] [cC] [hH] [aA] [rR]
+KW_OF ::= [oO] [fF]
+KW_OFF ::= [oO] [fF] [fF]
+KW_PRECISION ::= [pP] [rR] [eE] [cC] [iI] [sS] [iI] [oO] [nN]
+KW_REAL ::= [rR] [eE] [aA] [lL]
+KW_RECURSIVE ::= [rR] [eE] [cC] [uU] [rR] [sS] [iI] [vV] [eE]
+KW_SMALLINT ::= [sS] [mM] [aA] [lL] [lL] [iI] [nN] [tT]
+KW_TEXT ::= [tT] [eE] [xX] [tT]
+KW_TIME ::= [tT] [iI] [mM] [eE]
+KW_TIMESTAMP ::= [tT] [iI] [mM] [eE] [sS] [tT] [aA] [mM] [pP]
+KW_TINYINT ::= [tT] [iI] [nN] [yY] [iI] [nN] [tT]
+KW_TO ::= [tT] [oO]
+KW_UNION ::= [uU] [nN] [iI] [oO] [nN]
+KW_UNSIGNED ::= [uU] [nN] [sS] [iI] [gG] [nN] [eE] [dD]
+KW_VARBINARY ::= [vV] [aA] [rR] [bB] [iI] [nN] [aA] [rR] [yY]
+KW_VARCHAR ::= [vV] [aA] [rR] [cC] [hH] [aA] [rR]
+KW_VARYING ::= [vV] [aA] [rR] [yY] [iI] [nN] [gG]
+KW_WITH ::= [wW] [iI] [tT] [hH]
+KW_YES ::= [yY] [eE] [sS]
+
+Ignore ::= (WhiteSpace | LineComment | BlockComment)+
+           /* ws: definition */
+
+WhiteSpace ::= [#x9#xA#xD#x20]+
+
+NewLine ::= #xA
+          | #xD
+          | #xD #xA
+
+LineComment ::= '--' LineCommentChar* (NewLine | EOF)
+
+LineCommentChar ::= #x9
+                  | [#x20-#xD7FF]
+                  | [#xE000-#xFFFD]
+                  | [#x10000-#x10FFFF]
+
+BlockComment ::= '/*' BlockCommentBody* '*/'
+
+BlockCommentBody ::= (. - '*')
+                   | ('*' (. - '/'))
+
+Identifier ::= UnquotedIdentifier
+             | QuotedIdentifier
+             | BracketIdentifier
+             | BacktickIdentifier
+
+UnquotedIdentifier ::= IdentifierName
+
+IdentifierName ::= IdentifierStart IdentifierPart*
+
+IdentifierStart ::= [A-Z]
+                  | [a-z]
+                  | '_'
+                  | [#x80-#xD7FF]
+                  | [#xE000-#xFFFD]
+                  | [#x10000-#x10FFFF]
+
+IdentifierPart ::= IdentifierStart
+                 | [0-9]
+                 | '$'
+
+QuotedIdentifier ::= '"' QuotedIdentifierChar* '"'
+
+QuotedIdentifierChar ::= '""'
+                       | (. - '"')
+
+BracketIdentifier ::= '[' BracketIdentifierChar* ']'
+
+BracketIdentifierChar ::= . - ']'
+
+BacktickIdentifier ::= '`' BacktickIdentifierChar* '`'
+
+BacktickIdentifierChar ::= '``'
+                         | (. - '`')
+
+StringLiteral ::= "'" StringChar* "'"
+
+StringChar ::= "''"
+             | (. - "'")
+
+BlobLiteral ::= ('X' | 'x') "'" HexDigit* "'" 
+
+NumericLiteral ::= HexInteger
+                 | DecimalNumber
+
+HexInteger ::= '0' ('X' | 'x') HexDigit+
+
+DecimalNumber ::= Digit+ ('.' Digit*)? ExponentPart?
+                | '.' Digit+ ExponentPart?
+
+ExponentPart ::= ('E' | 'e') ('+' | '-')? Digit+
+
+BindParameter ::= '?'
+                | '?' Digit+
+                | (':' | '@' | '$') ParameterName
+                | '$' ParameterName '::' ParameterName
+                  ('(' ParameterSuffixChar* ')')?
+
+ParameterName ::= IdentifierStart IdentifierPart*
+
+ParameterSuffixChar ::= . - ')'
+
+Digit ::= [0-9]
+
+HexDigit ::= [0-9A-Fa-f]
