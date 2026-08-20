@@ -58,14 +58,14 @@ The project targets **API and language compatibility where practical**, while pr
 | SQLite-oriented EBNF grammar | Complete |
 | CST collection | Complete |
 | JSON and XML CST serialization | Complete |
-| AST builder | Planned |
-| Semantic analyzer | Planned |
-| Query planner | Planned |
-| SQL executor | Planned |
-| Transaction manager | Planned |
-| IndexedDB storage engine | Planned |
-| Native API | Planned |
-| WebSQL compatibility adapter | Planned |
+| AST builder | Complete |
+| Semantic analyzer | Complete |
+| Query planner | Complete |
+| SQL executor | Complete |
+| Transaction manager | Complete |
+| IndexedDB storage engine | Complete |
+| Native API | Complete |
+| WebSQL compatibility adapter | Complete |
 
 ---
 
