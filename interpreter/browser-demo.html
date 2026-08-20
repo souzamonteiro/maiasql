@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MaiaSQL Browser Demo</title>
+  <style>
+    :root {
+      --bg: #f5efe4;
+      --panel: rgba(255, 251, 244, 0.94);
+      --panel-strong: #fffdf8;
+      --ink: #18201b;
+      --muted: #607064;
+      --accent: #14532d;
+      --accent-soft: #e4f0e7;
+      --accent-strong: #0d3b20;
+      --border: rgba(24, 32, 27, 0.12);
+      --shadow: 0 22px 54px rgba(24, 32, 27, 0.12);
+      --console: #18211d;
+      --console-ink: #eef6f1;
+      --warn: #9a5f09;
+      --error: #9f2d2d;
+      --success: #216e39;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      font-family: "Iowan Old Style", "Palatino Linotype", serif;
+      background:
+        radial-gradient(circle at top left, rgba(20, 83, 45, 0.16), transparent 35%),
+        radial-gradient(circle at bottom right, rgba(203, 149, 73, 0.16), transparent 28%),
+        linear-gradient(180deg, #eee4d2 0%, #f9f6ee 100%);
+    }
+
+    main {
+      width: min(1200px, calc(100vw - 28px));
+      margin: 22px auto 28px;
+      display: grid;
+      gap: 18px;
+    }
+
+    .hero,
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+    }
+
+    .hero {
+      padding: 28px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset: auto -80px -110px auto;
+      width: 240px;
+      height: 240px;
+      border-radius: 999px;
+      background: radial-gradient(circle, rgba(20, 83, 45, 0.18), rgba(20, 83, 45, 0));
+      pointer-events: none;
+    }
+
+    h1 {
+      margin: 0 0 10px;
+      font-size: clamp(2.3rem, 5vw, 4.2rem);
+      line-height: 0.92;
+      letter-spacing: -0.05em;
+      max-width: 11ch;
+    }
+
+    .lede {
+      max-width: 66ch;
+      margin: 0;
+      color: var(--muted);
+      font-size: 1.04rem;
+      line-height: 1.55;
+    }
+
+    .hero-meta {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 18px;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(20, 83, 45, 0.08);
+      color: var(--accent-strong);
+      font-size: 0.9rem;
+    }
+
+    .workspace {
+      display: grid;
+      grid-template-columns: minmax(320px, 1.25fr) minmax(280px, 0.95fr);
+      gap: 18px;
+    }
+
+    .panel {
+      padding: 18px;
+    }
+
+    .panel h2,
+    .panel h3 {
+      margin: 0;
+      letter-spacing: -0.03em;
+    }
+
+    .panel-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .panel-copy {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+
+    .controls {
+      display: grid;
+      gap: 14px;
+      margin-bottom: 14px;
+    }
+
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+    }
+
+    label {
+      font-size: 0.92rem;
+      color: var(--muted);
+    }
+
+    select,
+    input,
+    textarea,
+    button {
+      font: inherit;
+    }
+
+    select,
+    input {
+      min-height: 42px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: var(--panel-strong);
+      color: var(--ink);
+    }
+
+    .grow {
+      flex: 1 1 200px;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 330px;
+      resize: vertical;
+      padding: 18px;
+      border: 0;
+      border-radius: 24px;
+      background: var(--console);
+      color: var(--console-ink);
+      font-family: "SFMono-Regular", "Menlo", monospace;
+      font-size: 0.95rem;
+      line-height: 1.55;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    button {
+      border: 0;
+      border-radius: 999px;
+      padding: 11px 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 160ms ease, opacity 160ms ease, background 160ms ease;
+    }
+
+    button:hover { transform: translateY(-1px); }
+    button:disabled { opacity: 0.55; cursor: progress; transform: none; }
+
+    .primary {
+      background: var(--accent);
+      color: white;
+    }
+
+    .secondary {
+      background: var(--accent-soft);
+      color: var(--accent-strong);
+    }
+
+    .ghost {
+      background: rgba(24, 32, 27, 0.06);
+      color: var(--ink);
+    }
+
+    .status {
+      padding: 12px 14px;
+      border-radius: 16px;
+      background: rgba(20, 83, 45, 0.08);
+      color: var(--accent-strong);
+      font-size: 0.92rem;
+    }
+
+    .snippet-grid {
+      display: grid;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .snippet {
+      width: 100%;
+      text-align: left;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.62);
+      border: 1px solid var(--border);
+      padding: 14px;
+    }
+
+    .snippet strong {
+      display: block;
+      margin-bottom: 4px;
+      color: var(--ink);
+    }
+
+    .snippet span {
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .results {
+      display: grid;
+      gap: 14px;
+    }
+
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .metric {
+      padding: 14px;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.62);
+      border: 1px solid var(--border);
+    }
+
+    .metric-label {
+      display: block;
+      color: var(--muted);
+      font-size: 0.82rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .metric-value {
+      display: block;
+      margin-top: 6px;
+      font-size: 1.15rem;
+      font-weight: 700;
+    }
+
+    .result-table-wrap {
+      overflow: auto;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.72);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.94rem;
+    }
+
+    th,
+    td {
+      padding: 11px 12px;
+      text-align: left;
+      border-bottom: 1px solid rgba(24, 32, 27, 0.08);
+      white-space: nowrap;
+    }
+
+    th {
+      background: rgba(20, 83, 45, 0.07);
+      color: var(--accent-strong);
+      position: sticky;
+      top: 0;
+    }
+
+    .empty {
+      padding: 20px;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    .log {
+      min-height: 180px;
+      max-height: 260px;
+      overflow: auto;
+      padding: 16px;
+      border-radius: 20px;
+      background: #1d2621;
+      color: #edf4ef;
+      font-family: "SFMono-Regular", "Menlo", monospace;
+      font-size: 0.9rem;
+    }
+
+    .log-line {
+      margin-bottom: 10px;
+      white-space: pre-wrap;
+    }
+
+    .log-line.warn { color: #f5cf8d; }
+    .log-line.error { color: #ffabab; }
+    .log-line.success { color: #9ce3aa; }
+
+    .footnote {
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.5;
+      margin-top: 10px;
+    }
+
+    @media (max-width: 920px) {
+      .workspace {
+        grid-template-columns: 1fr;
+      }
+
+      .summary {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <section class="hero">
+      <h1>MaiaSQL Browser Demo</h1>
+      <p class="lede">
+        Interactive SQL console for the MaiaSQL prototype. Run statements against the Promise-based native API or the
+        WebSQL compatibility adapter, inspect result rows, and reset the IndexedDB-backed demo database whenever you want.
+      </p>
+      <div class="hero-meta">
+        <span class="pill">IndexedDB persistence</span>
+        <span class="pill">Native API + WebSQL adapter</span>
+        <span class="pill">Interactive SQL console</span>
+      </div>
+    </section>
+
+    <section class="workspace">
+      <div class="panel">
+        <div class="panel-head">
+          <div>
+            <h2>SQL Console</h2>
+            <p class="panel-copy">Edit the script, pick an execution mode, and run it directly in the browser.</p>
+          </div>
+        </div>
+
+        <div class="controls">
+          <div class="row">
+            <label>
+              API mode
+              <select data-mode>
+                <option value="native">Native Promise API</option>
+                <option value="websql">WebSQL Compatibility API</option>
+              </select>
+            </label>
+
+            <label class="grow">
+              Database name
+              <input type="text" value="maiasql-demo" data-db-name>
+            </label>
+          </div>
+
+          <div class="status" data-status>Idle. Load a snippet or write SQL and press Run.</div>
+        </div>
+
+        <textarea data-sql spellcheck="false"></textarea>
+
+        <div class="toolbar">
+          <button class="primary" data-run>Run SQL</button>
+          <button class="secondary" data-load-seed>Load Starter Script</button>
+          <button class="ghost" data-clear-log>Clear Log</button>
+          <button class="ghost" data-reset-db>Reset Demo Database</button>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head">
+          <div>
+            <h2>Results</h2>
+            <p class="panel-copy">Each run updates this panel with the last statement result and an execution log.</p>
+          </div>
+        </div>
+
+        <div class="results">
+          <div class="summary">
+            <div class="metric">
+              <span class="metric-label">Statement Type</span>
+              <span class="metric-value" data-metric-type>None</span>
+            </div>
+            <div class="metric">
+              <span class="metric-label">Rows</span>
+              <span class="metric-value" data-metric-rows>0</span>
+            </div>
+            <div class="metric">
+              <span class="metric-label">Affected</span>
+              <span class="metric-value" data-metric-affected>0</span>
+            </div>
+          </div>
+
+          <div class="result-table-wrap" data-results-wrap>
+            <div class="empty" data-results-empty>No query results yet.</div>
+            <table hidden data-results-table>
+              <thead data-results-head></thead>
+              <tbody data-results-body></tbody>
+            </table>
+          </div>
+
+          <div>
+            <h3>Snippets</h3>
+            <div class="snippet-grid">
+              <button class="snippet" data-snippet="starter">
+                <strong>Starter schema</strong>
+                <span>Create a table, insert rows, and query the result.</span>
+              </button>
+              <button class="snippet" data-snippet="analytics">
+                <strong>Aggregate query</strong>
+                <span>Try grouping, CASE, SUM, and ORDER BY.</span>
+              </button>
+              <button class="snippet" data-snippet="websql">
+                <strong>WebSQL flow</strong>
+                <span>Run a small script that fits the compatibility adapter.</span>
+              </button>
+            </div>
+          </div>
+
+          <div>
+            <h3>Execution Log</h3>
+            <div class="log" data-log></div>
+            <p class="footnote">
+              Serve this directory over HTTP so the browser can load the generated parser bundle.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="./sql-parser-browser-loader.js"></script>
+  <script src="./maiasql-core.js"></script>
+  <script src="./maiasql-websql.js"></script>
+  <script src="./browser-demo.js"></script>
+</body>
+</html>

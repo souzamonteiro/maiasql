@@ -355,6 +355,91 @@ The adapter must implement:
 
 ---
 
+## Current prototype usage
+
+The current prototype can already be consumed directly from this repository as a CommonJS package entrypoint.
+
+### Node.js
+
+```javascript
+const {
+  Parser,
+  MaiaSQL,
+  openDatabase,
+  installWebSqlGlobals
+} = require('./interpreter');
+
+async function main() {
+  const db = await MaiaSQL.open({
+    name: 'demo',
+    storage: 'memory',
+    parser: Parser
+  });
+
+  await db.exec(`
+    CREATE TABLE users (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT NOT NULL
+    );
+    INSERT INTO users (name) VALUES ('Ada');
+  `);
+
+  console.log((await db.exec('SELECT * FROM users')).rows);
+
+  const legacy = openDatabase('legacy-demo', '1.0', 'Legacy demo', 1024 * 1024);
+  legacy.transaction(function (tx) {
+    tx.executeSql('CREATE TABLE IF NOT EXISTS logs (id INTEGER PRIMARY KEY AUTOINCREMENT, message TEXT)');
+  });
+
+  installWebSqlGlobals();
+}
+
+main().catch(console.error);
+```
+
+### Browser
+
+Load these files in order:
+
+```html
+<script src="./interpreter/sql-parser.js"></script>
+<script src="./interpreter/maiasql-core.js"></script>
+<script src="./interpreter/maiasql-websql.js"></script>
+```
+
+Then use either API:
+
+```javascript
+const db = await MaiaSQLRuntime.MaiaSQL.open({
+  name: 'browser-demo',
+  storage: 'indexeddb',
+  parser: MaiaSQLParser
+});
+
+const websqlDb = MaiaSQLWebSQL.openDatabase(
+  'browser-demo-websql',
+  '1.0',
+  'Browser demo',
+  5 * 1024 * 1024
+);
+```
+
+There is also a ready-to-use interactive demo page at [interpreter/browser-demo.html](./interpreter/browser-demo.html) with:
+
+- an in-browser SQL console;
+- a switch between the native Promise API and the WebSQL compatibility adapter;
+- result tables and execution logs;
+- reset support for the IndexedDB-backed demo database.
+
+If you want a drop-in global replacement in environments where native WebSQL no longer exists, use the package helper:
+
+```javascript
+const { installWebSqlGlobals } = require('./interpreter');
+installWebSqlGlobals();
+```
+
+---
+
 # Class model
 
 ## End-to-end class diagram

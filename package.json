@@ -1,0 +1,40 @@
+{
+  "name": "maiasql",
+  "version": "0.1.0",
+  "description": "Pure JavaScript SQL engine with a WebSQL-compatible adapter over IndexedDB or memory storage.",
+  "author": "The MaiaScript Team (https://www.maiascript.com)",
+  "main": "interpreter/index.js",
+  "type": "commonjs",
+  "files": [
+    "README.md",
+    "LICENSE",
+    "interpreter/index.js",
+    "interpreter/install-websql-globals.js",
+    "interpreter/maiasql-core.js",
+    "interpreter/maiasql-websql.js",
+    "interpreter/sql-parser.js",
+    "interpreter/sql-parser-browser-loader.js"
+  ],
+  "keywords": [
+    "sql",
+    "websql",
+    "indexeddb",
+    "sqlite",
+    "browser"
+  ],
+  "license": "Apache-2.0",
+  "scripts": {
+    "test": "node --test interpreter/tests/runtime-engine.test.js interpreter/tests/websql-adapter.test.js interpreter/tests/package-exports.test.js interpreter/tests/sql-parser.test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/souzamonteiro/maiasql.git"
+  },
+  "bugs": {
+    "url": "https://github.com/souzamonteiro/maiasql/issues"
+  },
+  "homepage": "https://github.com/souzamonteiro/maiasql#readme",
+  "engines": {
+    "node": ">=18"
+  }
+}

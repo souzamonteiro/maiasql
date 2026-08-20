@@ -92,18 +92,20 @@
     }
 
     changeVersion(oldVersion, newVersion, callback, errorCallback, successCallback) {
-      return this.transaction(async (tx) => {
-        const db = await this._ready;
-        if (String(db.version) !== String(oldVersion)) {
+      const targetVersion = String(newVersion);
+      return this.transaction((tx) => {
+        if (String(this.version) !== String(oldVersion)) {
           throw new WebSqlError(
-            `Version mismatch. Expected ${oldVersion}, found ${db.version}`,
+            `Version mismatch. Expected ${oldVersion}, found ${this.version}`,
             WEBSQL_ERRORS.VERSION_ERR
           );
         }
         if (typeof callback === 'function') callback(tx);
-        await db.exec(`PRAGMA user_version = ${Number(newVersion) || 0}`);
-        this.version = String(newVersion);
-      }, errorCallback, successCallback);
+        tx.executeSql(`PRAGMA user_version = ${Number(newVersion) || 0}`);
+      }, errorCallback, () => {
+        this.version = targetVersion;
+        if (typeof successCallback === 'function') successCallback();
+      });
     }
 
     async _runQueuedTransaction(callback, errorCallback, successCallback, readOnly) {
@@ -163,6 +165,8 @@
         return WEBSQL_ERRORS.SYNTAX_ERR;
       case 'NOT_NULL':
       case 'PRIMARY_KEY':
+      case 'UNIQUE':
+      case 'CHECK':
       case 'READ_ONLY':
         return WEBSQL_ERRORS.CONSTRAINT_ERR;
       default:
