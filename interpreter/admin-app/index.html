@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MaiaSQL Admin</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar panel">
+        <div class="sidebar-header">
+          <div>
+            <p class="eyebrow">MaiaSQL</p>
+            <h1>Admin</h1>
+          </div>
+          <button id="reset-db" class="secondary">Reset DB</button>
+        </div>
+
+        <div class="sidebar-section toolbar-inline">
+          <button id="new-db" class="secondary small">New DB</button>
+          <button id="delete-db" class="secondary small">Delete DB</button>
+          <button id="refresh-db-list" class="ghost small">Refresh list</button>
+        </div>
+
+        <div class="sidebar-section">
+          <label for="db-name">Database</label>
+          <input id="db-name" type="text" value="maiasql-admin-demo" placeholder="Database name" />
+          <div class="sidebar-section" style="margin-top: 0.75rem;">
+            <label for="db-name-select">Known databases</label>
+            <select id="db-name-select" style="width: 100%; margin-top: 0.35rem;">
+              <option value="maiasql-admin-demo">maiasql-admin-demo</option>
+            </select>
+          </div>
+          <div id="db-current-label" class="db-current-label" style="margin-top: 0.75rem;">Current: maiasql-admin-demo</div>
+          <div class="db-support-note" style="margin-top: 0.5rem; font-size: 0.75rem; opacity: 0.8;">
+            Browser list may be limited when IndexedDB.databases() is unsupported.
+          </div>
+        </div>
+
+        <div class="sidebar-section">
+          <div class="section-title-row">
+            <h2>Tables</h2>
+            <button id="seed-demo" class="ghost small">Seed demo</button>
+          </div>
+          <ul id="table-list" class="table-list"></ul>
+        </div>
+
+        <div class="sidebar-section">
+          <div class="section-title-row">
+            <h2>Schema</h2>
+          </div>
+          <div id="schema-panel" class="schema-panel empty">
+            Select a table to inspect its fields.
+          </div>
+        </div>
+      </aside>
+
+      <main class="workspace panel">
+        <header class="workspace-header">
+          <div>
+            <p class="eyebrow">Workspace</p>
+            <h2>Query console</h2>
+          </div>
+          <div class="status-pill" id="status-pill">Ready</div>
+        </header>
+
+        <div class="toolbar">
+          <button id="run-query" class="primary">Run SQL</button>
+          <button id="new-query" class="secondary">Load starter</button>
+          <button id="clear-output" class="ghost">Clear</button>
+        </div>
+
+        <div class="sql-editor-wrap">
+          <pre id="sql-editor-highlight" class="sql-editor-highlight" aria-hidden="true"></pre>
+          <textarea id="sql-editor" spellcheck="false">CREATE TABLE IF NOT EXISTS users (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  name TEXT NOT NULL,
+  role TEXT DEFAULT 'user',
+  active INTEGER DEFAULT 1
+);
+
+INSERT INTO users (name, role, active) VALUES
+  ('Ada', 'compiler', 1),
+  ('Grace', 'runtime', 1),
+  ('Linus', 'maintainer', 0);
+
+SELECT id, name, role, active
+FROM users
+ORDER BY id ASC;</textarea>
+          <div id="sql-suggestions" class="sql-suggestions hidden" aria-live="polite"></div>
+        </div>
+
+        <div class="results-header">
+          <h3>Results</h3>
+          <div class="metrics">
+            <span>Type: <strong id="result-type">-</strong></span>
+            <span>Rows: <strong id="result-rows">0</strong></span>
+            <span>Changed: <strong id="result-changed">0</strong></span>
+            <button id="export-csv" class="ghost small">Export CSV</button>
+          </div>
+        </div>
+
+        <div class="query-history-panel">
+          <div class="section-title-row">
+            <h3>Recent queries</h3>
+            <button id="clear-history" class="ghost small">Clear history</button>
+          </div>
+          <div id="query-history" class="query-history"></div>
+
+          <div class="saved-query-controls">
+            <input id="query-name" type="text" placeholder="Save query as" maxlength="40" />
+            <button id="save-query" class="secondary small">Save</button>
+          </div>
+          <div class="section-title-row saved-query-header">
+            <h3>Saved queries</h3>
+          </div>
+          <div id="saved-query-list" class="query-history saved-query-list"></div>
+        </div>
+
+        <div id="output-empty" class="output-empty">No query rows yet.</div>
+
+        <div class="results-table-wrap">
+          <table id="results-table" class="results-table" hidden>
+            <thead id="results-head"></thead>
+            <tbody id="results-body"></tbody>
+          </table>
+        </div>
+
+        <div id="log-panel" class="log-panel"></div>
+      </main>
+    </div>
+
+    <script src="../sql-parser-browser-loader.js"></script>
+    <script src="./path-resolver.js"></script>
+    <script src="../maiasql-core.js"></script>
+    <script src="./app.js"></script>
+  </body>
+</html>

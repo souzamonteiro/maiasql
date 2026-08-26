@@ -32,6 +32,30 @@ describe('MaiaSQL prototype runtime', () => {
     assert.equal(deletion.rowsAffected, 1);
   });
 
+  it('supports the optional IndexedDB implementation when provided', async () => {
+    let indexedDBFactory;
+    try {
+      indexedDBFactory = require('../node-indexeddb').indexedDB;
+    } catch (error) {
+      return;
+    }
+
+    const db = await runtime.MaiaSQL.open({
+      name: 'indexeddb-runtime-test',
+      storage: 'indexeddb',
+      parser: Parser,
+      indexedDB: indexedDBFactory
+    });
+
+    await db.exec('CREATE TABLE logs (id INTEGER PRIMARY KEY AUTOINCREMENT, message TEXT NOT NULL)');
+    await db.exec("INSERT INTO logs (message) VALUES ('hello')");
+
+    const result = await db.exec('SELECT COUNT(*) AS total FROM logs');
+    assert.equal(result.rows[0].total, 1);
+
+    await db.close();
+  });
+
   it('rolls back implicit transaction on failure', async () => {
     const db = await runtime.MaiaSQL.open({
       name: 'memory-rollback-test',
@@ -317,6 +341,491 @@ describe('MaiaSQL prototype runtime', () => {
       effort_band: 'long',
       status: 'queued'
     });
+  });
+
+  it('supports correlated EXISTS subqueries and NULL-aware CASE logic', async () => {
+    const db = await runtime.MaiaSQL.open({
+      name: 'memory-subquery-null-test',
+      storage: 'memory',
+      parser: Parser
+    });
+
+    await db.exec(`
+      CREATE TABLE parents (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL,
+        status TEXT
+      );
+
+      CREATE TABLE child_items (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        parent_id INTEGER NOT NULL,
+        amount INTEGER,
+        tag TEXT
+      );
+
+      INSERT INTO parents (name, status) VALUES
+        ('Alpha', 'active'),
+        ('Beta', NULL),
+        ('Gamma', 'paused');
+
+      INSERT INTO child_items (parent_id, amount, tag) VALUES
+        (1, 10, 'x'),
+        (1, 90, 'y'),
+        (2, NULL, 'z'),
+        (3, 15, 'w');
+    `);
+
+    const correlated = await db.exec(`
+      SELECT p.name,
+             CASE
+               WHEN EXISTS (
+                 SELECT 1
+                 FROM child_items c
+                 WHERE c.parent_id = p.id AND c.amount >= 50
+               ) THEN 'active'
+               WHEN p.status IS NULL THEN 'unknown'
+               ELSE 'idle'
+             END AS state
+      FROM parents p
+      ORDER BY p.id ASC
+    `);
+
+    assert.deepEqual(correlated.rows, [
+      { name: 'Alpha', state: 'active' },
+      { name: 'Beta', state: 'unknown' },
+      { name: 'Gamma', state: 'idle' }
+    ]);
+
+    const nullCase = await db.exec(`
+      SELECT
+        CASE
+          WHEN amount IS NULL THEN 'missing'
+          WHEN amount >= 50 THEN 'large'
+          ELSE 'small'
+        END AS bucket,
+        COUNT(*) AS total
+      FROM child_items
+      GROUP BY CASE
+          WHEN amount IS NULL THEN 'missing'
+          WHEN amount >= 50 THEN 'large'
+          ELSE 'small'
+        END
+      ORDER BY bucket ASC
+    `);
+
+    assert.deepEqual(nullCase.rows, [
+      { bucket: 'small', total: 2 },
+      { bucket: 'large', total: 1 },
+      { bucket: 'missing', total: 1 }
+    ]);
+  });
+
+  it('supports correlated update/delete and savepoint rollback', async () => {
+    const db = await runtime.MaiaSQL.open({
+      name: 'memory-transaction-correlation-test',
+      storage: 'memory',
+      parser: Parser
+    });
+
+    await db.exec(`
+      CREATE TABLE orders (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        state TEXT NOT NULL,
+        total INTEGER NOT NULL DEFAULT 0
+      );
+
+      CREATE TABLE order_lines (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        order_id INTEGER NOT NULL REFERENCES orders(id),
+        sku TEXT NOT NULL,
+        qty INTEGER NOT NULL,
+        amount INTEGER NOT NULL
+      );
+
+      INSERT INTO orders (state, total) VALUES
+        ('paid', 10),
+        ('cancelled', 0),
+        ('pending', 0);
+
+      INSERT INTO order_lines (order_id, sku, qty, amount) VALUES
+        (1, 'A', 2, 10),
+        (1, 'B', 1, 5),
+        (2, 'C', 4, 20),
+        (3, 'D', 3, 7);
+    `);
+
+    await db.exec(`
+      UPDATE order_lines
+      SET amount = amount + 5
+      WHERE EXISTS (
+        SELECT 1 FROM orders o
+        WHERE o.id = order_lines.order_id
+          AND o.state = 'paid'
+      )
+    `);
+
+    let paidRows = await db.exec(`SELECT sku, amount FROM order_lines WHERE order_id = 1 ORDER BY id ASC`);
+    assert.deepEqual(paidRows.rows, [
+      { sku: 'A', amount: 15 },
+      { sku: 'B', amount: 10 }
+    ]);
+
+    await db.exec(`
+      DELETE FROM order_lines
+      WHERE EXISTS (
+        SELECT 1 FROM orders o
+        WHERE o.id = order_lines.order_id
+          AND o.state = 'cancelled'
+      )
+    `);
+
+    const remaining = await db.exec(`SELECT COUNT(*) AS total FROM order_lines`);
+    assert.equal(remaining.rows[0].total, 3);
+
+    await db.transaction(async (tx) => {
+      await tx.exec(`SAVEPOINT before_reset`);
+      await tx.exec(`UPDATE orders SET total = 99 WHERE id = 3`);
+      const modified = await tx.exec(`SELECT total FROM orders WHERE id = 3`);
+      assert.equal(modified.rows[0].total, 99);
+
+      await tx.exec(`ROLLBACK TO SAVEPOINT before_reset`);
+      const restored = await tx.exec(`SELECT total FROM orders WHERE id = 3`);
+      assert.equal(restored.rows[0].total, 0);
+    });
+  });
+
+  it('supports CTEs and NULLS ordering semantics', async () => {
+    const db = await runtime.MaiaSQL.open({
+      name: 'memory-cte-nulls-test',
+      storage: 'memory',
+      parser: Parser
+    });
+
+    await db.exec(`
+      CREATE TABLE scores (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        team TEXT NOT NULL,
+        value INTEGER
+      );
+
+      INSERT INTO scores (team, value) VALUES
+        ('alpha', 10),
+        ('beta', NULL),
+        ('gamma', 4),
+        ('delta', 8);
+    `);
+
+    const cteResult = await db.exec(`
+      WITH ranked AS (
+        SELECT id, team, value
+        FROM scores
+        WHERE value IS NOT NULL
+      )
+      SELECT team, value
+      FROM ranked
+      ORDER BY value DESC NULLS LAST
+    `);
+
+    assert.deepEqual(cteResult.rows, [
+      { team: 'alpha', value: 10 },
+      { team: 'delta', value: 8 },
+      { team: 'gamma', value: 4 }
+    ]);
+
+    const nullsResult = await db.exec(`
+      SELECT team, value
+      FROM scores
+      ORDER BY value ASC NULLS FIRST
+    `);
+
+    assert.deepEqual(nullsResult.rows, [
+      { team: 'beta', value: null },
+      { team: 'gamma', value: 4 },
+      { team: 'delta', value: 8 },
+      { team: 'alpha', value: 10 }
+    ]);
+  });
+
+  it('supports recursive CTE expansion', async () => {
+    const db = await runtime.MaiaSQL.open({
+      name: 'memory-recursive-cte-test',
+      storage: 'memory',
+      parser: Parser
+    });
+
+    const result = await db.exec(`
+      WITH RECURSIVE seq(n) AS (
+        VALUES (1)
+        UNION ALL
+        SELECT n + 1 FROM seq WHERE n < 5
+      )
+      SELECT n FROM seq ORDER BY n ASC
+    `);
+
+    assert.deepEqual(result.rows, [
+      { n: 1 },
+      { n: 2 },
+      { n: 3 },
+      { n: 4 },
+      { n: 5 }
+    ]);
+  });
+
+  it('supports ANY and ALL quantified subqueries', async () => {
+    const db = await runtime.MaiaSQL.open({
+      name: 'memory-any-all-test',
+      storage: 'memory',
+      parser: Parser
+    });
+
+    await db.exec(`
+      CREATE TABLE scores (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        value INTEGER NOT NULL
+      );
+
+      INSERT INTO scores (value) VALUES (10), (15), (20), (25);
+    `);
+
+    const allResult = await db.exec(`
+      SELECT id, value
+      FROM scores
+      WHERE value > ALL (
+        SELECT value FROM scores WHERE id IN (1, 2)
+      )
+      ORDER BY id ASC
+    `);
+
+    assert.deepEqual(allResult.rows, [
+      { id: 3, value: 20 },
+      { id: 4, value: 25 }
+    ]);
+
+    const anyResult = await db.exec(`
+      SELECT id, value
+      FROM scores
+      WHERE value = ANY (
+        SELECT value FROM scores WHERE id IN (2, 3)
+      )
+      ORDER BY id ASC
+    `);
+
+    assert.deepEqual(anyResult.rows, [
+      { id: 2, value: 15 },
+      { id: 3, value: 20 }
+    ]);
+  });
+
+  it('supports NOT-prefixed comparison predicates and BETWEEN precedence', async () => {
+    const db = await runtime.MaiaSQL.open({
+      name: 'memory-not-prefix-compare-test',
+      storage: 'memory',
+      parser: Parser
+    });
+
+    await db.exec(`
+      CREATE TABLE samples (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        value INTEGER,
+        label TEXT
+      );
+
+      INSERT INTO samples (value, label) VALUES
+        (1, 'one'),
+        (2, 'two'),
+        (3, 'three'),
+        (4, 'four'),
+        (NULL, 'missing');
+    `);
+
+    const betweenResult = await db.exec(`
+      SELECT id, value
+      FROM samples
+      WHERE NOT value BETWEEN 2 AND 3
+      ORDER BY id ASC
+    `);
+
+    assert.deepEqual(betweenResult.rows, [
+      { id: 1, value: 1 },
+      { id: 4, value: 4 }
+    ]);
+
+    const nullResult = await db.exec(`
+      SELECT id, label
+      FROM samples
+      WHERE NOT value IS NULL
+      ORDER BY id ASC
+    `);
+
+    assert.deepEqual(nullResult.rows, [
+      { id: 1, label: 'one' },
+      { id: 2, label: 'two' },
+      { id: 3, label: 'three' },
+      { id: 4, label: 'four' }
+    ]);
+  });
+
+  it('preserves SQL precedence for NOT with BETWEEN and IS NULL', async () => {
+    const db = await runtime.MaiaSQL.open({
+      name: 'memory-not-between-null-precedence-test',
+      storage: 'memory',
+      parser: Parser
+    });
+
+    await db.exec(`
+      CREATE TABLE precedence_cases (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        value INTEGER,
+        note TEXT
+      );
+
+      INSERT INTO precedence_cases (value, note) VALUES
+        (1, 'one'),
+        (2, 'two'),
+        (3, 'three'),
+        (NULL, 'missing');
+    `);
+
+    const grouped = await db.exec(`
+      SELECT id, value
+      FROM precedence_cases
+      WHERE NOT (value BETWEEN 2 AND 3 OR value IS NULL)
+      ORDER BY id ASC
+    `);
+
+    assert.deepEqual(grouped.rows, [
+      { id: 1, value: 1 }
+    ]);
+
+    const orPrecedence = await db.exec(`
+      SELECT id, value
+      FROM precedence_cases
+      WHERE value IS NULL OR NOT value BETWEEN 2 AND 3
+      ORDER BY id ASC
+    `);
+
+    assert.deepEqual(orPrecedence.rows, [
+      { id: 1, value: 1 },
+      { id: 4, value: null }
+    ]);
+  });
+
+  it('supports NOT IN and NOT LIKE predicates', async () => {
+    const db = await runtime.MaiaSQL.open({
+      name: 'memory-not-in-like-test',
+      storage: 'memory',
+      parser: Parser
+    });
+
+    await db.exec(`
+      CREATE TABLE labels (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL
+      );
+
+      INSERT INTO labels (name) VALUES ('alpha'), ('beta'), ('gamma');
+    `);
+
+    const result = await db.exec(`
+      SELECT name
+      FROM labels
+      WHERE name NOT LIKE 'a%'
+        AND id NOT IN (SELECT id FROM labels WHERE name = 'beta')
+      ORDER BY id ASC
+    `);
+
+    assert.deepEqual(result.rows, [
+      { name: 'gamma' }
+    ]);
+  });
+
+  it('supports update-from/delete-using and CHECK enforcement', async () => {
+    const db = await runtime.MaiaSQL.open({
+      name: 'memory-join-update-delete-test',
+      storage: 'memory',
+      parser: Parser
+    });
+
+    await db.exec(`
+      CREATE TABLE accounts (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL,
+        balance INTEGER NOT NULL CHECK (balance >= 0)
+      );
+
+      CREATE TABLE bonuses (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        account_id INTEGER NOT NULL,
+        amount INTEGER NOT NULL
+      );
+
+      INSERT INTO accounts (name, balance) VALUES ('alpha', 100), ('beta', 40);
+      INSERT INTO bonuses (account_id, amount) VALUES (1, 5), (2, 25);
+    `);
+
+    await db.exec(`
+      UPDATE accounts
+      SET balance = balance + bonuses.amount
+      FROM bonuses
+      WHERE accounts.id = bonuses.account_id
+        AND accounts.name = 'alpha'
+    `);
+
+    let adjusted = await db.exec(`SELECT name, balance FROM accounts ORDER BY id ASC`);
+    assert.deepEqual(adjusted.rows, [
+      { name: 'alpha', balance: 105 },
+      { name: 'beta', balance: 40 }
+    ]);
+
+    await db.exec(`
+      DELETE FROM accounts
+      USING bonuses
+      WHERE accounts.id = bonuses.account_id
+        AND bonuses.amount >= 25
+    `);
+
+    const afterDelete = await db.exec(`SELECT name FROM accounts ORDER BY id ASC`);
+    assert.deepEqual(afterDelete.rows, [
+      { name: 'alpha' }
+    ]);
+
+    await assert.rejects(
+      db.exec(`UPDATE accounts SET balance = -1 WHERE id = 1`),
+      /CHECK constraint failed/
+    );
+  });
+
+  it('rejects unsupported drop-column DDL while preserving supported rename/add column flows', async () => {
+    const db = await runtime.MaiaSQL.open({
+      name: 'memory-drop-column-test',
+      storage: 'memory',
+      parser: Parser
+    });
+
+    await db.exec(`
+      CREATE TABLE metrics (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        title TEXT,
+        score INTEGER DEFAULT 0
+      );
+
+      INSERT INTO metrics (title, score) VALUES ('demo', 7);
+      ALTER TABLE metrics RENAME COLUMN title TO label;
+      ALTER TABLE metrics ADD COLUMN notes TEXT DEFAULT 'pending';
+    `);
+
+    const probe = await db.exec(`SELECT label, notes, score FROM metrics WHERE id = 1`);
+    assert.deepEqual(probe.rows[0], {
+      label: 'demo',
+      notes: 'pending',
+      score: 7
+    });
+
+    await assert.rejects(
+      db.exec(`ALTER TABLE metrics DROP COLUMN notes`),
+      /Unsupported ALTER TABLE statement|INVALID_ALTER_TABLE/
+    );
   });
 
   it('supports pragma metadata for tables, indexes and foreign keys', async () => {

@@ -23,6 +23,18 @@ function resolveTrexPath() {
   throw new Error(`Could not find tREx.sh. Checked: ${candidates.join(', ')}`);
 }
 
+function backupExistingParser(parserPath) {
+  if (!parserPath || !fs.existsSync(parserPath)) {
+    return null;
+  }
+
+  const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+  const backupPath = `${parserPath}.bak-${timestamp}`;
+
+  fs.copyFileSync(parserPath, backupPath);
+  return backupPath;
+}
+
 function generateParser(parserOutputPath, timeoutMs = 120000) {
   const grammarPath = path.join(REPO_DIR, 'grammar', 'SQL.ebnf');
   const trexPath = resolveTrexPath();
@@ -79,10 +91,10 @@ function run(options = {}) {
   try {
     if (options.generateParser) {
       tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'maiasql-parser-'));
-      parserPath = generateParser(
-        path.join(tempDir, 'sql-parser.generated.js'),
-        options.generateTimeoutMs
-      );
+      const generatedPath = path.join(tempDir, 'sql-parser.generated.js');
+
+      backupExistingParser(parserPath);
+      parserPath = generateParser(generatedPath, options.generateTimeoutMs);
     }
 
     return parseSql({ parserPath, collectorPath, sqlPath });
@@ -153,6 +165,7 @@ if (require.main === module) {
 }
 
 module.exports = {
+  backupExistingParser,
   generateParser,
   parseSql,
   run

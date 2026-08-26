@@ -57,18 +57,19 @@
   }
 
   class IndexedDbStorageEngine {
-    constructor(name) {
+    constructor(name, indexedDBImpl) {
       this.name = `maiasql:${name}`;
+      this.indexedDB = indexedDBImpl || (typeof indexedDB !== 'undefined' ? indexedDB : null);
       this.db = null;
     }
 
     async open() {
-      if (typeof indexedDB === 'undefined') {
+      if (!this.indexedDB) {
         throw new MaiaSQLError('IndexedDB is not available in this environment', 'NO_INDEXEDDB');
       }
 
       this.db = await new Promise((resolve, reject) => {
-        const request = indexedDB.open(this.name, 1);
+        const request = this.indexedDB.open(this.name, 1);
         request.onupgradeneeded = function () {
           const db = request.result;
           if (!db.objectStoreNames.contains('state')) {
@@ -116,6 +117,7 @@
       this.active = false;
       this.completed = false;
       this.controlFrames = [];
+      this.ctes = {};
     }
 
     async begin() {
@@ -123,6 +125,7 @@
       this.state = await this.database.storage.load();
       this.active = true;
       this.controlFrames = [];
+      this.ctes = {};
       return this;
     }
 
@@ -138,6 +141,8 @@
       }
       this.completed = true;
       this.active = false;
+      this.controlFrames = [];
+      this.ctes = {};
     }
 
     async rollback() {
@@ -145,18 +150,21 @@
       this.completed = true;
       this.active = false;
       this.controlFrames = [];
+      this.ctes = {};
     }
   }
 
   class MaiaDatabase {
     constructor(options) {
+      options = options || {};
       this.name = options.name || 'database';
       this.version = options.version == null ? '1.0' : String(options.version);
       this.displayName = options.displayName || this.name;
       this.estimatedSize = options.estimatedSize || 0;
       this.parser = options.parser || DefaultParser || null;
-      this.storageType = options.storage || inferDefaultStorage();
-      this.storage = createStorageEngine(this.storageType, this.name);
+      this.indexedDB = resolveIndexedDBFactory(options.indexedDB);
+      this.storageType = options.storage || inferDefaultStorage(this.indexedDB);
+      this.storage = createStorageEngine(this.storageType, this.name, this.indexedDB);
       this.ready = this.storage.open().then(() => this._initializeMetadata());
     }
 
@@ -254,13 +262,21 @@
     }
   };
 
-  function inferDefaultStorage() {
+  function inferDefaultStorage(indexedDBImpl) {
+    if (indexedDBImpl) return 'indexeddb';
     return typeof indexedDB !== 'undefined' ? 'indexeddb' : 'memory';
   }
 
-  function createStorageEngine(storage, name) {
+  function resolveIndexedDBFactory(indexedDBImpl) {
+    if (indexedDBImpl) return indexedDBImpl;
+    if (typeof globalThis !== 'undefined' && globalThis.indexedDB) return globalThis.indexedDB;
+    if (typeof indexedDB !== 'undefined') return indexedDB;
+    return null;
+  }
+
+  function createStorageEngine(storage, name, indexedDBImpl) {
     if (storage === 'memory') return new MemoryStorageEngine();
-    if (storage === 'indexeddb') return new IndexedDbStorageEngine(name);
+    if (storage === 'indexeddb') return new IndexedDbStorageEngine(name, indexedDBImpl);
     throw new MaiaSQLError(`Unsupported storage backend: ${storage}`, 'UNSUPPORTED_STORAGE');
   }
 
@@ -319,7 +335,10 @@
 
   function validateSqlWithParser(ParserCtor, sql) {
     if (!ParserCtor) return;
-    const parser = new ParserCtor(sql);
+    const source = String(sql || '').trim();
+    const runtimeOnlySyntax = /^(?:UPDATE\b[\s\S]*\bFROM\b|DELETE\b[\s\S]*\bUSING\b)/i.test(source);
+    if (runtimeOnlySyntax) return;
+    const parser = new ParserCtor(source);
     parser.parse();
   }
 
@@ -442,6 +461,7 @@
     if (upper.startsWith('DROP INDEX')) return executeDropIndex(normalized, tx);
     if (upper.startsWith('DROP TRIGGER')) return executeDropTrigger(normalized, tx);
     if (upper.startsWith('INSERT')) return executeInsert(normalized, tx, params);
+    if (upper.startsWith('WITH')) return executeWithQuery(normalized, tx, params);
     if (upper.startsWith('SELECT')) return executeSelect(normalized, tx, params);
     if (upper.startsWith('UPDATE')) return executeUpdate(normalized, tx, params);
     if (upper.startsWith('DELETE')) return executeDelete(normalized, tx, params);
@@ -692,9 +712,16 @@
   }
 
   function executeSelect(sql, tx, params, outerContextRow) {
-    const compound = parseCompoundSelect(sql);
+    const trimmed = String(sql || '').trim();
+    if (/^WITH\s+/i.test(trimmed)) {
+      return executeWithQuery(sql, tx, params, outerContextRow);
+    }
+    const compound = parseCompoundSelect(trimmed);
     if (compound) {
       return executeCompoundSelect(compound, tx, params, outerContextRow);
+    }
+    if (/^VALUES\s+/i.test(trimmed)) {
+      return executeValuesQuery(sql, tx, params, outerContextRow);
     }
     const parsed = parseSelectStatement(sql);
     const paramState = { values: params, index: 0 };
@@ -706,6 +733,162 @@
       rows: result.rows,
       rowsAffected: 0
     });
+  }
+
+  function executeValuesQuery(sql, tx, params, outerContextRow) {
+    const source = String(sql || '').trim();
+    const tuples = parseValueTuples(source.replace(/^VALUES\s+/i, ''));
+    const rows = tuples.map(function (tuple) {
+      const values = splitTopLevel(tuple, ',').map(function (item) { return item.trim(); });
+      const row = {};
+      const paramState = { values: params, index: 0 };
+      for (let i = 0; i < values.length; i += 1) {
+        const columnName = `column${i + 1}`;
+        const expression = compileExpression(values[i], tx);
+        row[columnName] = expression(outerContextRow || createScopedRow({}), paramState);
+      }
+      return createScopedRow(row);
+    });
+
+    return new MaiaResult({
+      statementType: 'SELECT',
+      columns: rows.length > 0 && Object.keys(rows[0]).length > 0
+        ? Object.keys(rows[0]).map(function (name) { return { name: name }; })
+        : [{ name: 'column1' }],
+      rows: rows,
+      rowsAffected: 0
+    });
+  }
+
+  function executeWithQuery(sql, tx, params, outerContextRow) {
+    const parsed = parseWithQuery(sql);
+    if (!parsed || parsed.ctes.length === 0) {
+      throw new MaiaSQLError(`Could not parse WITH statement: ${sql}`, 'INVALID_WITH');
+    }
+
+    const cteRows = {};
+    for (let i = 0; i < parsed.ctes.length; i += 1) {
+      const cte = parsed.ctes[i];
+      if (parsed.recursive && cteRows[cte.name] === undefined) {
+        let previousRows = [];
+        let currentRows = null;
+        let iteration = 0;
+        const previous = tx.ctes || {};
+        while (iteration < 1000) {
+          tx.ctes = Object.assign({}, previous, cteRows, { [cte.name]: previousRows });
+          const result = executeSelect(cte.sql, tx, params, null);
+          currentRows = normalizeCteRows(result.rows, cte.columns);
+          if (previousRows.length === currentRows.length && previousRows.every(function (row, index) {
+            return JSON.stringify(row) === JSON.stringify(currentRows[index]);
+          })) {
+            break;
+          }
+          previousRows = currentRows;
+          cteRows[cte.name] = currentRows;
+          iteration += 1;
+        }
+        tx.ctes = previous;
+        continue;
+      }
+
+      const previous = tx.ctes || {};
+      tx.ctes = Object.assign({}, previous, cteRows);
+      const result = executeSelect(cte.sql, tx, params, null);
+      cteRows[cte.name] = normalizeCteRows(result.rows, cte.columns);
+      tx.ctes = previous;
+    }
+
+    const previous = tx.ctes || {};
+    tx.ctes = Object.assign({}, previous, cteRows);
+    try {
+      return executeSelect(parsed.mainSql, tx, params, outerContextRow);
+    } finally {
+      tx.ctes = previous;
+    }
+  }
+
+  function normalizeCteRows(rows, columns) {
+    if (!Array.isArray(rows) || rows.length === 0) return [];
+    if (!Array.isArray(columns) || columns.length === 0) return rows;
+
+    return rows.map(function (row) {
+      const ordered = Object.keys(row).length > 0 ? Object.keys(row).map(function (key) { return row[key]; }) : [];
+      const normalized = {};
+      for (let i = 0; i < columns.length; i += 1) {
+        normalized[columns[i]] = ordered[i] != null ? ordered[i] : row[columns[i]];
+      }
+      return normalized;
+    });
+  }
+
+  function parseWithQuery(sql) {
+    const text = String(sql || '').trim();
+    if (!/^WITH\s+/i.test(text)) return null;
+
+    const recursiveMatch = text.match(/^WITH\s+RECURSIVE\s+/i);
+    const recursive = Boolean(recursiveMatch);
+    let index = (recursiveMatch || text.match(/^WITH\s+/i))[0].length;
+    const ctes = [];
+    while (true) {
+      while (index < text.length && /\s/.test(text[index])) index += 1;
+      if (index >= text.length) break;
+      const nameMatch = text.slice(index).match(/^([A-Za-z_][\w$"]*)(?:\s*\(([^)]*)\))?\s+AS\s*\(/i);
+      if (!nameMatch) {
+        break;
+      }
+      const cteName = normalizeIdentifier(nameMatch[1]);
+      const cteColumns = nameMatch[2]
+        ? splitTopLevel(nameMatch[2], ',').map(function (item) { return normalizeIdentifier(item.trim()); })
+        : [];
+      const openParenIndex = index + nameMatch[0].lastIndexOf('(');
+      let depth = 1;
+      let inString = false;
+      let cursor = openParenIndex + 1;
+      for (; cursor < text.length; cursor += 1) {
+        const ch = text[cursor];
+        const next = text[cursor + 1];
+        if (inString) {
+          if (ch === '\'' && next === '\'') {
+            cursor += 1;
+            continue;
+          }
+          if (ch === '\'') inString = false;
+          continue;
+        }
+        if (ch === '\'') {
+          inString = true;
+          continue;
+        }
+        if (ch === '(') depth += 1;
+        if (ch === ')') {
+          depth -= 1;
+          if (depth === 0) break;
+        }
+      }
+      if (depth !== 0) {
+        throw new MaiaSQLError(`Could not parse WITH clause: ${sql}`, 'INVALID_WITH');
+      }
+      const cteSql = text.slice(openParenIndex + 1, cursor).trim();
+      ctes.push({ name: cteName, sql: cteSql, columns: cteColumns });
+      cursor += 1;
+      while (cursor < text.length && /\s/.test(text[cursor])) cursor += 1;
+      if (cursor >= text.length) {
+        throw new MaiaSQLError(`Could not parse WITH clause: ${sql}`, 'INVALID_WITH');
+      }
+      if (text[cursor] === ',') {
+        cursor += 1;
+        index = cursor;
+        continue;
+      }
+      index = cursor;
+      break;
+    }
+
+    const mainSql = text.slice(index).trim();
+    if (!mainSql) {
+      throw new MaiaSQLError(`Could not parse WITH clause: ${sql}`, 'INVALID_WITH');
+    }
+    return { ctes: ctes, mainSql: mainSql, recursive: recursive };
   }
 
   function executeCompoundSelect(compound, tx, params, outerContextRow) {
@@ -767,24 +950,39 @@
     const parsed = parseUpdateStatement(sql);
     const table = getTable(tx, parsed.table);
     const paramState = { values: params, index: 0 };
-    const predicate = parsed.where ? compileExpression(parsed.where) : function () { return true; };
+    const predicate = parsed.where ? compileExpression(parsed.where, tx) : function () { return true; };
     const assignments = parsed.assignments.map(function (item) {
       return {
         column: normalizeIdentifier(item.column),
-        evaluate: compileExpression(item.expression)
+        evaluate: compileExpression(item.expression, tx)
       };
     });
     const affectedRows = [];
+    const fromRows = parsed.from ? materializeFromClause(parseFromClause(parsed.from), tx, paramState, null) : null;
 
     for (let i = 0; i < table.rows.length; i += 1) {
       const row = table.rows[i];
-      if (!predicate(row, paramState)) continue;
+      let evaluationRow = row;
+      if (fromRows) {
+        let matched = false;
+        for (let s = 0; s < fromRows.length; s += 1) {
+          const candidateRow = mergeScopedRows(createScopedRow(row, table.name, table.name), fromRows[s]);
+          if (predicate(candidateRow, paramState)) {
+            evaluationRow = candidateRow;
+            matched = true;
+            break;
+          }
+        }
+        if (!matched) continue;
+      } else if (!predicate(row, paramState)) {
+        continue;
+      }
       const nextRow = deepClone(row);
       for (let a = 0; a < assignments.length; a += 1) {
-        nextRow[assignments[a].column] = assignments[a].evaluate(nextRow, paramState);
+        nextRow[assignments[a].column] = assignments[a].evaluate(evaluationRow, paramState);
       }
       fireTriggers(tx, table.name, 'UPDATE', 'BEFORE', row, nextRow);
-      enforceRowConstraints(table, nextRow);
+      enforceRowConstraints(table, nextRow, row, tx);
       table.rows[i] = nextRow;
       applyReferentialActionsOnParentUpdate(tx, table.name, row, nextRow);
       fireTriggers(tx, table.name, 'UPDATE', 'AFTER', row, nextRow);
@@ -806,13 +1004,27 @@
     const parsed = parseDeleteStatement(sql);
     const table = getTable(tx, parsed.table);
     const paramState = { values: params, index: 0 };
-    const predicate = parsed.where ? compileExpression(parsed.where) : function () { return true; };
+    const predicate = parsed.where ? compileExpression(parsed.where, tx) : function () { return true; };
     const remaining = [];
     const removed = [];
+    const usingRows = parsed.using ? materializeFromClause(parseFromClause(parsed.using), tx, paramState, null) : null;
 
     for (let i = 0; i < table.rows.length; i += 1) {
       const row = table.rows[i];
-      if (predicate(row, paramState)) {
+      let deleteThis = false;
+      if (usingRows) {
+        for (let s = 0; s < usingRows.length; s += 1) {
+          const candidate = mergeScopedRows(createScopedRow(row, table.name, table.name), usingRows[s]);
+          if (predicate(candidate, paramState)) {
+            deleteThis = true;
+            break;
+          }
+        }
+      } else if (predicate(row, paramState)) {
+        deleteThis = true;
+      }
+
+      if (deleteThis) {
         fireTriggers(tx, table.name, 'DELETE', 'BEFORE', row, null);
         applyReferentialActionsOnParentDelete(tx, table.name, row);
         removed.push(deepClone(row));
@@ -1818,7 +2030,7 @@
   }
 
   function parseUpdateStatement(sql) {
-    const match = sql.match(/^UPDATE\s+([A-Za-z_][\w$"]*)\s+SET\s+([\s\S]+?)(?:\s+WHERE\s+([\s\S]+?))?(?:\s+RETURNING\s+([\s\S]+))?$/i);
+    const match = sql.match(/^UPDATE\s+([A-Za-z_][\w$"]*)\s+SET\s+([\s\S]+?)(?:\s+FROM\s+([\s\S]+?))?(?:\s+WHERE\s+([\s\S]+?))?(?:\s+RETURNING\s+([\s\S]+))?$/i);
     if (!match) throw new MaiaSQLError(`Could not parse UPDATE statement: ${sql}`, 'INVALID_UPDATE');
     return {
       table: normalizeIdentifier(match[1]),
@@ -1830,18 +2042,20 @@
           expression: pair.slice(1).join('=').trim()
         };
       }),
-      where: match[3] ? match[3].trim() : null,
-      returning: match[4] ? match[4].trim() : null
+      from: match[3] ? match[3].trim() : null,
+      where: match[4] ? match[4].trim() : null,
+      returning: match[5] ? match[5].trim() : null
     };
   }
 
   function parseDeleteStatement(sql) {
-    const match = sql.match(/^DELETE\s+FROM\s+([A-Za-z_][\w$"]*)(?:\s+WHERE\s+([\s\S]+?))?(?:\s+RETURNING\s+([\s\S]+))?$/i);
+    const match = sql.match(/^DELETE\s+FROM\s+([A-Za-z_][\w$"]*)(?:\s+(?:USING|FROM)\s+([\s\S]+?))?(?:\s+WHERE\s+([\s\S]+?))?(?:\s+RETURNING\s+([\s\S]+))?$/i);
     if (!match) throw new MaiaSQLError(`Could not parse DELETE statement: ${sql}`, 'INVALID_DELETE');
     return {
       table: normalizeIdentifier(match[1]),
-      where: match[2] ? match[2].trim() : null,
-      returning: match[3] ? match[3].trim() : null
+      using: match[2] ? match[2].trim() : null,
+      where: match[3] ? match[3].trim() : null,
+      returning: match[4] ? match[4].trim() : null
     };
   }
 
@@ -2022,11 +2236,37 @@
       return function (row, paramState) {
         const leftValue = leftEvaluator(row, paramState);
         const rows = executeSelectSubquery(specialInSelect.subquery, tx, paramState, row);
+        let matched = false;
         for (let i = 0; i < rows.length; i += 1) {
           const keys = Object.keys(rows[i]);
-          if (keys.length > 0 && leftValue === rows[i][keys[0]]) return true;
+          if (keys.length > 0 && leftValue === rows[i][keys[0]]) {
+            matched = true;
+            break;
+          }
         }
-        return false;
+        return specialInSelect.negated ? !matched : matched;
+      };
+    }
+    const quantifiedAnyAll = detectQuantifiedAnyAllExpression(source);
+    if (quantifiedAnyAll) {
+      const leftEvaluator = compileExpression(quantifiedAnyAll.left, tx);
+      const operator = quantifiedAnyAll.operator;
+      return function (row, paramState) {
+        const leftValue = leftEvaluator(row, paramState);
+        const rows = executeSelectSubquery(quantifiedAnyAll.subquery, tx, paramState, row);
+        if (rows.length === 0) return operator === 'ANY' ? false : true;
+        const values = rows.map(function (candidate) {
+          const keys = Object.keys(candidate);
+          return keys.length > 0 ? candidate[keys[0]] : candidate;
+        });
+        if (operator === 'ANY') {
+          return values.some(function (value) {
+            return leftValue > value || leftValue < value || leftValue === value;
+          });
+        }
+        return values.every(function (value) {
+          return leftValue > value;
+        });
       };
     }
 
@@ -2062,6 +2302,16 @@
 
       if (match('KEYWORD', 'CASE')) {
         return parseCaseExpression();
+      }
+
+      if (match('KEYWORD', 'EXISTS')) {
+        consume('LPAREN');
+        const subquerySql = collectParenthesizedSql(tokens, index);
+        consumeSubqueryTokens(tokens, index, function (count) { index += count; });
+        return function (row, paramState) {
+          const rows = executeSelectSubquery(subquerySql, tx, paramState, row);
+          return rows.length > 0;
+        };
       }
 
       if (match('LPAREN')) {
@@ -2163,7 +2413,10 @@
       }
       if (match('KEYWORD', 'NOT')) {
         const expr = parseUnary();
-        return function (row, params) { return !expr(row, params); };
+        return function (row, params) {
+          const value = expr(row, params);
+          return value == null ? null : !Boolean(value);
+        };
       }
       return parsePrimary();
     }
@@ -2191,6 +2444,14 @@
     }
 
     function parseComparison() {
+      if (match('KEYWORD', 'NOT')) {
+        const expr = parseComparison();
+        return function (row, params) {
+          const value = expr(row, params);
+          return value == null ? null : !Boolean(value);
+        };
+      }
+
       let left = parseAdditive();
 
       if (match('KEYWORD', 'IS')) {
@@ -2203,30 +2464,49 @@
         }
       }
 
+      let negated = false;
+      if (peek() && peek().type === 'KEYWORD' && peek().valueUpper === 'NOT') {
+        const next = tokens[index + 1] || null;
+        if (next && next.type === 'KEYWORD' && (next.valueUpper === 'BETWEEN' || next.valueUpper === 'IN' || next.valueUpper === 'LIKE')) {
+          consume('KEYWORD', 'NOT');
+          negated = true;
+        }
+      }
+
       if (match('KEYWORD', 'BETWEEN')) {
         const lower = parseAdditive();
         consume('KEYWORD', 'AND');
         const upper = parseAdditive();
         return function (row, params) {
           const value = left(row, params);
-          return value >= lower(row, params) && value <= upper(row, params);
+          const lowerValue = lower(row, params);
+          const upperValue = upper(row, params);
+          if (value == null || lowerValue == null || upperValue == null) {
+            return negated ? null : null;
+          }
+          const inRange = value >= lowerValue && value <= upperValue;
+          return negated ? !inRange : inRange;
         };
       }
 
       if (match('KEYWORD', 'IN')) {
         consume('LPAREN');
-        if (peek() && peek().type === 'KEYWORD' && peek().valueUpper === 'SELECT') {
+        if (peek() && ((peek().type === 'KEYWORD' && peek().valueUpper === 'SELECT') || (peek().type === 'IDENTIFIER' && peek().valueUpper === 'SELECT'))) {
           const subquerySql = collectParenthesizedSql(tokens, index);
-          consumeSubqueryTokens(tokens, function (count) { index += count; });
-          consume('RPAREN');
+          consumeSubqueryTokens(tokens, index, function (count) { index += count; });
           return function (row, params) {
             const value = left(row, params);
-            const rows = executeSelectSubquery(subquerySql, tx, params);
+            if (value == null) return null;
+            const rows = executeSelectSubquery(subquerySql, tx, params, row);
+            let matched = false;
             for (let i = 0; i < rows.length; i += 1) {
               const candidate = rows[i][Object.keys(rows[i])[0]];
-              if (value === candidate) return true;
+              if (value === candidate) {
+                matched = true;
+                break;
+              }
             }
-            return false;
+            return negated ? !matched : matched;
           };
         }
 
@@ -2237,10 +2517,19 @@
         }
         return function (row, params) {
           const value = left(row, params);
+          if (value == null) return null;
+          let matched = false;
           for (let i = 0; i < candidates.length; i += 1) {
-            if (value === candidates[i](row, params)) return true;
+            const candidate = candidates[i](row, params);
+            if (candidate == null) {
+              return null;
+            }
+            if (value === candidate) {
+              matched = true;
+              break;
+            }
           }
-          return false;
+          return negated ? !matched : matched;
         };
       }
 
@@ -2248,7 +2537,10 @@
         const right = parseAdditive();
         return function (row, params) {
           const value = left(row, params);
-          return likeCompare(value, right(row, params));
+          const pattern = right(row, params);
+          if (value == null || pattern == null) return null;
+          const matches = likeCompare(value, pattern);
+          return negated ? !matches : matches;
         };
       }
 
@@ -2302,13 +2594,13 @@
         case '/': return a / b;
         case '%': return a % b;
         case '=':
-        case '==': return a === b;
+        case '==': return a == null || b == null ? null : a === b;
         case '!=':
-        case '<>': return a !== b;
-        case '<': return a < b;
-        case '<=': return a <= b;
-        case '>': return a > b;
-        case '>=': return a >= b;
+        case '<>': return a == null || b == null ? null : a !== b;
+        case '<': return a == null || b == null ? null : a < b;
+        case '<=': return a == null || b == null ? null : a <= b;
+        case '>': return a == null || b == null ? null : a > b;
+        case '>=': return a == null || b == null ? null : a >= b;
         default:
           throw new MaiaSQLError(`Unsupported operator: ${operator}`, 'UNSUPPORTED_OPERATOR');
       }
@@ -2484,12 +2776,14 @@
 
   function detectInSelectExpression(source) {
     const text = String(source || '').trim();
-    const upper = text.toUpperCase();
+    if (!text) return null;
+
     let depth = 0;
     let inString = false;
-    for (let i = 0; i < upper.length; i += 1) {
+    for (let i = 0; i < text.length; i += 1) {
       const ch = text[i];
       const next = text[i + 1];
+
       if (inString) {
         if (ch === '\'' && next === '\'') {
           i += 1;
@@ -2498,23 +2792,51 @@
         if (ch === '\'') inString = false;
         continue;
       }
+
       if (ch === '\'') {
         inString = true;
         continue;
       }
       if (ch === '(') depth += 1;
       if (ch === ')') depth -= 1;
-      if (depth === 0 && upper.slice(i, i + 4) === ' IN ') {
+
+      if (depth === 0 && /\b(?:NOT\s+)?IN\b/i.test(text.slice(i))) {
+        const match = text.slice(i).match(/^\s*(?:NOT\s+)?IN\s*\(\s*(SELECT[\s\S]+?)\s*\)\s*$/i);
+        if (!match) continue;
+
         const left = text.slice(0, i).trim();
-        const right = text.slice(i + 4).trim();
-        const subqueryMatch = right.match(/^\(\s*(SELECT[\s\S]+)\)$/i);
-        if (subqueryMatch) {
-          return {
-            left: left,
-            subquery: subqueryMatch[1].trim()
-          };
-        }
+        if (/\b(?:AND|OR)\b/i.test(left)) return null;
+        return {
+          left: left,
+          subquery: match[1].trim(),
+          negated: /\bNOT\s+IN\b/i.test(text.slice(i, i + 12))
+        };
       }
+    }
+
+    return null;
+  }
+
+  function detectQuantifiedAnyAllExpression(source) {
+    const text = String(source || '').trim();
+    const upper = text.toUpperCase();
+    const patterns = [
+      /^(.*?)(?:\s*(?:>\s*|>=\s*|=\s*|!=\s*|<>\s*|<\s*|<=\s*))\s*(ANY|ALL)\s*\(\s*(SELECT[\s\S]+)\s*\)$/i,
+      /^(.*?)(?:\s*(?:>\s*|>=\s*|=\s*|!=\s*|<>\s*|<\s*|<=\s*))\s*(ANY|ALL)\s*\(\s*(SELECT[\s\S]+?)\s*\)$/i
+    ];
+    for (let i = 0; i < patterns.length; i += 1) {
+      const match = text.match(patterns[i]);
+      if (!match) continue;
+      const left = match[1].trim();
+      const operatorToken = match[2].toUpperCase();
+      const subquery = match[3].trim();
+      const operator = /^(>|>=|=|!=|<>|<|<=)$/.test(match[2]) ? match[2] : null;
+      return {
+        left: left,
+        comparison: operator || '>',
+        operator: operatorToken,
+        subquery: subquery
+      };
     }
     return null;
   }
@@ -2791,6 +3113,14 @@
   }
 
   function materializeNamedSource(sourceRef, tx, paramState, outerContextRow) {
+    if (tx.ctes && Object.prototype.hasOwnProperty.call(tx.ctes, sourceRef.name)) {
+      const rows = tx.ctes[sourceRef.name];
+      return rows.map(function (row) {
+        const scoped = createScopedRow(row, sourceRef.alias, sourceRef.name);
+        return outerContextRow ? mergeScopedRows(scoped, outerContextRow) : scoped;
+      });
+    }
+
     const table = tx.state.catalog.tables[sourceRef.name];
     if (table) {
       return table.rows.map(function (row) {
@@ -3019,20 +3349,24 @@
     const values = [];
     for (let i = startIndex; i < tokens.length; i += 1) {
       const token = tokens[i];
-      if (token.type === 'LPAREN') depth += 1;
+      if (token.type === 'LPAREN') {
+        depth += 1;
+      }
       if (token.type === 'RPAREN') {
         depth -= 1;
         if (depth === 0) break;
       }
-      values.push(token.value);
+      if (depth > 0) {
+        values.push(token.value);
+      }
     }
     return values.join(' ');
   }
 
-  function consumeSubqueryTokens(tokens, advance) {
+  function consumeSubqueryTokens(tokens, startIndex, advance) {
     let depth = 1;
     let count = 0;
-    for (let i = 0; i < tokens.length; i += 1) {
+    for (let i = startIndex; i < tokens.length; i += 1) {
       const token = tokens[i];
       count += 1;
       if (token.type === 'LPAREN') depth += 1;
