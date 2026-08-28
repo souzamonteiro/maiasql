@@ -5,9 +5,24 @@
     db: null,
     tableNames: ['users', 'orders', 'tasks'],
     tableMeta: {
-      users: ['id', 'name', 'role', 'active'],
-      orders: ['id', 'user_id', 'total', 'status'],
-      tasks: ['id', 'title', 'priority', 'done']
+      users: [
+        { name: 'id', type: 'INTEGER', primaryKey: true, autoIncrement: true },
+        { name: 'name', type: 'TEXT', notNull: true },
+        { name: 'role', type: 'TEXT', defaultValue: "'user'" },
+        { name: 'active', type: 'INTEGER', defaultValue: '1' }
+      ],
+      orders: [
+        { name: 'id', type: 'INTEGER', primaryKey: true, autoIncrement: true },
+        { name: 'user_id', type: 'INTEGER', notNull: true },
+        { name: 'total', type: 'INTEGER', notNull: true },
+        { name: 'status', type: 'TEXT', defaultValue: "'pending'" }
+      ],
+      tasks: [
+        { name: 'id', type: 'INTEGER', primaryKey: true, autoIncrement: true },
+        { name: 'title', type: 'TEXT', notNull: true },
+        { name: 'priority', type: 'INTEGER', defaultValue: '1' },
+        { name: 'done', type: 'INTEGER', defaultValue: '0' }
+      ]
     }
   };
 
@@ -126,8 +141,8 @@
     state.tableNames.forEach(function (tableName) {
       names.add(tableName);
       if (Array.isArray(state.tableMeta[tableName])) {
-        state.tableMeta[tableName].forEach(function (columnName) {
-          names.add(columnName);
+        state.tableMeta[tableName].forEach(function (columnInfo) {
+          names.add(getColumnName(columnInfo));
         });
       }
     });
@@ -178,7 +193,7 @@
     } else if (context === 'column') {
       const preferredTable = state.tableNames[0];
       if (preferredTable && Array.isArray(state.tableMeta[preferredTable])) {
-        contextual = state.tableMeta[preferredTable].slice();
+        contextual = state.tableMeta[preferredTable].map(getColumnName);
       }
     }
 
@@ -403,12 +418,22 @@
     updateSuggestions();
   }
 
-  function getColumnTypeLabel(columnInfo) {
-    if (!columnInfo) {
-      return 'unknown';
-    }
+  function getColumnName(columnInfo) {
     if (typeof columnInfo === 'string') {
       return columnInfo;
+    }
+    if (columnInfo && columnInfo.name) {
+      return String(columnInfo.name);
+    }
+    return String(columnInfo || '');
+  }
+
+  function getColumnTypeLabel(columnInfo) {
+    if (!columnInfo) {
+      return '';
+    }
+    if (typeof columnInfo === 'string') {
+      return '';
     }
     if (typeof columnInfo === 'object') {
       if (columnInfo.type) {
@@ -418,44 +443,130 @@
         return String(columnInfo.kind);
       }
     }
-    return 'unknown';
+    return '';
+  }
+
+  function getColumnBadges(columnInfo) {
+    if (!columnInfo || typeof columnInfo !== 'object') {
+      return [];
+    }
+    const badges = [];
+    if (columnInfo.primaryKey) badges.push('PK');
+    if (columnInfo.autoIncrement) badges.push('AI');
+    if (columnInfo.notNull) badges.push('NN');
+    if (columnInfo.unique) badges.push('UQ');
+    if (columnInfo.references) badges.push('FK');
+    if (columnInfo.defaultValue != null) badges.push('DEF');
+    return badges;
+  }
+
+  function getColumnIconLabel(columnInfo) {
+    if (columnInfo && typeof columnInfo === 'object' && columnInfo.primaryKey) {
+      return 'PK';
+    }
+    const typeLabel = getColumnTypeLabel(columnInfo).toUpperCase();
+    if (/INT|REAL|NUM|DEC|DOUBLE|FLOAT/.test(typeLabel)) {
+      return '#';
+    }
+    if (/DATE|TIME/.test(typeLabel)) {
+      return 'Dt';
+    }
+    if (/BOOL/.test(typeLabel)) {
+      return '01';
+    }
+    return 'Aa';
   }
 
   function buildSchemaTree() {
     const container = document.createElement('div');
     container.className = 'schema-tree';
+    container.setAttribute('role', 'tree');
 
     state.tableNames.forEach(function (tableName) {
       const node = document.createElement('div');
       node.className = 'schema-node';
+      node.setAttribute('role', 'treeitem');
+      node.setAttribute('aria-expanded', 'false');
 
       const tableButton = document.createElement('button');
       tableButton.type = 'button';
       tableButton.className = 'schema-table-button';
-      tableButton.textContent = tableName;
+      tableButton.setAttribute('aria-expanded', 'false');
+
+      const tableCaret = document.createElement('span');
+      tableCaret.className = 'schema-caret';
+      tableCaret.setAttribute('aria-hidden', 'true');
+
+      const tableIcon = document.createElement('span');
+      tableIcon.className = 'schema-object-icon table-icon';
+      tableIcon.setAttribute('aria-hidden', 'true');
+
+      const tableMain = document.createElement('span');
+      tableMain.className = 'schema-object-main';
+
+      const tableNameSpan = document.createElement('span');
+      tableNameSpan.className = 'schema-object-name';
+      tableNameSpan.textContent = tableName;
+
+      const columns = Array.isArray(state.tableMeta[tableName]) ? state.tableMeta[tableName] : [];
+      const tableMeta = document.createElement('span');
+      tableMeta.className = 'schema-object-meta';
+      tableMeta.textContent = String(columns.length) + (columns.length === 1 ? ' column' : ' columns');
+
+      tableMain.appendChild(tableNameSpan);
+      tableMain.appendChild(tableMeta);
+      tableButton.appendChild(tableCaret);
+      tableButton.appendChild(tableIcon);
+      tableButton.appendChild(tableMain);
 
       const columnList = document.createElement('div');
       columnList.className = 'schema-column-list hidden';
+      columnList.setAttribute('role', 'group');
 
-      const columns = Array.isArray(state.tableMeta[tableName]) ? state.tableMeta[tableName] : [];
       if (columns.length) {
         columns.forEach(function (columnInfo) {
-          const columnName = typeof columnInfo === 'string' ? columnInfo : (columnInfo && columnInfo.name ? columnInfo.name : String(columnInfo));
+          const columnName = getColumnName(columnInfo);
           const typeLabel = getColumnTypeLabel(columnInfo);
           const columnButton = document.createElement('button');
           columnButton.type = 'button';
           columnButton.className = 'schema-column-button';
 
+          const branch = document.createElement('span');
+          branch.className = 'schema-branch';
+          branch.setAttribute('aria-hidden', 'true');
+
+          const columnIcon = document.createElement('span');
+          columnIcon.className = 'schema-object-icon column-icon';
+          columnIcon.setAttribute('aria-hidden', 'true');
+          columnIcon.textContent = getColumnIconLabel(columnInfo);
+
+          const columnMain = document.createElement('span');
+          columnMain.className = 'schema-object-main';
+
           const nameSpan = document.createElement('span');
-          nameSpan.className = 'column-name';
+          nameSpan.className = 'schema-object-name column-name';
           nameSpan.textContent = columnName;
 
-          const typeSpan = document.createElement('span');
-          typeSpan.className = 'column-type';
-          typeSpan.textContent = typeLabel;
+          const detailSpan = document.createElement('span');
+          detailSpan.className = 'schema-column-details';
+          if (typeLabel) {
+            const typeSpan = document.createElement('span');
+            typeSpan.className = 'schema-type-badge';
+            typeSpan.textContent = typeLabel;
+            detailSpan.appendChild(typeSpan);
+          }
+          getColumnBadges(columnInfo).forEach(function (label) {
+            const badge = document.createElement('span');
+            badge.className = 'schema-constraint-badge';
+            badge.textContent = label;
+            detailSpan.appendChild(badge);
+          });
 
-          columnButton.appendChild(nameSpan);
-          columnButton.appendChild(typeSpan);
+          columnMain.appendChild(nameSpan);
+          columnMain.appendChild(detailSpan);
+          columnButton.appendChild(branch);
+          columnButton.appendChild(columnIcon);
+          columnButton.appendChild(columnMain);
           columnButton.addEventListener('click', function () {
             insertAtCursor(columnName);
             setStatus('Column inserted');
@@ -471,6 +582,9 @@
 
       tableButton.addEventListener('click', function () {
         columnList.classList.toggle('hidden');
+        const expanded = !columnList.classList.contains('hidden');
+        tableButton.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+        node.setAttribute('aria-expanded', expanded ? 'true' : 'false');
       });
 
       node.appendChild(tableButton);
@@ -524,7 +638,21 @@
     tableNames.forEach(function (tableName) {
       const table = catalog.tables[tableName];
       if (table && Array.isArray(table.columns)) {
-        tableMeta[tableName] = table.columns.map(function (column) { return column && column.name ? column.name : String(column); });
+        tableMeta[tableName] = table.columns.map(function (column) {
+          if (!column || typeof column !== 'object') {
+            return { name: String(column || '') };
+          }
+          return {
+            name: column.name,
+            type: column.type,
+            primaryKey: Boolean(column.primaryKey),
+            autoIncrement: Boolean(column.autoIncrement),
+            notNull: Boolean(column.notNull),
+            unique: Boolean(column.unique),
+            references: column.references || null,
+            defaultValue: column.defaultValue
+          };
+        });
       } else {
         tableMeta[tableName] = [];
       }
@@ -854,9 +982,24 @@
 
     state.tableNames = ['users', 'orders', 'tasks'];
     state.tableMeta = {
-      users: ['id', 'name', 'role', 'active'],
-      orders: ['id', 'user_id', 'total', 'status'],
-      tasks: ['id', 'title', 'priority', 'done']
+      users: [
+        { name: 'id', type: 'INTEGER', primaryKey: true, autoIncrement: true },
+        { name: 'name', type: 'TEXT', notNull: true },
+        { name: 'role', type: 'TEXT', defaultValue: "'user'" },
+        { name: 'active', type: 'INTEGER', defaultValue: '1' }
+      ],
+      orders: [
+        { name: 'id', type: 'INTEGER', primaryKey: true, autoIncrement: true },
+        { name: 'user_id', type: 'INTEGER', notNull: true },
+        { name: 'total', type: 'INTEGER', notNull: true },
+        { name: 'status', type: 'TEXT', defaultValue: "'pending'" }
+      ],
+      tasks: [
+        { name: 'id', type: 'INTEGER', primaryKey: true, autoIncrement: true },
+        { name: 'title', type: 'TEXT', notNull: true },
+        { name: 'priority', type: 'INTEGER', defaultValue: '1' },
+        { name: 'done', type: 'INTEGER', defaultValue: '0' }
+      ]
     };
     await refreshDatabaseSchema(db);
     log('Demo seed loaded.', 'success');

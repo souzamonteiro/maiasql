@@ -552,8 +552,12 @@
 
     const renameColumn = sql.match(/^ALTER\s+TABLE\s+([A-Za-z_][\w$"]*)\s+RENAME\s+COLUMN\s+([A-Za-z_][\w$"]*)\s+TO\s+([A-Za-z_][\w$"]*)$/i);
     if (renameColumn) {
-      const table = getTable(tx, normalizeIdentifier(renameColumn[1]));
-      renameTableColumn(table, normalizeIdentifier(renameColumn[2]), normalizeIdentifier(renameColumn[3]));
+      const tableName = normalizeIdentifier(renameColumn[1]);
+      const oldName = normalizeIdentifier(renameColumn[2]);
+      const newName = normalizeIdentifier(renameColumn[3]);
+      const table = getTable(tx, tableName);
+      renameTableColumn(table, oldName, newName);
+      rewriteColumnReferences(tx.state.catalog, tableName, oldName, newName);
       return new MaiaResult({ statementType: 'ALTER_TABLE' });
     }
 
@@ -658,12 +662,14 @@
       ? parsed.valuesTuples.map(function (tuple) {
           return splitTopLevel(tuple, ',').map(function (item) { return item.trim(); });
         })
+      : parsed.defaultValues
+        ? [[]]
       : materializeInsertSelectRows(parsed.selectSql, tx, params, columns.length);
 
     for (let i = 0; i < sourceRows.length; i += 1) {
       const row = buildDefaultRow(table);
       const values = sourceRows[i];
-      if (values.length !== columns.length) {
+      if (!parsed.defaultValues && values.length !== columns.length) {
         throw new MaiaSQLError(`INSERT column/value count mismatch on ${table.name}`, 'INSERT_ARITY');
       }
 
@@ -1440,6 +1446,17 @@
     }
   }
 
+  function rewriteColumnReferences(catalog, tableName, oldName, newName) {
+    const indexNames = Object.keys(catalog.indexes);
+    for (let i = 0; i < indexNames.length; i += 1) {
+      const index = catalog.indexes[indexNames[i]];
+      if (index.table !== tableName) continue;
+      index.columns = index.columns.map(function (name) {
+        return name === oldName ? newName : name;
+      });
+    }
+  }
+
   function removeDependentCatalogObjects(catalog, tableName) {
     const indexNames = Object.keys(catalog.indexes);
     for (let i = 0; i < indexNames.length; i += 1) {
@@ -1516,7 +1533,7 @@
       }
       if (column.check) {
         const passed = compileExpression(column.check, tx)(row, createParamState([]));
-        if (!passed) {
+        if (passed === false) {
           throw new MaiaSQLError(`CHECK constraint failed: ${table.name}.${column.name}`, 'CHECK');
         }
       }
@@ -1544,7 +1561,7 @@
       }
       if (column.check) {
         const passed = compileExpression(column.check, tx)(row, createParamState([]));
-        if (!passed) {
+        if (passed === false) {
           throw new MaiaSQLError(`CHECK constraint failed: ${table.name}.${column.name}`, 'CHECK');
         }
       }
@@ -1556,8 +1573,10 @@
   function enforceUniqueConstraints(table, row, previousRow) {
     for (let i = 0; i < table.uniqueKeys.length; i += 1) {
       const columns = table.uniqueKeys[i];
+      if (columns.some(function (column) { return row[column] == null; })) continue;
       const conflict = table.rows.some(function (existing) {
         if (previousRow && existing === previousRow) return false;
+        if (columns.some(function (column) { return existing[column] == null; })) return false;
         for (let c = 0; c < columns.length; c += 1) {
           if (existing[columns[c]] !== row[columns[c]]) return false;
         }
@@ -2855,12 +2874,28 @@
     const onConflictDoNothing = /\bON\s+CONFLICT\s+DO\s+NOTHING\b/i.test(tail);
     const cleanedTail = tail.replace(/\bON\s+CONFLICT\s+DO\s+NOTHING\b/i, '').trim();
 
+    if (/^DEFAULT\s+VALUES$/i.test(cleanedTail)) {
+      return {
+        target: targetMatch[2],
+        columns: targetMatch[3],
+        valuesTuples: null,
+        selectSql: null,
+        defaultValues: true,
+        orReplace: orReplace,
+        orIgnore: orIgnore,
+        orAbort: orAbort,
+        onConflictDoNothing: onConflictDoNothing,
+        returning: returning
+      };
+    }
+
     if (/^VALUES\b/i.test(cleanedTail)) {
       return {
         target: targetMatch[2],
         columns: targetMatch[3],
         valuesTuples: parseValueTuples(cleanedTail.replace(/^VALUES\s+/i, '')),
         selectSql: null,
+        defaultValues: false,
         orReplace: orReplace,
         orIgnore: orIgnore,
         orAbort: orAbort,
@@ -2875,6 +2910,7 @@
         columns: targetMatch[3],
         valuesTuples: null,
         selectSql: cleanedTail,
+        defaultValues: false,
         orReplace: orReplace,
         orIgnore: orIgnore,
         orAbort: orAbort,
@@ -2992,11 +3028,22 @@
   }
 
   function parseSourceRef(segment) {
-    const match = segment.trim().match(/^((?:[A-Za-z_][\w$]*|"(?:[^"]|"")+"?)(?:\s*\.\s*(?:[A-Za-z_][\w$]*|"(?:[^"]|"")+"?))?)(?:\s+(?:AS\s+)?([A-Za-z_][\w$"]*))?$/i);
+    const trimmed = segment.trim();
+    const derivedMatch = trimmed.match(/^\(([\s\S]+)\)(?:\s+(?:AS\s+)?([A-Za-z_][\w$"]*))?$/i);
+    if (derivedMatch) {
+      return {
+        kind: 'derived',
+        query: derivedMatch[1].trim(),
+        alias: derivedMatch[2] ? normalizeIdentifier(derivedMatch[2]) : 'derived_table'
+      };
+    }
+
+    const match = trimmed.match(/^((?:[A-Za-z_][\w$]*|"(?:[^"]|"")+"?)(?:\s*\.\s*(?:[A-Za-z_][\w$]*|"(?:[^"]|"")+"?))?)(?:\s+(?:AS\s+)?([A-Za-z_][\w$"]*))?$/i);
     if (!match) throw new MaiaSQLError(`Could not parse FROM source: ${segment}`, 'INVALID_FROM');
     const qualified = normalizeQualifiedName(match[1]);
     const name = qualified.name;
     return {
+      kind: 'table',
       name: name,
       alias: match[2] ? normalizeIdentifier(match[2]) : name
     };
@@ -3113,6 +3160,14 @@
   }
 
   function materializeNamedSource(sourceRef, tx, paramState, outerContextRow) {
+    if (sourceRef.kind === 'derived') {
+      const result = executeSelect(sourceRef.query, tx, paramState.values, outerContextRow);
+      return result.rows.map(function (row) {
+        const scoped = createScopedRow(row, sourceRef.alias, sourceRef.alias);
+        return outerContextRow ? mergeScopedRows(scoped, outerContextRow) : scoped;
+      });
+    }
+
     if (tx.ctes && Object.prototype.hasOwnProperty.call(tx.ctes, sourceRef.name)) {
       const rows = tx.ctes[sourceRef.name];
       return rows.map(function (row) {

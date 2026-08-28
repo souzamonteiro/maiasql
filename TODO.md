@@ -6,7 +6,7 @@ MaiaSQL already has a working prototype runtime, a browser demo, and a WebSQL co
 
 Current state after the latest runtime pass:
 
-- the runtime suite passes with 22/22 checks under `node --test interpreter/tests/runtime-engine.test.js`
+- the runtime suite passes with 28/28 checks under `node --test interpreter/tests/runtime-engine.test.js`
 - the `NOT IN` / `NOT LIKE` predicate regression has been fixed in the runtime comparator without changing the generated parser or MaiaCC grammar artifacts
 - the browser admin shell is now working as a local-first SQL playground with database switching, schema refresh, syntax highlighting, autocomplete, recent queries, saved queries, schema-tree column insertion, and CSV export
 - the parser regeneration pipeline is still treated as a slow/optional validation path instead of a default failure condition
@@ -19,7 +19,7 @@ Current state after the latest runtime pass:
 - [x] Validate the checked-in parser against the grammar in CI on every change with a long enough timeout budget via the explicit slow-parser test route
 - [x] Add deterministic parser generation steps and explicit timeout/error reporting in `interpreter/tests/run-sql-parser.js`
 - [x] Harden browser parser lookup paths for the admin app and add regression tests for likely root/nested URL layouts
-- [ ] Document supported SQL grammar boundaries and unsupported dialect features
+- [x] Document supported SQL grammar boundaries and unsupported dialect features
 - [x] Distinguish between a genuinely broken grammar and a slow full regeneration process in developer tooling
 - [x] Keep grammar and MaiaCC modifications out of the default workflow unless strictly required
 
@@ -31,25 +31,25 @@ The current runtime is already strong for a browser prototype, but the most rele
 - [ ] `CASE` and boolean logic are still narrow compared to SQLite semantics, especially around `NULL`, nested conditions, and expression reuse
 - [ ] `ORDER BY`/`GROUP BY` evaluation is usable but needs deeper validation for aliases, composite expressions, and edge-case sorting
 - [ ] Function coverage is partial; unsupported functions should be explicitly documented and tested as intentional limitations
-- [ ] Constraint validation remains focused on the main path; edge cases for `CHECK`, `UNIQUE`, and referential cascade behavior deserve more regression coverage
+- [x] Constraint validation remains focused on the main path; edge cases for `CHECK`, `UNIQUE`, and referential cascade behavior deserve more regression coverage
 - [ ] Transaction and rollback handling is tested, but deeper multi-statement and nested savepoint scenarios are still under-covered
 - [ ] Schema introspection and DDL coverage is good, but `DROP/ALTER` edge cases still need targeted regression tests
 - [ ] Most browser/admin features still depend on the runtime being mature enough to provide consistent metadata and result shapes
 
 ## Priority 1: interpreter correctness and coverage
 
-- [ ] Add tests for nested `WITH` queries and CTEs
-- [ ] Add tests for `NULLS FIRST/LAST` and collation edge cases
-- [ ] Add tests for more scalar functions and constraint semantics
-- [ ] Add tests for multi-table `UPDATE` and `DELETE` behaviors
+- [x] Add tests for nested `WITH` queries and CTEs
+- [x] Add tests for `NULLS FIRST/LAST` and collation edge cases
+- [x] Add tests for more scalar functions and constraint semantics
+- [x] Add tests for multi-table `UPDATE` and `DELETE` behaviors
 - [ ] Add tests for `ALTER TABLE ... DROP COLUMN` and column reordering semantics
-- [ ] Add tests for `INSERT ... DEFAULT VALUES`, `RETURNING`, and `ON CONFLICT` variants
+- [x] Add tests for `INSERT ... DEFAULT VALUES`, `RETURNING`, and `ON CONFLICT` variants
 - [ ] Add tests for `CHECK` constraints and derived table validation
 - [ ] Add tests for `EXISTS`, `IN`, `ANY`, `ALL`, and subquery edge cases
 - [ ] Add property-style tests for result ordering and deterministic output
-- [ ] Validate alias resolution and qualified-name handling in nested joins and derived tables
+- [x] Validate alias resolution and qualified-name handling in nested joins and derived tables
 - [ ] Exercise more real-world failure paths for invalid expressions, missing tables, and constraint violations
-- [ ] Add regression tests for schema changes after `ALTER TABLE` and `DROP` operations
+- [x] Add regression tests for schema changes after `ALTER TABLE` and `DROP` operations
 
 ## Priority 2: strengthen SQL behavior
 

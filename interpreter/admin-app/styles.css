@@ -375,16 +375,13 @@ textarea {
 }
 
 .schema-tree {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+  display: grid;
+  gap: 2px;
+  font-size: 0.86rem;
 }
 
 .schema-node {
-  border: 1px solid rgba(27, 29, 42, 0.08);
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.4);
-  overflow: hidden;
+  position: relative;
 }
 
 .schema-table-button,
@@ -394,48 +391,178 @@ textarea {
   background: transparent;
   color: var(--ink);
   text-align: left;
-  padding: 10px 12px;
+  padding: 5px 8px;
   font: inherit;
   cursor: pointer;
+  min-height: 30px;
+  border-radius: 6px;
+  display: grid;
+  align-items: center;
 }
 
 .schema-table-button {
   font-weight: 700;
-  background: rgba(29, 109, 82, 0.06);
+  grid-template-columns: 14px 16px minmax(0, 1fr);
+  gap: 7px;
 }
 
 .schema-column-list {
-  display: flex;
-  flex-direction: column;
-  border-top: 1px solid rgba(27, 29, 42, 0.08);
+  position: relative;
+  display: grid;
+  gap: 1px;
+  margin-left: 16px;
+  padding-left: 15px;
 }
 
 .schema-column-list.hidden {
   display: none;
 }
 
+.schema-column-list::before {
+  content: '';
+  position: absolute;
+  left: 6px;
+  top: 0;
+  bottom: 14px;
+  width: 1px;
+  background: rgba(27, 29, 42, 0.18);
+}
+
 .schema-column-button {
-  padding-left: 18px;
+  position: relative;
   color: var(--muted);
-  background: rgba(27, 29, 42, 0.02);
-  display: flex;
-  justify-content: space-between;
+  grid-template-columns: 16px 14px minmax(0, 1fr);
+  gap: 7px;
+}
+
+.schema-caret {
+  width: 0;
+  height: 0;
+  border-top: 4px solid transparent;
+  border-bottom: 4px solid transparent;
+  border-left: 5px solid currentColor;
+  opacity: 0.7;
+  transform-origin: 2px 4px;
+  transition: transform 0.14s ease;
+}
+
+.schema-table-button[aria-expanded='true'] .schema-caret {
+  transform: rotate(90deg);
+}
+
+.schema-object-icon {
+  position: relative;
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  border: 1px solid rgba(27, 29, 42, 0.25);
+  background: rgba(255, 255, 255, 0.65);
+}
+
+.table-icon::before,
+.table-icon::after {
+  content: '';
+  position: absolute;
+  left: 2px;
+  right: 2px;
+  height: 1px;
+  background: rgba(27, 29, 42, 0.28);
+}
+
+.table-icon::before {
+  top: 4px;
+}
+
+.table-icon::after {
+  top: 8px;
+}
+
+.column-icon {
+  width: auto;
+  min-width: 18px;
+  height: 16px;
+  border-radius: 4px;
+  background: rgba(29, 109, 82, 0.08);
+  border-color: rgba(29, 109, 82, 0.35);
+  color: var(--accent-strong);
+  display: inline-flex;
   align-items: center;
-  gap: 8px;
+  justify-content: center;
+  padding: 0 3px;
+  font-size: 0.58rem;
+  font-weight: 800;
+  line-height: 1;
 }
 
-.schema-column-button .column-name {
-  flex: 1;
+.schema-branch {
+  position: relative;
+  width: 16px;
+  height: 16px;
 }
 
-.schema-column-button .column-type {
+.schema-branch::before {
+  content: '';
+  position: absolute;
+  left: -9px;
+  top: 8px;
+  width: 17px;
+  height: 1px;
+  background: rgba(27, 29, 42, 0.18);
+}
+
+.schema-object-main {
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+}
+
+.schema-object-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.schema-object-meta,
+.schema-column-details {
+  color: var(--muted);
   font-size: 0.72rem;
-  opacity: 0.75;
+  font-weight: 500;
+}
+
+.schema-column-details {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+.schema-type-badge,
+.schema-constraint-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 17px;
+  padding: 1px 5px;
+  border-radius: 4px;
+  border: 1px solid rgba(27, 29, 42, 0.12);
+  background: rgba(255, 255, 255, 0.62);
+  color: var(--muted);
+  line-height: 1;
+}
+
+.schema-type-badge {
+  color: var(--accent-strong);
+  border-color: rgba(29, 109, 82, 0.18);
+  background: rgba(29, 109, 82, 0.08);
+}
+
+.schema-constraint-badge {
+  font-size: 0.66rem;
 }
 
 .schema-column-button:hover,
 .schema-table-button:hover {
-  background: rgba(29, 109, 82, 0.09);
+  background: rgba(29, 109, 82, 0.08);
 }
 
 .schema-panel {

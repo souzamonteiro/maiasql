@@ -217,6 +217,31 @@ describe('MaiaSQL prototype runtime', () => {
     });
   });
 
+  it('supports INSERT DEFAULT VALUES with RETURNING', async () => {
+    const db = await runtime.MaiaSQL.open({
+      name: 'memory-default-values-test',
+      storage: 'memory',
+      parser: Parser
+    });
+
+    await db.exec(`
+      CREATE TABLE settings (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        label TEXT DEFAULT 'new',
+        enabled INTEGER DEFAULT 1
+      )
+    `);
+
+    const inserted = await db.exec(`
+      INSERT INTO settings DEFAULT VALUES
+      RETURNING id, label, enabled
+    `);
+
+    assert.deepEqual(inserted.rows, [
+      { id: 1, label: 'new', enabled: 1 }
+    ]);
+  });
+
   it('supports distinct, having and insert or replace', async () => {
     const db = await runtime.MaiaSQL.open({
       name: 'memory-distinct-test',
@@ -547,6 +572,161 @@ describe('MaiaSQL prototype runtime', () => {
     ]);
   });
 
+  it('supports nested CTEs and mixed NULLS ordering directions', async () => {
+    const db = await runtime.MaiaSQL.open({
+      name: 'memory-nested-cte-order-test',
+      storage: 'memory',
+      parser: Parser
+    });
+
+    await db.exec(`
+      CREATE TABLE event_log (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        team TEXT NOT NULL,
+        score INTEGER,
+        label TEXT
+      );
+
+      INSERT INTO event_log (team, score, label) VALUES
+        ('gamma', 3, 'third'),
+        ('alpha', NULL, 'nulls'),
+        ('beta', 8, 'second'),
+        ('delta', 5, 'fourth');
+    `);
+
+    const nestedCte = await db.exec(`
+      WITH base AS (
+        SELECT id, team, score, label FROM event_log
+      ),
+      filtered AS (
+        WITH scoped AS (
+          SELECT id, team, score, label
+          FROM base
+          WHERE score IS NOT NULL
+        )
+        SELECT id, team, score, label
+        FROM scoped
+      )
+      SELECT team, score, label
+      FROM filtered
+      ORDER BY score DESC NULLS LAST
+    `);
+
+    assert.deepEqual(nestedCte.rows, [
+      { team: 'beta', score: 8, label: 'second' },
+      { team: 'delta', score: 5, label: 'fourth' },
+      { team: 'gamma', score: 3, label: 'third' }
+    ]);
+
+    const mixedNulls = await db.exec(`
+      SELECT team, score
+      FROM event_log
+      ORDER BY score ASC NULLS FIRST
+    `);
+
+    assert.deepEqual(mixedNulls.rows, [
+      { team: 'alpha', score: null },
+      { team: 'gamma', score: 3 },
+      { team: 'delta', score: 5 },
+      { team: 'beta', score: 8 }
+    ]);
+  });
+
+  it('supports derived tables in FROM and JOIN clauses', async () => {
+    const db = await runtime.MaiaSQL.open({
+      name: 'memory-derived-table-test',
+      storage: 'memory',
+      parser: Parser
+    });
+
+    await db.exec(`
+      CREATE TABLE users (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL
+      );
+
+      CREATE TABLE orders (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER NOT NULL,
+        total INTEGER NOT NULL
+      );
+
+      INSERT INTO users (name) VALUES ('alice'), ('bob');
+      INSERT INTO orders (user_id, total) VALUES (1, 10), (1, 20), (2, 5);
+    `);
+
+    const result = await db.exec(`
+      SELECT u.name, summary.total
+      FROM (
+        SELECT id, name FROM users
+      ) AS u
+      JOIN (
+        SELECT user_id, SUM(total) AS total
+        FROM orders
+        GROUP BY user_id
+      ) AS summary ON u.id = summary.user_id
+      ORDER BY u.name ASC
+    `);
+
+    assert.deepEqual(result.rows, [
+      { name: 'alice', total: 30 },
+      { name: 'bob', total: 5 }
+    ]);
+  });
+
+  it('resolves aliases in joined UPDATE and DELETE statements', async () => {
+    const db = await runtime.MaiaSQL.open({
+      name: 'memory-aliased-update-delete-test',
+      storage: 'memory',
+      parser: Parser
+    });
+
+    await db.exec(`
+      CREATE TABLE accounts (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL,
+        balance INTEGER NOT NULL
+      );
+
+      CREATE TABLE adjustments (
+        account_id INTEGER NOT NULL,
+        amount INTEGER NOT NULL
+      );
+
+      INSERT INTO accounts (name, balance) VALUES ('alice', 10), ('bob', 20);
+      INSERT INTO adjustments (account_id, amount) VALUES (1, 5), (2, 7);
+    `);
+
+    await db.exec(`
+      UPDATE accounts
+      SET balance = accounts.balance + adjustment.amount
+      FROM adjustments AS adjustment
+      WHERE accounts.id = adjustment.account_id
+    `);
+
+    const updated = await db.exec(`
+      SELECT name, balance
+      FROM accounts
+      ORDER BY id ASC
+    `);
+    assert.deepEqual(updated.rows, [
+      { name: 'alice', balance: 15 },
+      { name: 'bob', balance: 27 }
+    ]);
+
+    await db.exec(`
+      DELETE FROM accounts
+      USING adjustments AS adjustment
+      WHERE accounts.id = adjustment.account_id
+        AND adjustment.amount = 7
+    `);
+
+    const remaining = await db.exec(`SELECT name FROM accounts ORDER BY id ASC`);
+    assert.deepEqual(remaining.rows, [
+      { name: 'alice' }
+    ]);
+  });
+
   it('supports recursive CTE expansion', async () => {
     const db = await runtime.MaiaSQL.open({
       name: 'memory-recursive-cte-test',
@@ -796,6 +976,34 @@ describe('MaiaSQL prototype runtime', () => {
     );
   });
 
+  it('preserves SQL NULL semantics for CHECK and UNIQUE constraints', async () => {
+    const db = await runtime.MaiaSQL.open({
+      name: 'memory-null-constraint-test',
+      storage: 'memory',
+      parser: Parser
+    });
+
+    await db.exec(`
+      CREATE TABLE measurements (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        reading INTEGER CHECK (reading > 0),
+        tag TEXT UNIQUE
+      );
+
+      INSERT INTO measurements (reading, tag) VALUES (NULL, NULL), (5, NULL);
+    `);
+
+    const rows = await db.exec(`
+      SELECT reading, tag
+      FROM measurements
+      ORDER BY id ASC
+    `);
+    assert.deepEqual(rows.rows, [
+      { reading: null, tag: null },
+      { reading: 5, tag: null }
+    ]);
+  });
+
   it('rejects unsupported drop-column DDL while preserving supported rename/add column flows', async () => {
     const db = await runtime.MaiaSQL.open({
       name: 'memory-drop-column-test',
@@ -826,6 +1034,34 @@ describe('MaiaSQL prototype runtime', () => {
       db.exec(`ALTER TABLE metrics DROP COLUMN notes`),
       /Unsupported ALTER TABLE statement|INVALID_ALTER_TABLE/
     );
+  });
+
+  it('keeps index metadata consistent after column renames', async () => {
+    const db = await runtime.MaiaSQL.open({
+      name: 'memory-rename-index-metadata-test',
+      storage: 'memory',
+      parser: Parser
+    });
+
+    await db.exec(`
+      CREATE TABLE contacts (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        email TEXT NOT NULL
+      );
+      CREATE INDEX idx_contacts_email ON contacts(email);
+      INSERT INTO contacts (email) VALUES ('ada@example.com');
+      ALTER TABLE contacts RENAME COLUMN email TO address;
+    `);
+
+    const row = await db.exec(`SELECT address FROM contacts WHERE address = 'ada@example.com'`);
+    assert.deepEqual(row.rows, [
+      { address: 'ada@example.com' }
+    ]);
+
+    const indexInfo = await db.exec(`PRAGMA index_info(idx_contacts_email)`);
+    assert.deepEqual(indexInfo.rows, [
+      { seqno: 0, cid: 1, name: 'address' }
+    ]);
   });
 
   it('supports pragma metadata for tables, indexes and foreign keys', async () => {

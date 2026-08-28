@@ -1,12 +1,12 @@
-# MaiaSQL (WebSQL)
+# MaiaSQL
 
-![MaiaSQL](images/Squirrel.png)
+![MaiaSQL](https://raw.githubusercontent.com/souzamonteiro/maiasql/main/images/Squirrel.png)
 
-Pure JavaScript implementation of WebSQL.
+SQLite-inspired SQL runtime and WebSQL-compatible adapter written in pure JavaScript.
 
 > **Not SQLite compiled to WebAssembly — a browser-native SQL engine designed for the Web.**
 
-MaiaSQL is a SQLite-compatible SQL engine written entirely in JavaScript.
+MaiaSQL is a browser-native SQL engine written entirely in JavaScript. It aims for practical SQLite-style language and API compatibility where feasible, while remaining explicit about unsupported dialect features and preview-level behavior.
 
 It provides its own lexer, parser, Concrete Syntax Tree (CST), Abstract Syntax Tree (AST), semantic analyzer, execution engine, transaction manager, and storage abstraction. Its default persistent backend is IndexedDB.
 
@@ -53,14 +53,16 @@ The project targets **API and language compatibility where practical**, while pr
 
 This project is in a solid prototype-to-early-product stage. The runtime and the browser integration work, and the core interpreter is now validated under the project’s own runtime suite. It is still not a drop-in SQLite replacement or a full production-grade SQL administration platform, but the current runtime path is substantially more reliable than earlier snapshots.
 
-Verified status as of 2026-08-26 from the runtime suite and the current regeneration workflow:
+Verified status as of 2026-08-28 from the runtime suite and the current regeneration workflow:
 
-- `node --test interpreter/tests/runtime-engine.test.js` passes 22 of 22 checks
+- `node --test interpreter/tests/runtime-engine.test.js` passes 28 of 28 checks
 - the current regression for `NOT IN` and `NOT LIKE` predicates has been fixed in the runtime layer without changing the generated parser or MaiaCC grammar files
 - the parser regeneration path remains a slow/optional validation workflow, not the default execution gate
 - the default memory backend remains stable, and the optional IndexedDB path remains available for Node-based validation scenarios
 - the generation pipeline is not considered broken; it is still a time-intensive operation that should be treated as a separate validation task rather than a required step for every runtime test run
 - the repository now exposes an explicit slow parser validation command, `npm run test:parser:slow`, to exercise the grammar regeneration path with a realistic timeout budget
+
+For the current supported SQL subset, practical examples, and known limitations, see [docs/MANUAL.md](docs/MANUAL.md).
 
 | Component | Status | Notes |
 |---|---|---|
