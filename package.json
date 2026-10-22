@@ -1,6 +1,6 @@
 {
   "name": "maiasql",
-  "version": "1.6.0",
+  "version": "1.6.1",
   "description": "Pure JavaScript SQL engine with a WebSQL-compatible adapter over IndexedDB or memory storage.",
   "author": "The MaiaScript Team (https://www.maiascript.com)",
   "main": "interpreter/index.js",
