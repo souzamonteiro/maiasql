@@ -21,6 +21,27 @@ This separation allows legacy WebSQL applications to run on MaiaSQL without forc
 
 ---
 
+## Toolchain validation — 2026-10-24
+
+The Unicode toolchain update pins MaiaCC df4c3b5 and the published MaiaRegex
+runtime e2ae3a8. SQL parser regenerated from SQL.ebnf with the repository-local
+native C++98 MaiaCC frontend/emitter; JavaScript emission from that same XML
+is byte-identical. `npm test`: 39 pass, 1 optional slow regeneration skipped.
+The explicit `npm run test:parser:slow` was also attempted and exceeded its
+600000 ms JavaScript-frontend timeout; it is not reported as passing. This
+retains the documented default-regeneration performance limitation. Runtime
+and generated-parser smoke checks pass with the regenerated artifact.
+
+Reproduce the native generation with the existing MaiaCC tools:
+
+```sh
+sh maiacc/parser-generator/cpp98/build.sh /tmp/maiasql-native
+sh maiacc/bin/tREx-cpp98.sh --build-dir /tmp/maiasql-native --ebnf --language javascript --to-xml grammar/SQL.xml grammar/SQL.ebnf interpreter/sql-parser.js
+npm test
+```
+
+This does not change the default generator, SQL APIs, versions or npm release.
+
 ## Project goals
 
 - Implement a browser-native SQL engine in pure JavaScript.

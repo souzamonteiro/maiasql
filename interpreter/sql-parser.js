@@ -5,7 +5,8 @@ class Lexer {
     this.tokens = [];
     this.charClassDepth = 0;
     this.templateDepth = 0;
-    this.tokenPatterns = [    { type: 'TOKEN__3B_', regex: /^;/ },    { type: 'TOKEN__2E_', regex: /^\./ },    { type: 'TOKEN__3D_', regex: /^=/ },    { type: 'TOKEN__28_', regex: /^\(/ },    { type: 'TOKEN__29_', regex: /^\)/ },    { type: 'TOKEN__2C_', regex: /^,/ },    { type: 'TOKEN__2B_', regex: /^\+/ },    { type: 'TOKEN__2D_', regex: /^-/ },    { type: 'TOKEN__2A_', regex: /^\*/ },    { type: 'TOKEN__2F_', regex: /^\// },    { type: 'TOKEN__25_', regex: /^%/ },    { type: 'TOKEN__3C_', regex: /^</ },    { type: 'TOKEN__3E_', regex: /^>/ },    { type: 'TOKEN__3C__3D_', regex: /^<=/ },    { type: 'TOKEN__3E__3D_', regex: /^>=/ },    { type: 'TOKEN__3C__3E_', regex: /^<>/ },    { type: 'TOKEN__21__3D_', regex: /^!=/ },    { type: 'TOKEN__7C__7C_', regex: /^\|\|/ },    { type: 'TOKEN__3A_', regex: /^:/ },    { type: 'TOKEN__40_', regex: /^@/ },    { type: 'TOKEN__24_', regex: /^\$/ },    { type: 'TOKEN__3D__3D_', regex: /^==/ },    { type: 'TOKEN__26_', regex: /^&/ },    { type: 'TOKEN__7C_', regex: /^\|/ },    { type: 'TOKEN__3C__3C_', regex: /^<</ },    { type: 'TOKEN__3E__3E_', regex: /^>>/ },    { type: 'TOKEN__2D__3E_', regex: /^->/ },    { type: 'TOKEN__2D__3E__3E_', regex: /^->>/ },    { type: 'TOKEN__7E_', regex: /^~/ },    { type: 'KW_SELECT', regex: /^[sS][eE][lL][eE][cC][tT]/ },    { type: 'KW_FROM', regex: /^[fF][rR][oO][mM]/ },    { type: 'KW_WHERE', regex: /^[wW][hH][eE][rR][eE]/ },    { type: 'KW_GROUP', regex: /^[gG][rR][oO][uU][pP]/ },    { type: 'KW_HAVING', regex: /^[hH][aA][vV][iI][nN][gG]/ },    { type: 'KW_ORDER', regex: /^[oO][rR][dD][eE][rR]/ },    { type: 'KW_BY', regex: /^[bB][yY]/ },    { type: 'KW_LIMIT', regex: /^[lL][iI][mM][iI][tT]/ },    { type: 'KW_OFFSET', regex: /^[oO][fF][fF][sS][eE][tT]/ },    { type: 'KW_DISTINCT', regex: /^[dD][iI][sS][tT][iI][nN][cC][tT]/ },    { type: 'KW_ALL', regex: /^[aA][lL][lL]/ },    { type: 'KW_AS', regex: /^[aA][sS]/ },    { type: 'KW_WINDOW', regex: /^[wW][iI][nN][dD][oO][wW]/ },    { type: 'KW_PARTITION', regex: /^[pP][aA][rR][tT][iI][tT][iI][oO][nN]/ },    { type: 'KW_OVER', regex: /^[oO][vV][eE][rR]/ },    { type: 'KW_FILTER', regex: /^[fF][iI][lL][tT][eE][rR]/ },    { type: 'KW_JOIN', regex: /^[jJ][oO][iI][nN]/ },    { type: 'KW_INNER', regex: /^[iI][nN][nN][eE][rR]/ },    { type: 'KW_LEFT', regex: /^[lL][eE][fF][tT]/ },    { type: 'KW_RIGHT', regex: /^[rR][iI][gG][hH][tT]/ },    { type: 'KW_FULL', regex: /^[fF][uU][lL][lL]/ },    { type: 'KW_OUTER', regex: /^[oO][uU][tT][eE][rR]/ },    { type: 'KW_CROSS', regex: /^[cC][rR][oO][sS][sS]/ },    { type: 'KW_NATURAL', regex: /^[nN][aA][tT][uU][rR][aA][lL]/ },    { type: 'KW_ON', regex: /^[oO][nN]/ },    { type: 'KW_USING', regex: /^[uU][sS][iI][nN][gG]/ },    { type: 'KW_INSERT', regex: /^[iI][nN][sS][eE][rR][tT]/ },    { type: 'KW_INTO', regex: /^[iI][nN][tT][oO]/ },    { type: 'KW_VALUES', regex: /^[vV][aA][lL][uU][eE][sS]/ },    { type: 'KW_UPDATE', regex: /^[uU][pP][dD][aA][tT][eE]/ },    { type: 'KW_SET', regex: /^[sS][eE][tT]/ },    { type: 'KW_DELETE', regex: /^[dD][eE][lL][eE][tT][eE]/ },    { type: 'KW_REPLACE', regex: /^[rR][eE][pP][lL][aA][cC][eE]/ },    { type: 'KW_RETURNING', regex: /^[rR][eE][tT][uU][rR][nN][iI][nN][gG]/ },    { type: 'KW_DO', regex: /^[dD][oO]/ },    { type: 'KW_NOTHING', regex: /^[nN][oO][tT][hH][iI][nN][gG]/ },    { type: 'KW_CONFLICT', regex: /^[cC][oO][nN][fF][lL][iI][cC][tT]/ },    { type: 'KW_CREATE', regex: /^[cC][rR][eE][aA][tT][eE]/ },    { type: 'KW_ALTER', regex: /^[aA][lL][tT][eE][rR]/ },    { type: 'KW_DROP', regex: /^[dD][rR][oO][pP]/ },    { type: 'KW_TABLE', regex: /^[tT][aA][bB][lL][eE]/ },    { type: 'KW_INDEX', regex: /^[iI][nN][dD][eE][xX]/ },    { type: 'KW_VIEW', regex: /^[vV][iI][eE][wW]/ },    { type: 'KW_TRIGGER', regex: /^[tT][rR][iI][gG][gG][eE][rR]/ },    { type: 'KW_VIRTUAL', regex: /^[vV][iI][rR][tT][uU][aA][lL]/ },    { type: 'KW_TEMP', regex: /^[tT][eE][mM][pP]/ },    { type: 'KW_TEMPORARY', regex: /^[tT][eE][mM][pP][oO][rR][aA][rR][yY]/ },    { type: 'KW_RENAME', regex: /^[rR][eE][nN][aA][mM][eE]/ },    { type: 'KW_COLUMN', regex: /^[cC][oO][lL][uU][mM][nN]/ },    { type: 'KW_ADD', regex: /^[aA][dD][dD]/ },    { type: 'KW_PRIMARY', regex: /^[pP][rR][iI][mM][aA][rR][yY]/ },    { type: 'KW_KEY', regex: /^[kK][eE][yY]/ },    { type: 'KW_UNIQUE', regex: /^[uU][nN][iI][qQ][uU][eE]/ },    { type: 'KW_CHECK', regex: /^[cC][hH][eE][cC][kK]/ },    { type: 'KW_DEFAULT', regex: /^[dD][eE][fF][aA][uU][lL][tT]/ },    { type: 'KW_COLLATE', regex: /^[cC][oO][lL][lL][aA][tT][eE]/ },    { type: 'KW_REFERENCES', regex: /^[rR][eE][fF][eE][rR][eE][nN][cC][eE][sS]/ },    { type: 'KW_FOREIGN', regex: /^[fF][oO][rR][eE][iI][gG][nN]/ },    { type: 'KW_AUTOINCREMENT', regex: /^[aA][uU][tT][oO][iI][nN][cC][rR][eE][mM][eE][nN][tT]/ },    { type: 'KW_CONSTRAINT', regex: /^[cC][oO][nN][sS][tT][rR][aA][iI][nN][tT]/ },    { type: 'KW_DEFERRABLE', regex: /^[dD][eE][fF][eE][rR][rR][aA][bB][lL][eE]/ },    { type: 'KW_INITIALLY', regex: /^[iI][nN][iI][tT][iI][aA][lL][lL][yY]/ },    { type: 'KW_DEFERRED', regex: /^[dD][eE][fF][eE][rR][rR][eE][dD]/ },    { type: 'KW_IMMEDIATE', regex: /^[iI][mM][mM][eE][dD][iI][aA][tT][eE]/ },    { type: 'KW_CASCADE', regex: /^[cC][aA][sS][cC][aA][dD][eE]/ },    { type: 'KW_RESTRICT', regex: /^[rR][eE][sS][tT][rR][iI][cC][tT]/ },    { type: 'KW_ACTION', regex: /^[aA][cC][tT][iI][oO][nN]/ },    { type: 'KW_GENERATED', regex: /^[gG][eE][nN][eE][rR][aA][tT][eE][dD]/ },    { type: 'KW_ALWAYS', regex: /^[aA][lL][wW][aA][yY][sS]/ },    { type: 'KW_STORED', regex: /^[sS][tT][oO][rR][eE][dD]/ },    { type: 'KW_STRICT', regex: /^[sS][tT][rR][iI][cC][tT]/ },    { type: 'KW_WITHOUT', regex: /^[wW][iI][tT][hH][oO][uU][tT]/ },    { type: 'KW_ROWID', regex: /^[rR][oO][wW][iI][dD]/ },    { type: 'KW_AND', regex: /^[aA][nN][dD]/ },    { type: 'KW_OR', regex: /^[oO][rR]/ },    { type: 'KW_NOT', regex: /^[nN][oO][tT]/ },    { type: 'KW_IS', regex: /^[iI][sS]/ },    { type: 'KW_NULL', regex: /^[nN][uU][lL][lL]/ },    { type: 'KW_ISNULL', regex: /^[iI][sS][nN][uU][lL][lL]/ },    { type: 'KW_NOTNULL', regex: /^[nN][oO][tT][nN][uU][lL][lL]/ },    { type: 'KW_BETWEEN', regex: /^[bB][eE][tT][wW][eE][eE][nN]/ },    { type: 'KW_IN', regex: /^[iI][nN]/ },    { type: 'KW_LIKE', regex: /^[lL][iI][kK][eE]/ },    { type: 'KW_GLOB', regex: /^[gG][lL][oO][bB]/ },    { type: 'KW_REGEXP', regex: /^[rR][eE][gG][eE][xX][pP]/ },    { type: 'KW_MATCH', regex: /^[mM][aA][tT][cC][hH]/ },    { type: 'KW_ESCAPE', regex: /^[eE][sS][cC][aA][pP][eE]/ },    { type: 'KW_EXISTS', regex: /^[eE][xX][iI][sS][tT][sS]/ },    { type: 'KW_TRUE', regex: /^[tT][rR][uU][eE]/ },    { type: 'KW_FALSE', regex: /^[fF][aA][lL][sS][eE]/ },    { type: 'KW_ANY', regex: /^[aA][nN][yY]/ },    { type: 'KW_SOME', regex: /^[sS][oO][mM][eE]/ },    { type: 'KW_CASE', regex: /^[cC][aA][sS][eE]/ },    { type: 'KW_WHEN', regex: /^[wW][hH][eE][nN]/ },    { type: 'KW_THEN', regex: /^[tT][hH][eE][nN]/ },    { type: 'KW_ELSE', regex: /^[eE][lL][sS][eE]/ },    { type: 'KW_END', regex: /^[eE][nN][dD]/ },    { type: 'KW_CAST', regex: /^[cC][aA][sS][tT]/ },    { type: 'KW_RAISE', regex: /^[rR][aA][iI][sS][eE]/ },    { type: 'KW_CURRENT_DATE', regex: /^[cC][uU][rR][rR][eE][nN][tT]_[dD][aA][tT][eE]/ },    { type: 'KW_CURRENT_TIME', regex: /^[cC][uU][rR][rR][eE][nN][tT]_[tT][iI][mM][eE]/ },    { type: 'KW_CURRENT_TIMESTAMP', regex: /^[cC][uU][rR][rR][eE][nN][tT]_[tT][iI][mM][eE][sS][tT][aA][mM][pP]/ },    { type: 'KW_BEGIN', regex: /^[bB][eE][gG][iI][nN]/ },    { type: 'KW_COMMIT', regex: /^[cC][oO][mM][mM][iI][tT]/ },    { type: 'KW_ROLLBACK', regex: /^[rR][oO][lL][lL][bB][aA][cC][kK]/ },    { type: 'KW_SAVEPOINT', regex: /^[sS][aA][vV][eE][pP][oO][iI][nN][tT]/ },    { type: 'KW_RELEASE', regex: /^[rR][eE][lL][eE][aA][sS][eE]/ },    { type: 'KW_TRANSACTION', regex: /^[tT][rR][aA][nN][sS][aA][cC][tT][iI][oO][nN]/ },    { type: 'KW_EXCLUSIVE', regex: /^[eE][xX][cC][lL][uU][sS][iI][vV][eE]/ },    { type: 'KW_PRAGMA', regex: /^[pP][rR][aA][gG][mM][aA]/ },    { type: 'KW_VACUUM', regex: /^[vV][aA][cC][uU][uU][mM]/ },    { type: 'KW_ANALYZE', regex: /^[aA][nN][aA][lL][yY][zZ][eE]/ },    { type: 'KW_REINDEX', regex: /^[rR][eE][iI][nN][dD][eE][xX]/ },    { type: 'KW_ATTACH', regex: /^[aA][tT][tT][aA][cC][hH]/ },    { type: 'KW_DETACH', regex: /^[dD][eE][tT][aA][cC][hH]/ },    { type: 'KW_DATABASE', regex: /^[dD][aA][tT][aA][bB][aA][sS][eE]/ },    { type: 'KW_EXPLAIN', regex: /^[eE][xX][pP][lL][aA][iI][nN]/ },    { type: 'KW_QUERY', regex: /^[qQ][uU][eE][rR][yY]/ },    { type: 'KW_PLAN', regex: /^[pP][lL][aA][nN]/ },    { type: 'KW_ROWS', regex: /^[rR][oO][wW][sS]/ },    { type: 'KW_RANGE', regex: /^[rR][aA][nN][gG][eE]/ },    { type: 'KW_GROUPS', regex: /^[gG][rR][oO][uU][pP][sS]/ },    { type: 'KW_UNBOUNDED', regex: /^[uU][nN][bB][oO][uU][nN][dD][eE][dD]/ },    { type: 'KW_PRECEDING', regex: /^[pP][rR][eE][cC][eE][dD][iI][nN][gG]/ },    { type: 'KW_FOLLOWING', regex: /^[fF][oO][lL][lL][oO][wW][iI][nN][gG]/ },    { type: 'KW_CURRENT', regex: /^[cC][uU][rR][rR][eE][nN][tT]/ },    { type: 'KW_ROW', regex: /^[rR][oO][wW]/ },    { type: 'KW_EXCLUDE', regex: /^[eE][xX][cC][lL][uU][dD][eE]/ },    { type: 'KW_NO', regex: /^[nN][oO]/ },    { type: 'KW_OTHERS', regex: /^[oO][tT][hH][eE][rR][sS]/ },    { type: 'KW_TIES', regex: /^[tT][iI][eE][sS]/ },    { type: 'KW_FIRST', regex: /^[fF][iI][rR][sS][tT]/ },    { type: 'KW_LAST', regex: /^[lL][aA][sS][tT]/ },    { type: 'KW_NULLS', regex: /^[nN][uU][lL][lL][sS]/ },    { type: 'KW_ABORT', regex: /^[aA][bB][oO][rR][tT]/ },    { type: 'KW_AFTER', regex: /^[aA][fF][tT][eE][rR]/ },    { type: 'KW_ASC', regex: /^[aA][sS][cC]/ },    { type: 'KW_BEFORE', regex: /^[bB][eE][fF][oO][rR][eE]/ },    { type: 'KW_BIG', regex: /^[bB][iI][gG]/ },    { type: 'KW_BIGINT', regex: /^[bB][iI][gG][iI][nN][tT]/ },    { type: 'KW_BINARY', regex: /^[bB][iI][nN][aA][rR][yY]/ },    { type: 'KW_BIT', regex: /^[bB][iI][tT]/ },    { type: 'KW_BLOB', regex: /^[bB][lL][oO][bB]/ },    { type: 'KW_BOOLEAN', regex: /^[bB][oO][oO][lL][eE][aA][nN]/ },    { type: 'KW_CHAR', regex: /^[cC][hH][aA][rR]/ },    { type: 'KW_CHARACTER', regex: /^[cC][hH][aA][rR][aA][cC][tT][eE][rR]/ },    { type: 'KW_CLOB', regex: /^[cC][lL][oO][bB]/ },    { type: 'KW_DATE', regex: /^[dD][aA][tT][eE]/ },    { type: 'KW_DATETIME', regex: /^[dD][aA][tT][eE][tT][iI][mM][eE]/ },    { type: 'KW_DECIMAL', regex: /^[dD][eE][cC][iI][mM][aA][lL]/ },    { type: 'KW_DESC', regex: /^[dD][eE][sS][cC]/ },    { type: 'KW_DOUBLE', regex: /^[dD][oO][uU][bB][lL][eE]/ },    { type: 'KW_EACH', regex: /^[eE][aA][cC][hH]/ },    { type: 'KW_EXCEPT', regex: /^[eE][xX][cC][eE][pP][tT]/ },    { type: 'KW_FAIL', regex: /^[fF][aA][iI][lL]/ },    { type: 'KW_FLOAT', regex: /^[fF][lL][oO][aA][tT]/ },    { type: 'KW_FOR', regex: /^[fF][oO][rR]/ },    { type: 'KW_IF', regex: /^[iI][fF]/ },    { type: 'KW_IGNORE', regex: /^[iI][gG][nN][oO][rR][eE]/ },    { type: 'KW_INDEXED', regex: /^[iI][nN][dD][eE][xX][eE][dD]/ },    { type: 'KW_INSTEAD', regex: /^[iI][nN][sS][tT][eE][aA][dD]/ },    { type: 'KW_INT', regex: /^[iI][nN][tT]/ },    { type: 'KW_INTEGER', regex: /^[iI][nN][tT][eE][gG][eE][rR]/ },    { type: 'KW_INTERSECT', regex: /^[iI][nN][tT][eE][rR][sS][eE][cC][tT]/ },    { type: 'KW_MATERIALIZED', regex: /^[mM][aA][tT][eE][rR][iI][aA][lL][iI][zZ][eE][dD]/ },    { type: 'KW_MEDIUMINT', regex: /^[mM][eE][dD][iI][uU][mM][iI][nN][tT]/ },    { type: 'KW_NATIONAL', regex: /^[nN][aA][tT][iI][oO][nN][aA][lL]/ },    { type: 'KW_NATIVE', regex: /^[nN][aA][tT][iI][vV][eE]/ },    { type: 'KW_NCHAR', regex: /^[nN][cC][hH][aA][rR]/ },    { type: 'KW_NUMERIC', regex: /^[nN][uU][mM][eE][rR][iI][cC]/ },    { type: 'KW_NVARCHAR', regex: /^[nN][vV][aA][rR][cC][hH][aA][rR]/ },    { type: 'KW_OF', regex: /^[oO][fF]/ },    { type: 'KW_OFF', regex: /^[oO][fF][fF]/ },    { type: 'KW_PRECISION', regex: /^[pP][rR][eE][cC][iI][sS][iI][oO][nN]/ },    { type: 'KW_REAL', regex: /^[rR][eE][aA][lL]/ },    { type: 'KW_RECURSIVE', regex: /^[rR][eE][cC][uU][rR][sS][iI][vV][eE]/ },    { type: 'KW_SMALLINT', regex: /^[sS][mM][aA][lL][lL][iI][nN][tT]/ },    { type: 'KW_TEXT', regex: /^[tT][eE][xX][tT]/ },    { type: 'KW_TIME', regex: /^[tT][iI][mM][eE]/ },    { type: 'KW_TIMESTAMP', regex: /^[tT][iI][mM][eE][sS][tT][aA][mM][pP]/ },    { type: 'KW_TINYINT', regex: /^[tT][iI][nN][yY][iI][nN][tT]/ },    { type: 'KW_TO', regex: /^[tT][oO]/ },    { type: 'KW_UNION', regex: /^[uU][nN][iI][oO][nN]/ },    { type: 'KW_UNSIGNED', regex: /^[uU][nN][sS][iI][gG][nN][eE][dD]/ },    { type: 'KW_VARBINARY', regex: /^[vV][aA][rR][bB][iI][nN][aA][rR][yY]/ },    { type: 'KW_VARCHAR', regex: /^[vV][aA][rR][cC][hH][aA][rR]/ },    { type: 'KW_VARYING', regex: /^[vV][aA][rR][yY][iI][nN][gG]/ },    { type: 'KW_WITH', regex: /^[wW][iI][tT][hH]/ },    { type: 'KW_YES', regex: /^[yY][eE][sS]/ },    { type: 'skip', regex: /^(?:(?:(?:[\u0009\u000a\u000d ])+|--(?:(?:\u0009|[\u0020-\ud7ff]|[\ue000-\ufffd]))*(?:(?:\u000a|\u000d|\u000d\u000a))|\/\*(?:(?:(?:[^*])|(?:\*(?:[^/]))))*\*\/))+/, skip: true },    { type: 'Identifier', regex: /^(?:(?:[A-Z]|[a-z]|_|[\u0080-\ud7ff]|[\ue000-\ufffd])(?:(?:(?:[A-Z]|[a-z]|_|[\u0080-\ud7ff]|[\ue000-\ufffd])|[0-9]|\$))*|"(?:(?:""|(?:[^"])))*"|\[(?:[^\]])*\]|`(?:(?:``|(?:[^`])))*`)/ },    { type: 'StringLiteral', regex: /^'(?:(?:''|(?:[^'])))*'/ },    { type: 'BlobLiteral', regex: /^(?:X|x)'(?:[0-9A-Fa-f])*'/ },    { type: 'NumericLiteral', regex: /^(?:0(?:X|x)(?:[0-9A-Fa-f])+|(?:(?:[0-9])+(?:(?:\.(?:[0-9])*))?(?:(?:E|e)(?:(?:\+|-))?(?:[0-9])+)?|\.(?:[0-9])+(?:(?:E|e)(?:(?:\+|-))?(?:[0-9])+)?))/ },    { type: 'BindParameter', regex: /^(?:\?|\?(?:[0-9])+|(?::|@|\$)(?:[A-Z]|[a-z]|_|[\u0080-\ud7ff]|[\ue000-\ufffd])(?:(?:(?:[A-Z]|[a-z]|_|[\u0080-\ud7ff]|[\ue000-\ufffd])|[0-9]|\$))*|\$(?:[A-Z]|[a-z]|_|[\u0080-\ud7ff]|[\ue000-\ufffd])(?:(?:(?:[A-Z]|[a-z]|_|[\u0080-\ud7ff]|[\ue000-\ufffd])|[0-9]|\$))*::(?:[A-Z]|[a-z]|_|[\u0080-\ud7ff]|[\ue000-\ufffd])(?:(?:(?:[A-Z]|[a-z]|_|[\u0080-\ud7ff]|[\ue000-\ufffd])|[0-9]|\$))*(?:(?:\((?:[^)])*\)))?)/ },    ];
+    this.templateBraceDepthStack = [];
+    this.tokenPatterns = [    { type: 'TOKEN__3B_', regex: /^;/ },    { type: 'TOKEN__2E_', regex: /^\./ },    { type: 'TOKEN__3D_', regex: /^=/ },    { type: 'TOKEN__28_', regex: /^\(/ },    { type: 'TOKEN__29_', regex: /^\)/ },    { type: 'TOKEN__2C_', regex: /^,/ },    { type: 'TOKEN__2B_', regex: /^\+/ },    { type: 'TOKEN__2D_', regex: /^-/ },    { type: 'TOKEN__2A_', regex: /^\*/ },    { type: 'TOKEN__2F_', regex: /^\// },    { type: 'TOKEN__25_', regex: /^%/ },    { type: 'TOKEN__3C_', regex: /^</ },    { type: 'TOKEN__3E_', regex: /^>/ },    { type: 'TOKEN__3C__3D_', regex: /^<=/ },    { type: 'TOKEN__3E__3D_', regex: /^>=/ },    { type: 'TOKEN__3C__3E_', regex: /^<>/ },    { type: 'TOKEN__21__3D_', regex: /^!=/ },    { type: 'TOKEN__7C__7C_', regex: /^\|\|/ },    { type: 'TOKEN__3A_', regex: /^:/ },    { type: 'TOKEN__40_', regex: /^@/ },    { type: 'TOKEN__24_', regex: /^\$/ },    { type: 'TOKEN__3D__3D_', regex: /^==/ },    { type: 'TOKEN__26_', regex: /^&/ },    { type: 'TOKEN__7C_', regex: /^\|/ },    { type: 'TOKEN__3C__3C_', regex: /^<</ },    { type: 'TOKEN__3E__3E_', regex: /^>>/ },    { type: 'TOKEN__2D__3E_', regex: /^->/ },    { type: 'TOKEN__2D__3E__3E_', regex: /^->>/ },    { type: 'TOKEN__7E_', regex: /^~/ },    { type: 'KW_SELECT', regex: /^[sS][eE][lL][eE][cC][tT]/ },    { type: 'KW_FROM', regex: /^[fF][rR][oO][mM]/ },    { type: 'KW_WHERE', regex: /^[wW][hH][eE][rR][eE]/ },    { type: 'KW_GROUP', regex: /^[gG][rR][oO][uU][pP]/ },    { type: 'KW_HAVING', regex: /^[hH][aA][vV][iI][nN][gG]/ },    { type: 'KW_ORDER', regex: /^[oO][rR][dD][eE][rR]/ },    { type: 'KW_BY', regex: /^[bB][yY]/ },    { type: 'KW_LIMIT', regex: /^[lL][iI][mM][iI][tT]/ },    { type: 'KW_OFFSET', regex: /^[oO][fF][fF][sS][eE][tT]/ },    { type: 'KW_DISTINCT', regex: /^[dD][iI][sS][tT][iI][nN][cC][tT]/ },    { type: 'KW_ALL', regex: /^[aA][lL][lL]/ },    { type: 'KW_AS', regex: /^[aA][sS]/ },    { type: 'KW_WINDOW', regex: /^[wW][iI][nN][dD][oO][wW]/ },    { type: 'KW_PARTITION', regex: /^[pP][aA][rR][tT][iI][tT][iI][oO][nN]/ },    { type: 'KW_OVER', regex: /^[oO][vV][eE][rR]/ },    { type: 'KW_FILTER', regex: /^[fF][iI][lL][tT][eE][rR]/ },    { type: 'KW_JOIN', regex: /^[jJ][oO][iI][nN]/ },    { type: 'KW_INNER', regex: /^[iI][nN][nN][eE][rR]/ },    { type: 'KW_LEFT', regex: /^[lL][eE][fF][tT]/ },    { type: 'KW_RIGHT', regex: /^[rR][iI][gG][hH][tT]/ },    { type: 'KW_FULL', regex: /^[fF][uU][lL][lL]/ },    { type: 'KW_OUTER', regex: /^[oO][uU][tT][eE][rR]/ },    { type: 'KW_CROSS', regex: /^[cC][rR][oO][sS][sS]/ },    { type: 'KW_NATURAL', regex: /^[nN][aA][tT][uU][rR][aA][lL]/ },    { type: 'KW_ON', regex: /^[oO][nN]/ },    { type: 'KW_USING', regex: /^[uU][sS][iI][nN][gG]/ },    { type: 'KW_INSERT', regex: /^[iI][nN][sS][eE][rR][tT]/ },    { type: 'KW_INTO', regex: /^[iI][nN][tT][oO]/ },    { type: 'KW_VALUES', regex: /^[vV][aA][lL][uU][eE][sS]/ },    { type: 'KW_UPDATE', regex: /^[uU][pP][dD][aA][tT][eE]/ },    { type: 'KW_SET', regex: /^[sS][eE][tT]/ },    { type: 'KW_DELETE', regex: /^[dD][eE][lL][eE][tT][eE]/ },    { type: 'KW_REPLACE', regex: /^[rR][eE][pP][lL][aA][cC][eE]/ },    { type: 'KW_RETURNING', regex: /^[rR][eE][tT][uU][rR][nN][iI][nN][gG]/ },    { type: 'KW_DO', regex: /^[dD][oO]/ },    { type: 'KW_NOTHING', regex: /^[nN][oO][tT][hH][iI][nN][gG]/ },    { type: 'KW_CONFLICT', regex: /^[cC][oO][nN][fF][lL][iI][cC][tT]/ },    { type: 'KW_CREATE', regex: /^[cC][rR][eE][aA][tT][eE]/ },    { type: 'KW_ALTER', regex: /^[aA][lL][tT][eE][rR]/ },    { type: 'KW_DROP', regex: /^[dD][rR][oO][pP]/ },    { type: 'KW_TABLE', regex: /^[tT][aA][bB][lL][eE]/ },    { type: 'KW_INDEX', regex: /^[iI][nN][dD][eE][xX]/ },    { type: 'KW_VIEW', regex: /^[vV][iI][eE][wW]/ },    { type: 'KW_TRIGGER', regex: /^[tT][rR][iI][gG][gG][eE][rR]/ },    { type: 'KW_VIRTUAL', regex: /^[vV][iI][rR][tT][uU][aA][lL]/ },    { type: 'KW_TEMP', regex: /^[tT][eE][mM][pP]/ },    { type: 'KW_TEMPORARY', regex: /^[tT][eE][mM][pP][oO][rR][aA][rR][yY]/ },    { type: 'KW_RENAME', regex: /^[rR][eE][nN][aA][mM][eE]/ },    { type: 'KW_COLUMN', regex: /^[cC][oO][lL][uU][mM][nN]/ },    { type: 'KW_ADD', regex: /^[aA][dD][dD]/ },    { type: 'KW_PRIMARY', regex: /^[pP][rR][iI][mM][aA][rR][yY]/ },    { type: 'KW_KEY', regex: /^[kK][eE][yY]/ },    { type: 'KW_UNIQUE', regex: /^[uU][nN][iI][qQ][uU][eE]/ },    { type: 'KW_CHECK', regex: /^[cC][hH][eE][cC][kK]/ },    { type: 'KW_DEFAULT', regex: /^[dD][eE][fF][aA][uU][lL][tT]/ },    { type: 'KW_COLLATE', regex: /^[cC][oO][lL][lL][aA][tT][eE]/ },    { type: 'KW_REFERENCES', regex: /^[rR][eE][fF][eE][rR][eE][nN][cC][eE][sS]/ },    { type: 'KW_FOREIGN', regex: /^[fF][oO][rR][eE][iI][gG][nN]/ },    { type: 'KW_AUTOINCREMENT', regex: /^[aA][uU][tT][oO][iI][nN][cC][rR][eE][mM][eE][nN][tT]/ },    { type: 'KW_CONSTRAINT', regex: /^[cC][oO][nN][sS][tT][rR][aA][iI][nN][tT]/ },    { type: 'KW_DEFERRABLE', regex: /^[dD][eE][fF][eE][rR][rR][aA][bB][lL][eE]/ },    { type: 'KW_INITIALLY', regex: /^[iI][nN][iI][tT][iI][aA][lL][lL][yY]/ },    { type: 'KW_DEFERRED', regex: /^[dD][eE][fF][eE][rR][rR][eE][dD]/ },    { type: 'KW_IMMEDIATE', regex: /^[iI][mM][mM][eE][dD][iI][aA][tT][eE]/ },    { type: 'KW_CASCADE', regex: /^[cC][aA][sS][cC][aA][dD][eE]/ },    { type: 'KW_RESTRICT', regex: /^[rR][eE][sS][tT][rR][iI][cC][tT]/ },    { type: 'KW_ACTION', regex: /^[aA][cC][tT][iI][oO][nN]/ },    { type: 'KW_GENERATED', regex: /^[gG][eE][nN][eE][rR][aA][tT][eE][dD]/ },    { type: 'KW_ALWAYS', regex: /^[aA][lL][wW][aA][yY][sS]/ },    { type: 'KW_STORED', regex: /^[sS][tT][oO][rR][eE][dD]/ },    { type: 'KW_STRICT', regex: /^[sS][tT][rR][iI][cC][tT]/ },    { type: 'KW_WITHOUT', regex: /^[wW][iI][tT][hH][oO][uU][tT]/ },    { type: 'KW_ROWID', regex: /^[rR][oO][wW][iI][dD]/ },    { type: 'KW_AND', regex: /^[aA][nN][dD]/ },    { type: 'KW_OR', regex: /^[oO][rR]/ },    { type: 'KW_NOT', regex: /^[nN][oO][tT]/ },    { type: 'KW_IS', regex: /^[iI][sS]/ },    { type: 'KW_NULL', regex: /^[nN][uU][lL][lL]/ },    { type: 'KW_ISNULL', regex: /^[iI][sS][nN][uU][lL][lL]/ },    { type: 'KW_NOTNULL', regex: /^[nN][oO][tT][nN][uU][lL][lL]/ },    { type: 'KW_BETWEEN', regex: /^[bB][eE][tT][wW][eE][eE][nN]/ },    { type: 'KW_IN', regex: /^[iI][nN]/ },    { type: 'KW_LIKE', regex: /^[lL][iI][kK][eE]/ },    { type: 'KW_GLOB', regex: /^[gG][lL][oO][bB]/ },    { type: 'KW_REGEXP', regex: /^[rR][eE][gG][eE][xX][pP]/ },    { type: 'KW_MATCH', regex: /^[mM][aA][tT][cC][hH]/ },    { type: 'KW_ESCAPE', regex: /^[eE][sS][cC][aA][pP][eE]/ },    { type: 'KW_EXISTS', regex: /^[eE][xX][iI][sS][tT][sS]/ },    { type: 'KW_TRUE', regex: /^[tT][rR][uU][eE]/ },    { type: 'KW_FALSE', regex: /^[fF][aA][lL][sS][eE]/ },    { type: 'KW_ANY', regex: /^[aA][nN][yY]/ },    { type: 'KW_SOME', regex: /^[sS][oO][mM][eE]/ },    { type: 'KW_CASE', regex: /^[cC][aA][sS][eE]/ },    { type: 'KW_WHEN', regex: /^[wW][hH][eE][nN]/ },    { type: 'KW_THEN', regex: /^[tT][hH][eE][nN]/ },    { type: 'KW_ELSE', regex: /^[eE][lL][sS][eE]/ },    { type: 'KW_END', regex: /^[eE][nN][dD]/ },    { type: 'KW_CAST', regex: /^[cC][aA][sS][tT]/ },    { type: 'KW_RAISE', regex: /^[rR][aA][iI][sS][eE]/ },    { type: 'KW_CURRENT_DATE', regex: /^[cC][uU][rR][rR][eE][nN][tT]_[dD][aA][tT][eE]/ },    { type: 'KW_CURRENT_TIME', regex: /^[cC][uU][rR][rR][eE][nN][tT]_[tT][iI][mM][eE]/ },    { type: 'KW_CURRENT_TIMESTAMP', regex: /^[cC][uU][rR][rR][eE][nN][tT]_[tT][iI][mM][eE][sS][tT][aA][mM][pP]/ },    { type: 'KW_BEGIN', regex: /^[bB][eE][gG][iI][nN]/ },    { type: 'KW_COMMIT', regex: /^[cC][oO][mM][mM][iI][tT]/ },    { type: 'KW_ROLLBACK', regex: /^[rR][oO][lL][lL][bB][aA][cC][kK]/ },    { type: 'KW_SAVEPOINT', regex: /^[sS][aA][vV][eE][pP][oO][iI][nN][tT]/ },    { type: 'KW_RELEASE', regex: /^[rR][eE][lL][eE][aA][sS][eE]/ },    { type: 'KW_TRANSACTION', regex: /^[tT][rR][aA][nN][sS][aA][cC][tT][iI][oO][nN]/ },    { type: 'KW_EXCLUSIVE', regex: /^[eE][xX][cC][lL][uU][sS][iI][vV][eE]/ },    { type: 'KW_PRAGMA', regex: /^[pP][rR][aA][gG][mM][aA]/ },    { type: 'KW_VACUUM', regex: /^[vV][aA][cC][uU][uU][mM]/ },    { type: 'KW_ANALYZE', regex: /^[aA][nN][aA][lL][yY][zZ][eE]/ },    { type: 'KW_REINDEX', regex: /^[rR][eE][iI][nN][dD][eE][xX]/ },    { type: 'KW_ATTACH', regex: /^[aA][tT][tT][aA][cC][hH]/ },    { type: 'KW_DETACH', regex: /^[dD][eE][tT][aA][cC][hH]/ },    { type: 'KW_DATABASE', regex: /^[dD][aA][tT][aA][bB][aA][sS][eE]/ },    { type: 'KW_EXPLAIN', regex: /^[eE][xX][pP][lL][aA][iI][nN]/ },    { type: 'KW_QUERY', regex: /^[qQ][uU][eE][rR][yY]/ },    { type: 'KW_PLAN', regex: /^[pP][lL][aA][nN]/ },    { type: 'KW_ROWS', regex: /^[rR][oO][wW][sS]/ },    { type: 'KW_RANGE', regex: /^[rR][aA][nN][gG][eE]/ },    { type: 'KW_GROUPS', regex: /^[gG][rR][oO][uU][pP][sS]/ },    { type: 'KW_UNBOUNDED', regex: /^[uU][nN][bB][oO][uU][nN][dD][eE][dD]/ },    { type: 'KW_PRECEDING', regex: /^[pP][rR][eE][cC][eE][dD][iI][nN][gG]/ },    { type: 'KW_FOLLOWING', regex: /^[fF][oO][lL][lL][oO][wW][iI][nN][gG]/ },    { type: 'KW_CURRENT', regex: /^[cC][uU][rR][rR][eE][nN][tT]/ },    { type: 'KW_ROW', regex: /^[rR][oO][wW]/ },    { type: 'KW_EXCLUDE', regex: /^[eE][xX][cC][lL][uU][dD][eE]/ },    { type: 'KW_NO', regex: /^[nN][oO]/ },    { type: 'KW_OTHERS', regex: /^[oO][tT][hH][eE][rR][sS]/ },    { type: 'KW_TIES', regex: /^[tT][iI][eE][sS]/ },    { type: 'KW_FIRST', regex: /^[fF][iI][rR][sS][tT]/ },    { type: 'KW_LAST', regex: /^[lL][aA][sS][tT]/ },    { type: 'KW_NULLS', regex: /^[nN][uU][lL][lL][sS]/ },    { type: 'KW_ABORT', regex: /^[aA][bB][oO][rR][tT]/ },    { type: 'KW_AFTER', regex: /^[aA][fF][tT][eE][rR]/ },    { type: 'KW_ASC', regex: /^[aA][sS][cC]/ },    { type: 'KW_BEFORE', regex: /^[bB][eE][fF][oO][rR][eE]/ },    { type: 'KW_BIG', regex: /^[bB][iI][gG]/ },    { type: 'KW_BIGINT', regex: /^[bB][iI][gG][iI][nN][tT]/ },    { type: 'KW_BINARY', regex: /^[bB][iI][nN][aA][rR][yY]/ },    { type: 'KW_BIT', regex: /^[bB][iI][tT]/ },    { type: 'KW_BLOB', regex: /^[bB][lL][oO][bB]/ },    { type: 'KW_BOOLEAN', regex: /^[bB][oO][oO][lL][eE][aA][nN]/ },    { type: 'KW_CHAR', regex: /^[cC][hH][aA][rR]/ },    { type: 'KW_CHARACTER', regex: /^[cC][hH][aA][rR][aA][cC][tT][eE][rR]/ },    { type: 'KW_CLOB', regex: /^[cC][lL][oO][bB]/ },    { type: 'KW_DATE', regex: /^[dD][aA][tT][eE]/ },    { type: 'KW_DATETIME', regex: /^[dD][aA][tT][eE][tT][iI][mM][eE]/ },    { type: 'KW_DECIMAL', regex: /^[dD][eE][cC][iI][mM][aA][lL]/ },    { type: 'KW_DESC', regex: /^[dD][eE][sS][cC]/ },    { type: 'KW_DOUBLE', regex: /^[dD][oO][uU][bB][lL][eE]/ },    { type: 'KW_EACH', regex: /^[eE][aA][cC][hH]/ },    { type: 'KW_EXCEPT', regex: /^[eE][xX][cC][eE][pP][tT]/ },    { type: 'KW_FAIL', regex: /^[fF][aA][iI][lL]/ },    { type: 'KW_FLOAT', regex: /^[fF][lL][oO][aA][tT]/ },    { type: 'KW_FOR', regex: /^[fF][oO][rR]/ },    { type: 'KW_IF', regex: /^[iI][fF]/ },    { type: 'KW_IGNORE', regex: /^[iI][gG][nN][oO][rR][eE]/ },    { type: 'KW_INDEXED', regex: /^[iI][nN][dD][eE][xX][eE][dD]/ },    { type: 'KW_INSTEAD', regex: /^[iI][nN][sS][tT][eE][aA][dD]/ },    { type: 'KW_INT', regex: /^[iI][nN][tT]/ },    { type: 'KW_INTEGER', regex: /^[iI][nN][tT][eE][gG][eE][rR]/ },    { type: 'KW_INTERSECT', regex: /^[iI][nN][tT][eE][rR][sS][eE][cC][tT]/ },    { type: 'KW_MATERIALIZED', regex: /^[mM][aA][tT][eE][rR][iI][aA][lL][iI][zZ][eE][dD]/ },    { type: 'KW_MEDIUMINT', regex: /^[mM][eE][dD][iI][uU][mM][iI][nN][tT]/ },    { type: 'KW_NATIONAL', regex: /^[nN][aA][tT][iI][oO][nN][aA][lL]/ },    { type: 'KW_NATIVE', regex: /^[nN][aA][tT][iI][vV][eE]/ },    { type: 'KW_NCHAR', regex: /^[nN][cC][hH][aA][rR]/ },    { type: 'KW_NUMERIC', regex: /^[nN][uU][mM][eE][rR][iI][cC]/ },    { type: 'KW_NVARCHAR', regex: /^[nN][vV][aA][rR][cC][hH][aA][rR]/ },    { type: 'KW_OF', regex: /^[oO][fF]/ },    { type: 'KW_OFF', regex: /^[oO][fF][fF]/ },    { type: 'KW_PRECISION', regex: /^[pP][rR][eE][cC][iI][sS][iI][oO][nN]/ },    { type: 'KW_REAL', regex: /^[rR][eE][aA][lL]/ },    { type: 'KW_RECURSIVE', regex: /^[rR][eE][cC][uU][rR][sS][iI][vV][eE]/ },    { type: 'KW_SMALLINT', regex: /^[sS][mM][aA][lL][lL][iI][nN][tT]/ },    { type: 'KW_TEXT', regex: /^[tT][eE][xX][tT]/ },    { type: 'KW_TIME', regex: /^[tT][iI][mM][eE]/ },    { type: 'KW_TIMESTAMP', regex: /^[tT][iI][mM][eE][sS][tT][aA][mM][pP]/ },    { type: 'KW_TINYINT', regex: /^[tT][iI][nN][yY][iI][nN][tT]/ },    { type: 'KW_TO', regex: /^[tT][oO]/ },    { type: 'KW_UNION', regex: /^[uU][nN][iI][oO][nN]/ },    { type: 'KW_UNSIGNED', regex: /^[uU][nN][sS][iI][gG][nN][eE][dD]/ },    { type: 'KW_VARBINARY', regex: /^[vV][aA][rR][bB][iI][nN][aA][rR][yY]/ },    { type: 'KW_VARCHAR', regex: /^[vV][aA][rR][cC][hH][aA][rR]/ },    { type: 'KW_VARYING', regex: /^[vV][aA][rR][yY][iI][nN][gG]/ },    { type: 'KW_WITH', regex: /^[wW][iI][tT][hH]/ },    { type: 'KW_YES', regex: /^[yY][eE][sS]/ },    { type: 'skip', regex: /^(?:(?:(?:[\u0009\u000a\u000d ])+|--(?:(?:\u0009|[\u0020-\ud7ff]|[\ue000-\ufffd]|(?:[\ud800][\udc00-\udfff]|[\ud801-\udbfe][\udc00-\udfff]|[\udbff][\udc00-\udfff])))*(?:(?:\u000a|\u000d|\u000d\u000a)|(?![\s\S]))|\/\*(?:(?:(?:[^*])|(?:\*(?:[^/]))))*\*\/))+/, skip: true },    { type: 'Identifier', regex: /^(?:(?:[A-Z]|[a-z]|_|[\u0080-\ud7ff]|[\ue000-\ufffd]|(?:[\ud800][\udc00-\udfff]|[\ud801-\udbfe][\udc00-\udfff]|[\udbff][\udc00-\udfff]))(?:(?:(?:[A-Z]|[a-z]|_|[\u0080-\ud7ff]|[\ue000-\ufffd]|(?:[\ud800][\udc00-\udfff]|[\ud801-\udbfe][\udc00-\udfff]|[\udbff][\udc00-\udfff]))|[0-9]|\$))*|"(?:(?:""|(?:[^"])))*"|\[(?:[^\]])*\]|`(?:(?:``|(?:[^`])))*`)/ },    { type: 'StringLiteral', regex: /^'(?:(?:''|(?:[^'])))*'/ },    { type: 'BlobLiteral', regex: /^(?:X|x)'(?:[0-9A-Fa-f])*'/ },    { type: 'NumericLiteral', regex: /^(?:0(?:X|x)(?:[0-9A-Fa-f])+|(?:(?:[0-9])+(?:(?:\.(?:[0-9])*))?(?:(?:E|e)(?:(?:\+|-))?(?:[0-9])+)?|\.(?:[0-9])+(?:(?:E|e)(?:(?:\+|-))?(?:[0-9])+)?))/ },    { type: 'BindParameter', regex: /^(?:\?|\?(?:[0-9])+|(?::|@|\$)(?:[A-Z]|[a-z]|_|[\u0080-\ud7ff]|[\ue000-\ufffd]|(?:[\ud800][\udc00-\udfff]|[\ud801-\udbfe][\udc00-\udfff]|[\udbff][\udc00-\udfff]))(?:(?:(?:[A-Z]|[a-z]|_|[\u0080-\ud7ff]|[\ue000-\ufffd]|(?:[\ud800][\udc00-\udfff]|[\ud801-\udbfe][\udc00-\udfff]|[\udbff][\udc00-\udfff]))|[0-9]|\$))*|\$(?:[A-Z]|[a-z]|_|[\u0080-\ud7ff]|[\ue000-\ufffd]|(?:[\ud800][\udc00-\udfff]|[\ud801-\udbfe][\udc00-\udfff]|[\udbff][\udc00-\udfff]))(?:(?:(?:[A-Z]|[a-z]|_|[\u0080-\ud7ff]|[\ue000-\ufffd]|(?:[\ud800][\udc00-\udfff]|[\ud801-\udbfe][\udc00-\udfff]|[\udbff][\udc00-\udfff]))|[0-9]|\$))*::(?:[A-Z]|[a-z]|_|[\u0080-\ud7ff]|[\ue000-\ufffd]|(?:[\ud800][\udc00-\udfff]|[\ud801-\udbfe][\udc00-\udfff]|[\udbff][\udc00-\udfff]))(?:(?:(?:[A-Z]|[a-z]|_|[\u0080-\ud7ff]|[\ue000-\ufffd]|(?:[\ud800][\udc00-\udfff]|[\ud801-\udbfe][\udc00-\udfff]|[\udbff][\udc00-\udfff]))|[0-9]|\$))*(?:(?:\((?:[^)])*\)))?)/ },    ];
   }
 
   isTemplateSpanPattern(pos, kind) {
@@ -38,11 +39,34 @@ class Lexer {
 
   enterTemplateSpan() {
     this.templateDepth++;
+    this.templateBraceDepthStack.push(0);
   }
 
   exitTemplateSpan() {
     if (this.templateDepth > 0) {
       this.templateDepth--;
+    }
+    if (this.templateBraceDepthStack.length > 0) {
+      this.templateBraceDepthStack.pop();
+    }
+  }
+
+  currentTemplateBraceDepth() {
+    return this.templateBraceDepthStack.length === 0
+      ? 0
+      : this.templateBraceDepthStack[this.templateBraceDepthStack.length - 1];
+  }
+
+  incrementTemplateBraceDepth() {
+    if (this.templateBraceDepthStack.length > 0) {
+      this.templateBraceDepthStack[this.templateBraceDepthStack.length - 1] += 1;
+    }
+  }
+
+  decrementTemplateBraceDepth() {
+    const index = this.templateBraceDepthStack.length - 1;
+    if (index >= 0 && this.templateBraceDepthStack[index] > 0) {
+      this.templateBraceDepthStack[index] -= 1;
     }
   }
   
@@ -57,9 +81,10 @@ class Lexer {
       );
 
       for (const pattern of this.tokenPatterns) {
-        // Template middle/tail tokens are context-sensitive and must only
-        // be considered while lexing inside an active template expression.
-        if ((pattern.type === 'TemplateMiddle' || pattern.type === 'TemplateTail') && this.templateDepth === 0) {
+        // Template spans are synthesized only when a closing brace ends the
+        // active interpolation. Their raw patterns must not consume ordinary
+        // braces from nested expressions.
+        if (pattern.type === 'TemplateMiddle' || pattern.type === 'TemplateTail') {
           continue;
         }
 
@@ -68,25 +93,42 @@ class Lexer {
 
         if (match && match.index === 0 && match[0].length > 0) {
           let effectivePattern = pattern;
+          let effectiveMatch = match;
           // When parsing template expressions, disambiguate closing brace as template span boundary.
-          if (this.templateDepth > 0 && pattern.type === 'TOKEN__7D_') {
+          if (this.templateDepth > 0
+            && pattern.type === 'TOKEN__7D_'
+            && this.currentTemplateBraceDepth() === 0) {
             if (this.isTemplateSpanPattern(this.position, 'TemplateMiddle')) {
-              effectivePattern = { ...pattern, type: 'TemplateMiddle' };
+              const templateMiddle = this.tokenPatterns.find((candidate) => candidate.type === 'TemplateMiddle');
+              const templateMatch = templateMiddle
+                ? this.input.substring(this.position).match(templateMiddle.regex)
+                : null;
+              if (templateMatch && templateMatch.index === 0 && templateMatch[0].length > 0) {
+                effectivePattern = templateMiddle;
+                effectiveMatch = templateMatch;
+              }
             } else if (this.isTemplateSpanPattern(this.position, 'TemplateTail')) {
-              effectivePattern = { ...pattern, type: 'TemplateTail' };
+              const templateTail = this.tokenPatterns.find((candidate) => candidate.type === 'TemplateTail');
+              const templateMatch = templateTail
+                ? this.input.substring(this.position).match(templateTail.regex)
+                : null;
+              if (templateMatch && templateMatch.index === 0 && templateMatch[0].length > 0) {
+                effectivePattern = templateTail;
+                effectiveMatch = templateMatch;
+              }
             }
           }
 
-          candidates.push({ pattern: effectivePattern, match });
+          candidates.push({ pattern: effectivePattern, match: effectiveMatch });
           if (!bestMatch
-              || match[0].length > bestMatch[0].length
-              || (match[0].length === bestMatch[0].length && effectivePattern.skip && !bestPattern.skip)
-              || (match[0].length === bestMatch[0].length
+              || effectiveMatch[0].length > bestMatch[0].length
+              || (effectiveMatch[0].length === bestMatch[0].length && effectivePattern.skip && !bestPattern.skip)
+              || (effectiveMatch[0].length === bestMatch[0].length
                   && bestPattern
                   && isGenericNameType(bestPattern.type)
                   && !isGenericNameType(effectivePattern.type))) {
             bestPattern = effectivePattern;
-            bestMatch = match;
+            bestMatch = effectiveMatch;
           }
         }
       }
@@ -141,6 +183,10 @@ class Lexer {
           this.charClassDepth++;
         } else if (bestPattern.type === 'TOKEN__5D_' && this.charClassDepth > 0) {
           this.charClassDepth--;
+        } else if (bestPattern.type === 'TOKEN__7B_' && this.templateDepth > 0) {
+          this.incrementTemplateBraceDepth();
+        } else if (bestPattern.type === 'TOKEN__7D_' && this.templateDepth > 0) {
+          this.decrementTemplateBraceDepth();
         } else if (bestPattern.type === 'TemplateHead') {
           this.enterTemplateSpan();
         } else if (bestPattern.type === 'TemplateTail') {
@@ -170,6 +216,7 @@ class Parser {
     this.position = 0;
     this.errors = [];
     this.eventHandler = eventHandler;
+    this.failureMemo = new Set();
   }
   
   peek(offset = 0) {
@@ -205,6 +252,30 @@ class Parser {
     return false;
   }
 
+  consumeContextual(expectedType) {
+    const token = this.peek();
+    if (token && token.type === expectedType) {
+      return this.consume(expectedType);
+    }
+
+    const pattern = this.lexer.tokenPatterns.find((candidate) => candidate.type === expectedType);
+    const match = pattern && token ? token.value.match(pattern.regex) : null;
+    if (!match || match.index !== 0 || match[0].length !== token.value.length) {
+      this.errors.push({
+        expected: expectedType,
+        found: token ? token.type : 'EOF',
+        position: this.position
+      });
+      throw new Error('Expected contextual ' + expectedType + ', got ' + (token ? token.type : 'EOF'));
+    }
+
+    if (this.eventHandler && typeof this.eventHandler.terminal === 'function') {
+      this.eventHandler.terminal(token.type, token.value, this.position);
+    }
+    this.position++;
+    return token;
+  }
+
   markEventState() {
     if (this.eventHandler && typeof this.eventHandler.checkpoint === 'function') {
       return this.eventHandler.checkpoint();
@@ -235,6 +306,11 @@ class Parser {
     return result;
   }
   parseSqlScript() {
+    const __memoStart = this.position;
+    const __memoKey = 'SqlScript@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule SqlScript at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('SqlScript', this.position);
     }
@@ -272,6 +348,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('SqlScript', this.position);
@@ -283,6 +362,11 @@ class Parser {
     }
   }
   parseSqlStatement() {
+    const __memoStart = this.position;
+    const __memoKey = 'SqlStatement@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule SqlStatement at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('SqlStatement', this.position);
     }
@@ -582,6 +666,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('SqlStatement', this.position);
@@ -593,6 +680,11 @@ class Parser {
     }
   }
   parseExplainPrefix() {
+    const __memoStart = this.position;
+    const __memoKey = 'ExplainPrefix@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule ExplainPrefix at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('ExplainPrefix', this.position);
     }
@@ -614,6 +706,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('ExplainPrefix', this.position);
@@ -625,6 +720,11 @@ class Parser {
     }
   }
   parseAlterTableStmt() {
+    const __memoStart = this.position;
+    const __memoKey = 'AlterTableStmt@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule AlterTableStmt at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('AlterTableStmt', this.position);
     }
@@ -695,6 +795,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('AlterTableStmt', this.position);
@@ -706,6 +809,11 @@ class Parser {
     }
   }
   parseAnalyzeStmt() {
+    const __memoStart = this.position;
+    const __memoKey = 'AnalyzeStmt@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule AnalyzeStmt at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('AnalyzeStmt', this.position);
     }
@@ -762,6 +870,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('AnalyzeStmt', this.position);
@@ -773,6 +884,11 @@ class Parser {
     }
   }
   parseAttachStmt() {
+    const __memoStart = this.position;
+    const __memoKey = 'AttachStmt@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule AttachStmt at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('AttachStmt', this.position);
     }
@@ -786,6 +902,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('AttachStmt', this.position);
@@ -797,6 +916,11 @@ class Parser {
     }
   }
   parseBeginStmt() {
+    const __memoStart = this.position;
+    const __memoKey = 'BeginStmt@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule BeginStmt at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('BeginStmt', this.position);
     }
@@ -852,6 +976,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('BeginStmt', this.position);
@@ -863,6 +990,11 @@ class Parser {
     }
   }
   parseCommitStmt() {
+    const __memoStart = this.position;
+    const __memoKey = 'CommitStmt@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule CommitStmt at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('CommitStmt', this.position);
     }
@@ -899,6 +1031,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('CommitStmt', this.position);
@@ -910,6 +1045,11 @@ class Parser {
     }
   }
   parseRollbackStmt() {
+    const __memoStart = this.position;
+    const __memoKey = 'RollbackStmt@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule RollbackStmt at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('RollbackStmt', this.position);
     }
@@ -933,6 +1073,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('RollbackStmt', this.position);
@@ -944,6 +1087,11 @@ class Parser {
     }
   }
   parseSavepointStmt() {
+    const __memoStart = this.position;
+    const __memoKey = 'SavepointStmt@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule SavepointStmt at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('SavepointStmt', this.position);
     }
@@ -954,6 +1102,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('SavepointStmt', this.position);
@@ -965,6 +1116,11 @@ class Parser {
     }
   }
   parseReleaseStmt() {
+    const __memoStart = this.position;
+    const __memoKey = 'ReleaseStmt@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule ReleaseStmt at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('ReleaseStmt', this.position);
     }
@@ -976,6 +1132,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('ReleaseStmt', this.position);
@@ -987,6 +1146,11 @@ class Parser {
     }
   }
   parseDetachStmt() {
+    const __memoStart = this.position;
+    const __memoKey = 'DetachStmt@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule DetachStmt at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('DetachStmt', this.position);
     }
@@ -998,6 +1162,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('DetachStmt', this.position);
@@ -1009,6 +1176,11 @@ class Parser {
     }
   }
   parseVacuumStmt() {
+    const __memoStart = this.position;
+    const __memoKey = 'VacuumStmt@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule VacuumStmt at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('VacuumStmt', this.position);
     }
@@ -1041,6 +1213,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('VacuumStmt', this.position);
@@ -1052,6 +1227,11 @@ class Parser {
     }
   }
   parseReindexStmt() {
+    const __memoStart = this.position;
+    const __memoKey = 'ReindexStmt@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule ReindexStmt at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('ReindexStmt', this.position);
     }
@@ -1108,6 +1288,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('ReindexStmt', this.position);
@@ -1119,6 +1302,11 @@ class Parser {
     }
   }
   parsePragmaStmt() {
+    const __memoStart = this.position;
+    const __memoKey = 'PragmaStmt@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule PragmaStmt at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('PragmaStmt', this.position);
     }
@@ -1177,6 +1365,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('PragmaStmt', this.position);
@@ -1188,6 +1379,11 @@ class Parser {
     }
   }
   parsePragmaValue() {
+    const __memoStart = this.position;
+    const __memoKey = 'PragmaValue@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule PragmaValue at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('PragmaValue', this.position);
     }
@@ -1291,6 +1487,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('PragmaValue', this.position);
@@ -1302,6 +1501,11 @@ class Parser {
     }
   }
   parseCreateIndexStmt() {
+    const __memoStart = this.position;
+    const __memoKey = 'CreateIndexStmt@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule CreateIndexStmt at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('CreateIndexStmt', this.position);
     }
@@ -1367,6 +1571,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('CreateIndexStmt', this.position);
@@ -1378,6 +1585,11 @@ class Parser {
     }
   }
   parseCreateTableStmt() {
+    const __memoStart = this.position;
+    const __memoKey = 'CreateTableStmt@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule CreateTableStmt at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('CreateTableStmt', this.position);
     }
@@ -1514,6 +1726,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('CreateTableStmt', this.position);
@@ -1525,6 +1740,11 @@ class Parser {
     }
   }
   parseColumnDef() {
+    const __memoStart = this.position;
+    const __memoKey = 'ColumnDef@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule ColumnDef at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('ColumnDef', this.position);
     }
@@ -1557,6 +1777,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('ColumnDef', this.position);
@@ -1568,6 +1791,11 @@ class Parser {
     }
   }
   parseTypeName() {
+    const __memoStart = this.position;
+    const __memoKey = 'TypeName@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule TypeName at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('TypeName', this.position);
     }
@@ -1604,6 +1832,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('TypeName', this.position);
@@ -1615,6 +1846,11 @@ class Parser {
     }
   }
   parseTypeNameWord() {
+    const __memoStart = this.position;
+    const __memoKey = 'TypeNameWord@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule TypeNameWord at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('TypeNameWord', this.position);
     }
@@ -1968,6 +2204,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('TypeNameWord', this.position);
@@ -1979,6 +2218,11 @@ class Parser {
     }
   }
   parseTypeParameters() {
+    const __memoStart = this.position;
+    const __memoKey = 'TypeParameters@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule TypeParameters at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('TypeParameters', this.position);
     }
@@ -2002,6 +2246,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('TypeParameters', this.position);
@@ -2013,6 +2260,11 @@ class Parser {
     }
   }
   parseColumnConstraint() {
+    const __memoStart = this.position;
+    const __memoKey = 'ColumnConstraint@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule ColumnConstraint at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('ColumnConstraint', this.position);
     }
@@ -2240,6 +2492,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('ColumnConstraint', this.position);
@@ -2251,6 +2506,11 @@ class Parser {
     }
   }
   parseGeneratedColumnConstraint() {
+    const __memoStart = this.position;
+    const __memoKey = 'GeneratedColumnConstraint@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule GeneratedColumnConstraint at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('GeneratedColumnConstraint', this.position);
     }
@@ -2360,6 +2620,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('GeneratedColumnConstraint', this.position);
@@ -2371,6 +2634,11 @@ class Parser {
     }
   }
   parseTableConstraint() {
+    const __memoStart = this.position;
+    const __memoKey = 'TableConstraint@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule TableConstraint at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('TableConstraint', this.position);
     }
@@ -2506,6 +2774,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('TableConstraint', this.position);
@@ -2517,6 +2788,11 @@ class Parser {
     }
   }
   parseTableOptions() {
+    const __memoStart = this.position;
+    const __memoKey = 'TableOptions@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule TableOptions at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('TableOptions', this.position);
     }
@@ -2540,6 +2816,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('TableOptions', this.position);
@@ -2551,6 +2830,11 @@ class Parser {
     }
   }
   parseTableOption() {
+    const __memoStart = this.position;
+    const __memoKey = 'TableOption@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule TableOption at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('TableOption', this.position);
     }
@@ -2585,6 +2869,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('TableOption', this.position);
@@ -2596,6 +2883,11 @@ class Parser {
     }
   }
   parseConflictClause() {
+    const __memoStart = this.position;
+    const __memoKey = 'ConflictClause@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule ConflictClause at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('ConflictClause', this.position);
     }
@@ -2607,6 +2899,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('ConflictClause', this.position);
@@ -2618,6 +2913,11 @@ class Parser {
     }
   }
   parseConflictAction() {
+    const __memoStart = this.position;
+    const __memoKey = 'ConflictAction@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule ConflictAction at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('ConflictAction', this.position);
     }
@@ -2681,6 +2981,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('ConflictAction', this.position);
@@ -2692,6 +2995,11 @@ class Parser {
     }
   }
   parseForeignKeyClause() {
+    const __memoStart = this.position;
+    const __memoKey = 'ForeignKeyClause@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule ForeignKeyClause at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('ForeignKeyClause', this.position);
     }
@@ -2763,6 +3071,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('ForeignKeyClause', this.position);
@@ -2774,6 +3085,11 @@ class Parser {
     }
   }
   parseForeignKeyAction() {
+    const __memoStart = this.position;
+    const __memoKey = 'ForeignKeyAction@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule ForeignKeyAction at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('ForeignKeyAction', this.position);
     }
@@ -2873,6 +3189,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('ForeignKeyAction', this.position);
@@ -2884,6 +3203,11 @@ class Parser {
     }
   }
   parseForeignKeyMatch() {
+    const __memoStart = this.position;
+    const __memoKey = 'ForeignKeyMatch@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule ForeignKeyMatch at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('ForeignKeyMatch', this.position);
     }
@@ -2894,6 +3218,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('ForeignKeyMatch', this.position);
@@ -2905,6 +3232,11 @@ class Parser {
     }
   }
   parseForeignKeyDeferrable() {
+    const __memoStart = this.position;
+    const __memoKey = 'ForeignKeyDeferrable@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule ForeignKeyDeferrable at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('ForeignKeyDeferrable', this.position);
     }
@@ -2953,6 +3285,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('ForeignKeyDeferrable', this.position);
@@ -2964,6 +3299,11 @@ class Parser {
     }
   }
   parseCreateViewStmt() {
+    const __memoStart = this.position;
+    const __memoKey = 'CreateViewStmt@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule CreateViewStmt at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('CreateViewStmt', this.position);
     }
@@ -3060,6 +3400,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('CreateViewStmt', this.position);
@@ -3071,6 +3414,11 @@ class Parser {
     }
   }
   parseCreateVirtualTableStmt() {
+    const __memoStart = this.position;
+    const __memoKey = 'CreateVirtualTableStmt@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule CreateVirtualTableStmt at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('CreateVirtualTableStmt', this.position);
     }
@@ -3134,6 +3482,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('CreateVirtualTableStmt', this.position);
@@ -3145,6 +3496,11 @@ class Parser {
     }
   }
   parseModuleArgument() {
+    const __memoStart = this.position;
+    const __memoKey = 'ModuleArgument@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule ModuleArgument at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('ModuleArgument', this.position);
     }
@@ -3170,6 +3526,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('ModuleArgument', this.position);
@@ -3181,6 +3540,11 @@ class Parser {
     }
   }
   parseModuleArgToken() {
+    const __memoStart = this.position;
+    const __memoKey = 'ModuleArgToken@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule ModuleArgToken at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('ModuleArgToken', this.position);
     }
@@ -3404,6 +3768,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('ModuleArgToken', this.position);
@@ -3415,6 +3782,11 @@ class Parser {
     }
   }
   parseCreateTriggerStmt() {
+    const __memoStart = this.position;
+    const __memoKey = 'CreateTriggerStmt@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule CreateTriggerStmt at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('CreateTriggerStmt', this.position);
     }
@@ -3637,6 +4009,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('CreateTriggerStmt', this.position);
@@ -3648,6 +4023,11 @@ class Parser {
     }
   }
   parseTriggerStep() {
+    const __memoStart = this.position;
+    const __memoKey = 'TriggerStep@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule TriggerStep at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('TriggerStep', this.position);
     }
@@ -3701,6 +4081,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('TriggerStep', this.position);
@@ -3712,6 +4095,11 @@ class Parser {
     }
   }
   parseDropIndexStmt() {
+    const __memoStart = this.position;
+    const __memoKey = 'DropIndexStmt@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule DropIndexStmt at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('DropIndexStmt', this.position);
     }
@@ -3745,6 +4133,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('DropIndexStmt', this.position);
@@ -3756,6 +4147,11 @@ class Parser {
     }
   }
   parseDropTableStmt() {
+    const __memoStart = this.position;
+    const __memoKey = 'DropTableStmt@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule DropTableStmt at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('DropTableStmt', this.position);
     }
@@ -3789,6 +4185,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('DropTableStmt', this.position);
@@ -3800,6 +4199,11 @@ class Parser {
     }
   }
   parseDropTriggerStmt() {
+    const __memoStart = this.position;
+    const __memoKey = 'DropTriggerStmt@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule DropTriggerStmt at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('DropTriggerStmt', this.position);
     }
@@ -3833,6 +4237,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('DropTriggerStmt', this.position);
@@ -3844,6 +4251,11 @@ class Parser {
     }
   }
   parseDropViewStmt() {
+    const __memoStart = this.position;
+    const __memoKey = 'DropViewStmt@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule DropViewStmt at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('DropViewStmt', this.position);
     }
@@ -3877,6 +4289,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('DropViewStmt', this.position);
@@ -3888,6 +4303,11 @@ class Parser {
     }
   }
   parseInsertStmt() {
+    const __memoStart = this.position;
+    const __memoKey = 'InsertStmt@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule InsertStmt at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('InsertStmt', this.position);
     }
@@ -4058,6 +4478,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('InsertStmt', this.position);
@@ -4069,6 +4492,11 @@ class Parser {
     }
   }
   parseConflictModifier() {
+    const __memoStart = this.position;
+    const __memoKey = 'ConflictModifier@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule ConflictModifier at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('ConflictModifier', this.position);
     }
@@ -4079,6 +4507,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('ConflictModifier', this.position);
@@ -4090,6 +4521,11 @@ class Parser {
     }
   }
   parseDefaultValues() {
+    const __memoStart = this.position;
+    const __memoKey = 'DefaultValues@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule DefaultValues at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('DefaultValues', this.position);
     }
@@ -4100,6 +4536,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('DefaultValues', this.position);
@@ -4111,6 +4550,11 @@ class Parser {
     }
   }
   parseValuesClause() {
+    const __memoStart = this.position;
+    const __memoKey = 'ValuesClause@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule ValuesClause at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('ValuesClause', this.position);
     }
@@ -4135,6 +4579,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('ValuesClause', this.position);
@@ -4146,6 +4593,11 @@ class Parser {
     }
   }
   parseParenthesizedExprList() {
+    const __memoStart = this.position;
+    const __memoKey = 'ParenthesizedExprList@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule ParenthesizedExprList at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('ParenthesizedExprList', this.position);
     }
@@ -4171,6 +4623,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('ParenthesizedExprList', this.position);
@@ -4182,6 +4637,11 @@ class Parser {
     }
   }
   parseUpsertClause() {
+    const __memoStart = this.position;
+    const __memoKey = 'UpsertClause@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule UpsertClause at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('UpsertClause', this.position);
     }
@@ -4287,6 +4747,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('UpsertClause', this.position);
@@ -4298,6 +4761,11 @@ class Parser {
     }
   }
   parseUpdateStmt() {
+    const __memoStart = this.position;
+    const __memoKey = 'UpdateStmt@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule UpdateStmt at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('UpdateStmt', this.position);
     }
@@ -4391,6 +4859,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('UpdateStmt', this.position);
@@ -4402,6 +4873,11 @@ class Parser {
     }
   }
   parseUpdateAssignment() {
+    const __memoStart = this.position;
+    const __memoKey = 'UpdateAssignment@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule UpdateAssignment at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('UpdateAssignment', this.position);
     }
@@ -4455,6 +4931,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('UpdateAssignment', this.position);
@@ -4466,6 +4945,11 @@ class Parser {
     }
   }
   parseUpdateFromClause() {
+    const __memoStart = this.position;
+    const __memoKey = 'UpdateFromClause@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule UpdateFromClause at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('UpdateFromClause', this.position);
     }
@@ -4490,6 +4974,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('UpdateFromClause', this.position);
@@ -4501,6 +4988,11 @@ class Parser {
     }
   }
   parseDeleteStmt() {
+    const __memoStart = this.position;
+    const __memoKey = 'DeleteStmt@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule DeleteStmt at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('DeleteStmt', this.position);
     }
@@ -4557,6 +5049,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('DeleteStmt', this.position);
@@ -4568,6 +5063,11 @@ class Parser {
     }
   }
   parseUpdateDeleteLimitClause() {
+    const __memoStart = this.position;
+    const __memoKey = 'UpdateDeleteLimitClause@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule UpdateDeleteLimitClause at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('UpdateDeleteLimitClause', this.position);
     }
@@ -4647,6 +5147,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('UpdateDeleteLimitClause', this.position);
@@ -4658,6 +5161,11 @@ class Parser {
     }
   }
   parseQualifiedTableName() {
+    const __memoStart = this.position;
+    const __memoKey = 'QualifiedTableName@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule QualifiedTableName at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('QualifiedTableName', this.position);
     }
@@ -4715,6 +5223,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('QualifiedTableName', this.position);
@@ -4726,6 +5237,11 @@ class Parser {
     }
   }
   parseReturningClause() {
+    const __memoStart = this.position;
+    const __memoKey = 'ReturningClause@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule ReturningClause at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('ReturningClause', this.position);
     }
@@ -4750,6 +5266,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('ReturningClause', this.position);
@@ -4761,6 +5280,11 @@ class Parser {
     }
   }
   parseSelectStmt() {
+    const __memoStart = this.position;
+    const __memoKey = 'SelectStmt@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule SelectStmt at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('SelectStmt', this.position);
     }
@@ -4833,6 +5357,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('SelectStmt', this.position);
@@ -4844,6 +5371,11 @@ class Parser {
     }
   }
   parseWithClause() {
+    const __memoStart = this.position;
+    const __memoKey = 'WithClause@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule WithClause at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('WithClause', this.position);
     }
@@ -4869,6 +5401,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('WithClause', this.position);
@@ -4880,6 +5415,11 @@ class Parser {
     }
   }
   parseCommonTableExpression() {
+    const __memoStart = this.position;
+    const __memoKey = 'CommonTableExpression@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule CommonTableExpression at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('CommonTableExpression', this.position);
     }
@@ -4955,6 +5495,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('CommonTableExpression', this.position);
@@ -4966,6 +5509,11 @@ class Parser {
     }
   }
   parseSelectCore() {
+    const __memoStart = this.position;
+    const __memoKey = 'SelectCore@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule SelectCore at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('SelectCore', this.position);
     }
@@ -5093,6 +5641,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('SelectCore', this.position);
@@ -5104,6 +5655,11 @@ class Parser {
     }
   }
   parseFromClause() {
+    const __memoStart = this.position;
+    const __memoKey = 'FromClause@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule FromClause at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('FromClause', this.position);
     }
@@ -5114,6 +5670,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('FromClause', this.position);
@@ -5125,6 +5684,11 @@ class Parser {
     }
   }
   parseGroupByClause() {
+    const __memoStart = this.position;
+    const __memoKey = 'GroupByClause@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule GroupByClause at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('GroupByClause', this.position);
     }
@@ -5162,6 +5726,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('GroupByClause', this.position);
@@ -5173,6 +5740,11 @@ class Parser {
     }
   }
   parseWindowClause() {
+    const __memoStart = this.position;
+    const __memoKey = 'WindowClause@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule WindowClause at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('WindowClause', this.position);
     }
@@ -5197,6 +5769,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('WindowClause', this.position);
@@ -5208,6 +5783,11 @@ class Parser {
     }
   }
   parseNamedWindow() {
+    const __memoStart = this.position;
+    const __memoKey = 'NamedWindow@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule NamedWindow at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('NamedWindow', this.position);
     }
@@ -5219,6 +5799,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('NamedWindow', this.position);
@@ -5230,6 +5813,11 @@ class Parser {
     }
   }
   parseCompoundOperator() {
+    const __memoStart = this.position;
+    const __memoKey = 'CompoundOperator@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule CompoundOperator at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('CompoundOperator', this.position);
     }
@@ -5274,6 +5862,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('CompoundOperator', this.position);
@@ -5285,6 +5876,11 @@ class Parser {
     }
   }
   parseLimitClause() {
+    const __memoStart = this.position;
+    const __memoKey = 'LimitClause@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule LimitClause at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('LimitClause', this.position);
     }
@@ -5337,6 +5933,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('LimitClause', this.position);
@@ -5348,6 +5947,11 @@ class Parser {
     }
   }
   parseResultColumn() {
+    const __memoStart = this.position;
+    const __memoKey = 'ResultColumn@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule ResultColumn at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('ResultColumn', this.position);
     }
@@ -5405,6 +6009,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('ResultColumn', this.position);
@@ -5416,6 +6023,11 @@ class Parser {
     }
   }
   parseTableOrSubquery() {
+    const __memoStart = this.position;
+    const __memoKey = 'TableOrSubquery@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule TableOrSubquery at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('TableOrSubquery', this.position);
     }
@@ -5636,6 +6248,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('TableOrSubquery', this.position);
@@ -5647,6 +6262,11 @@ class Parser {
     }
   }
   parseJoinClause() {
+    const __memoStart = this.position;
+    const __memoKey = 'JoinClause@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule JoinClause at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('JoinClause', this.position);
     }
@@ -5668,6 +6288,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('JoinClause', this.position);
@@ -5679,6 +6302,11 @@ class Parser {
     }
   }
   parseJoinTail() {
+    const __memoStart = this.position;
+    const __memoKey = 'JoinTail@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule JoinTail at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('JoinTail', this.position);
     }
@@ -5733,6 +6361,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('JoinTail', this.position);
@@ -5744,6 +6375,11 @@ class Parser {
     }
   }
   parseCrossJoinTail() {
+    const __memoStart = this.position;
+    const __memoKey = 'CrossJoinTail@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule CrossJoinTail at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('CrossJoinTail', this.position);
     }
@@ -5755,6 +6391,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('CrossJoinTail', this.position);
@@ -5766,6 +6405,11 @@ class Parser {
     }
   }
   parseNaturalJoinTail() {
+    const __memoStart = this.position;
+    const __memoKey = 'NaturalJoinTail@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule NaturalJoinTail at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('NaturalJoinTail', this.position);
     }
@@ -5788,6 +6432,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('NaturalJoinTail', this.position);
@@ -5799,6 +6446,11 @@ class Parser {
     }
   }
   parseNaturalJoinType() {
+    const __memoStart = this.position;
+    const __memoKey = 'NaturalJoinType@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule NaturalJoinType at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('NaturalJoinType', this.position);
     }
@@ -5855,6 +6507,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('NaturalJoinType', this.position);
@@ -5866,6 +6521,11 @@ class Parser {
     }
   }
   parseQualifiedJoinTail() {
+    const __memoStart = this.position;
+    const __memoKey = 'QualifiedJoinTail@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule QualifiedJoinTail at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('QualifiedJoinTail', this.position);
     }
@@ -5898,6 +6558,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('QualifiedJoinTail', this.position);
@@ -5909,6 +6572,11 @@ class Parser {
     }
   }
   parseQualifiedJoinType() {
+    const __memoStart = this.position;
+    const __memoKey = 'QualifiedJoinType@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule QualifiedJoinType at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('QualifiedJoinType', this.position);
     }
@@ -5965,6 +6633,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('QualifiedJoinType', this.position);
@@ -5976,6 +6647,11 @@ class Parser {
     }
   }
   parseJoinConstraint() {
+    const __memoStart = this.position;
+    const __memoKey = 'JoinConstraint@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule JoinConstraint at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('JoinConstraint', this.position);
     }
@@ -6027,6 +6703,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('JoinConstraint', this.position);
@@ -6038,6 +6717,11 @@ class Parser {
     }
   }
   parseOrderingTerm() {
+    const __memoStart = this.position;
+    const __memoKey = 'OrderingTerm@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule OrderingTerm at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('OrderingTerm', this.position);
     }
@@ -6131,6 +6815,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('OrderingTerm', this.position);
@@ -6142,6 +6829,11 @@ class Parser {
     }
   }
   parseIndexedColumn() {
+    const __memoStart = this.position;
+    const __memoKey = 'IndexedColumn@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule IndexedColumn at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('IndexedColumn', this.position);
     }
@@ -6223,6 +6915,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('IndexedColumn', this.position);
@@ -6234,6 +6929,11 @@ class Parser {
     }
   }
   parseWindowDefn() {
+    const __memoStart = this.position;
+    const __memoKey = 'WindowDefn@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule WindowDefn at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('WindowDefn', this.position);
     }
@@ -6320,6 +7020,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('WindowDefn', this.position);
@@ -6331,6 +7034,11 @@ class Parser {
     }
   }
   parseOverClause() {
+    const __memoStart = this.position;
+    const __memoKey = 'OverClause@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule OverClause at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('OverClause', this.position);
     }
@@ -6367,6 +7075,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('OverClause', this.position);
@@ -6378,6 +7089,11 @@ class Parser {
     }
   }
   parseFilterClause() {
+    const __memoStart = this.position;
+    const __memoKey = 'FilterClause@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule FilterClause at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('FilterClause', this.position);
     }
@@ -6391,6 +7107,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('FilterClause', this.position);
@@ -6402,6 +7121,11 @@ class Parser {
     }
   }
   parseFrameSpec() {
+    const __memoStart = this.position;
+    const __memoKey = 'FrameSpec@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule FrameSpec at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('FrameSpec', this.position);
     }
@@ -6423,6 +7147,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('FrameSpec', this.position);
@@ -6434,6 +7161,11 @@ class Parser {
     }
   }
   parseFrameUnit() {
+    const __memoStart = this.position;
+    const __memoKey = 'FrameUnit@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule FrameUnit at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('FrameUnit', this.position);
     }
@@ -6477,6 +7209,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('FrameUnit', this.position);
@@ -6488,6 +7223,11 @@ class Parser {
     }
   }
   parseFrameExtent() {
+    const __memoStart = this.position;
+    const __memoKey = 'FrameExtent@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule FrameExtent at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('FrameExtent', this.position);
     }
@@ -6524,6 +7264,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('FrameExtent', this.position);
@@ -6535,6 +7278,11 @@ class Parser {
     }
   }
   parseFrameBoundary() {
+    const __memoStart = this.position;
+    const __memoKey = 'FrameBoundary@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule FrameBoundary at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('FrameBoundary', this.position);
     }
@@ -6633,6 +7381,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('FrameBoundary', this.position);
@@ -6644,6 +7395,11 @@ class Parser {
     }
   }
   parseFrameExclude() {
+    const __memoStart = this.position;
+    const __memoKey = 'FrameExclude@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule FrameExclude at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('FrameExclude', this.position);
     }
@@ -6704,6 +7460,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('FrameExclude', this.position);
@@ -6715,6 +7474,11 @@ class Parser {
     }
   }
   parseExpr() {
+    const __memoStart = this.position;
+    const __memoKey = 'Expr@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule Expr at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('Expr', this.position);
     }
@@ -6724,6 +7488,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('Expr', this.position);
@@ -6735,6 +7502,11 @@ class Parser {
     }
   }
   parseOrExpr() {
+    const __memoStart = this.position;
+    const __memoKey = 'OrExpr@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule OrExpr at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('OrExpr', this.position);
     }
@@ -6758,6 +7530,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('OrExpr', this.position);
@@ -6769,6 +7544,11 @@ class Parser {
     }
   }
   parseAndExpr() {
+    const __memoStart = this.position;
+    const __memoKey = 'AndExpr@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule AndExpr at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('AndExpr', this.position);
     }
@@ -6792,6 +7572,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('AndExpr', this.position);
@@ -6803,6 +7586,11 @@ class Parser {
     }
   }
   parseNotExpr() {
+    const __memoStart = this.position;
+    const __memoKey = 'NotExpr@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule NotExpr at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('NotExpr', this.position);
     }
@@ -6813,6 +7601,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('NotExpr', this.position);
@@ -6824,6 +7615,11 @@ class Parser {
     }
   }
   parsePredicateExpr() {
+    const __memoStart = this.position;
+    const __memoKey = 'PredicateExpr@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule PredicateExpr at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('PredicateExpr', this.position);
     }
@@ -6845,6 +7641,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('PredicateExpr', this.position);
@@ -6856,6 +7655,11 @@ class Parser {
     }
   }
   parsePredicateTail() {
+    const __memoStart = this.position;
+    const __memoKey = 'PredicateTail@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule PredicateTail at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('PredicateTail', this.position);
     }
@@ -6996,6 +7800,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('PredicateTail', this.position);
@@ -7007,6 +7814,11 @@ class Parser {
     }
   }
   parseQuantifiedComparisonTail() {
+    const __memoStart = this.position;
+    const __memoKey = 'QuantifiedComparisonTail@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule QuantifiedComparisonTail at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('QuantifiedComparisonTail', this.position);
     }
@@ -7083,6 +7895,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('QuantifiedComparisonTail', this.position);
@@ -7094,6 +7909,11 @@ class Parser {
     }
   }
   parseEqualityExpr() {
+    const __memoStart = this.position;
+    const __memoKey = 'EqualityExpr@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule EqualityExpr at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('EqualityExpr', this.position);
     }
@@ -7115,6 +7935,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('EqualityExpr', this.position);
@@ -7126,6 +7949,11 @@ class Parser {
     }
   }
   parseEqualityTail() {
+    const __memoStart = this.position;
+    const __memoKey = 'EqualityTail@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule EqualityTail at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('EqualityTail', this.position);
     }
@@ -7174,6 +8002,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('EqualityTail', this.position);
@@ -7185,6 +8016,11 @@ class Parser {
     }
   }
   parseEqualityOperator() {
+    const __memoStart = this.position;
+    const __memoKey = 'EqualityOperator@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule EqualityOperator at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('EqualityOperator', this.position);
     }
@@ -7238,6 +8074,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('EqualityOperator', this.position);
@@ -7249,6 +8088,11 @@ class Parser {
     }
   }
   parseRelationalExpr() {
+    const __memoStart = this.position;
+    const __memoKey = 'RelationalExpr@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule RelationalExpr at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('RelationalExpr', this.position);
     }
@@ -7272,6 +8116,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('RelationalExpr', this.position);
@@ -7283,6 +8130,11 @@ class Parser {
     }
   }
   parseRelationalOperator() {
+    const __memoStart = this.position;
+    const __memoKey = 'RelationalOperator@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule RelationalOperator at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('RelationalOperator', this.position);
     }
@@ -7336,6 +8188,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('RelationalOperator', this.position);
@@ -7347,6 +8202,11 @@ class Parser {
     }
   }
   parseInRhs() {
+    const __memoStart = this.position;
+    const __memoKey = 'InRhs@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule InRhs at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('InRhs', this.position);
     }
@@ -7474,6 +8334,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('InRhs', this.position);
@@ -7485,6 +8348,11 @@ class Parser {
     }
   }
   parseBitwiseExpr() {
+    const __memoStart = this.position;
+    const __memoKey = 'BitwiseExpr@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule BitwiseExpr at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('BitwiseExpr', this.position);
     }
@@ -7556,6 +8424,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('BitwiseExpr', this.position);
@@ -7567,6 +8438,11 @@ class Parser {
     }
   }
   parseAddExpr() {
+    const __memoStart = this.position;
+    const __memoKey = 'AddExpr@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule AddExpr at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('AddExpr', this.position);
     }
@@ -7616,6 +8492,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('AddExpr', this.position);
@@ -7627,6 +8506,11 @@ class Parser {
     }
   }
   parseMultiplyExpr() {
+    const __memoStart = this.position;
+    const __memoKey = 'MultiplyExpr@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule MultiplyExpr at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('MultiplyExpr', this.position);
     }
@@ -7687,6 +8571,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('MultiplyExpr', this.position);
@@ -7698,6 +8585,11 @@ class Parser {
     }
   }
   parseConcatExpr() {
+    const __memoStart = this.position;
+    const __memoKey = 'ConcatExpr@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule ConcatExpr at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('ConcatExpr', this.position);
     }
@@ -7758,6 +8650,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('ConcatExpr', this.position);
@@ -7769,6 +8664,11 @@ class Parser {
     }
   }
   parseCollateExpr() {
+    const __memoStart = this.position;
+    const __memoKey = 'CollateExpr@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule CollateExpr at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('CollateExpr', this.position);
     }
@@ -7792,6 +8692,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('CollateExpr', this.position);
@@ -7803,6 +8706,11 @@ class Parser {
     }
   }
   parseUnaryExpr() {
+    const __memoStart = this.position;
+    const __memoKey = 'UnaryExpr@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule UnaryExpr at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('UnaryExpr', this.position);
     }
@@ -7859,6 +8767,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('UnaryExpr', this.position);
@@ -7870,6 +8781,11 @@ class Parser {
     }
   }
   parsePrimaryExpr() {
+    const __memoStart = this.position;
+    const __memoKey = 'PrimaryExpr@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule PrimaryExpr at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('PrimaryExpr', this.position);
     }
@@ -7997,6 +8913,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('PrimaryExpr', this.position);
@@ -8008,6 +8927,11 @@ class Parser {
     }
   }
   parseRowValueExpr() {
+    const __memoStart = this.position;
+    const __memoKey = 'RowValueExpr@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule RowValueExpr at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('RowValueExpr', this.position);
     }
@@ -8035,6 +8959,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('RowValueExpr', this.position);
@@ -8046,6 +8973,11 @@ class Parser {
     }
   }
   parseQualifiedColumnRef() {
+    const __memoStart = this.position;
+    const __memoKey = 'QualifiedColumnRef@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule QualifiedColumnRef at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('QualifiedColumnRef', this.position);
     }
@@ -8095,6 +9027,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('QualifiedColumnRef', this.position);
@@ -8106,6 +9041,11 @@ class Parser {
     }
   }
   parseFunctionInvocation() {
+    const __memoStart = this.position;
+    const __memoKey = 'FunctionInvocation@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule FunctionInvocation at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('FunctionInvocation', this.position);
     }
@@ -8150,6 +9090,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('FunctionInvocation', this.position);
@@ -8161,6 +9104,11 @@ class Parser {
     }
   }
   parseFunctionArguments() {
+    const __memoStart = this.position;
+    const __memoKey = 'FunctionArguments@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule FunctionArguments at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('FunctionArguments', this.position);
     }
@@ -8269,6 +9217,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('FunctionArguments', this.position);
@@ -8280,6 +9231,11 @@ class Parser {
     }
   }
   parseCastExpr() {
+    const __memoStart = this.position;
+    const __memoKey = 'CastExpr@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule CastExpr at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('CastExpr', this.position);
     }
@@ -8294,6 +9250,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('CastExpr', this.position);
@@ -8305,6 +9264,11 @@ class Parser {
     }
   }
   parseCaseExpr() {
+    const __memoStart = this.position;
+    const __memoKey = 'CaseExpr@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule CaseExpr at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('CaseExpr', this.position);
     }
@@ -8359,6 +9323,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('CaseExpr', this.position);
@@ -8370,6 +9337,11 @@ class Parser {
     }
   }
   parseExistsExpr() {
+    const __memoStart = this.position;
+    const __memoKey = 'ExistsExpr@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule ExistsExpr at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('ExistsExpr', this.position);
     }
@@ -8382,6 +9354,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('ExistsExpr', this.position);
@@ -8393,6 +9368,11 @@ class Parser {
     }
   }
   parseRaiseFunction() {
+    const __memoStart = this.position;
+    const __memoKey = 'RaiseFunction@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule RaiseFunction at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('RaiseFunction', this.position);
     }
@@ -8470,6 +9450,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('RaiseFunction', this.position);
@@ -8481,6 +9464,11 @@ class Parser {
     }
   }
   parseLiteralValue() {
+    const __memoStart = this.position;
+    const __memoKey = 'LiteralValue@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule LiteralValue at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('LiteralValue', this.position);
     }
@@ -8584,6 +9572,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('LiteralValue', this.position);
@@ -8595,6 +9586,11 @@ class Parser {
     }
   }
   parseSignedNumber() {
+    const __memoStart = this.position;
+    const __memoKey = 'SignedNumber@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule SignedNumber at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('SignedNumber', this.position);
     }
@@ -8638,6 +9634,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('SignedNumber', this.position);
@@ -8649,6 +9648,11 @@ class Parser {
     }
   }
   parseSchemaQualifier() {
+    const __memoStart = this.position;
+    const __memoKey = 'SchemaQualifier@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule SchemaQualifier at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('SchemaQualifier', this.position);
     }
@@ -8659,6 +9663,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('SchemaQualifier', this.position);
@@ -8670,6 +9677,11 @@ class Parser {
     }
   }
   parseQualifiedTableRef() {
+    const __memoStart = this.position;
+    const __memoKey = 'QualifiedTableRef@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule QualifiedTableRef at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('QualifiedTableRef', this.position);
     }
@@ -8690,6 +9702,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('QualifiedTableRef', this.position);
@@ -8701,6 +9716,11 @@ class Parser {
     }
   }
   parseIfExists() {
+    const __memoStart = this.position;
+    const __memoKey = 'IfExists@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule IfExists at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('IfExists', this.position);
     }
@@ -8711,6 +9731,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('IfExists', this.position);
@@ -8722,6 +9745,11 @@ class Parser {
     }
   }
   parseIfNotExists() {
+    const __memoStart = this.position;
+    const __memoKey = 'IfNotExists@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule IfNotExists at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('IfNotExists', this.position);
     }
@@ -8733,6 +9761,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('IfNotExists', this.position);
@@ -8744,6 +9775,11 @@ class Parser {
     }
   }
   parseName() {
+    const __memoStart = this.position;
+    const __memoKey = 'Name@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule Name at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('Name', this.position);
     }
@@ -8753,6 +9789,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('Name', this.position);
@@ -8764,6 +9803,11 @@ class Parser {
     }
   }
   parseSchemaName() {
+    const __memoStart = this.position;
+    const __memoKey = 'SchemaName@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule SchemaName at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('SchemaName', this.position);
     }
@@ -8773,6 +9817,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('SchemaName', this.position);
@@ -8784,6 +9831,11 @@ class Parser {
     }
   }
   parseTableName() {
+    const __memoStart = this.position;
+    const __memoKey = 'TableName@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule TableName at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('TableName', this.position);
     }
@@ -8793,6 +9845,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('TableName', this.position);
@@ -8804,6 +9859,11 @@ class Parser {
     }
   }
   parseTableOrIndexName() {
+    const __memoStart = this.position;
+    const __memoKey = 'TableOrIndexName@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule TableOrIndexName at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('TableOrIndexName', this.position);
     }
@@ -8813,6 +9873,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('TableOrIndexName', this.position);
@@ -8824,6 +9887,11 @@ class Parser {
     }
   }
   parseIndexName() {
+    const __memoStart = this.position;
+    const __memoKey = 'IndexName@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule IndexName at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('IndexName', this.position);
     }
@@ -8833,6 +9901,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('IndexName', this.position);
@@ -8844,6 +9915,11 @@ class Parser {
     }
   }
   parseViewName() {
+    const __memoStart = this.position;
+    const __memoKey = 'ViewName@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule ViewName at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('ViewName', this.position);
     }
@@ -8853,6 +9929,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('ViewName', this.position);
@@ -8864,6 +9943,11 @@ class Parser {
     }
   }
   parseTriggerName() {
+    const __memoStart = this.position;
+    const __memoKey = 'TriggerName@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule TriggerName at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('TriggerName', this.position);
     }
@@ -8873,6 +9957,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('TriggerName', this.position);
@@ -8884,6 +9971,11 @@ class Parser {
     }
   }
   parseColumnName() {
+    const __memoStart = this.position;
+    const __memoKey = 'ColumnName@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule ColumnName at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('ColumnName', this.position);
     }
@@ -8893,6 +9985,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('ColumnName', this.position);
@@ -8904,6 +9999,11 @@ class Parser {
     }
   }
   parseColumnAlias() {
+    const __memoStart = this.position;
+    const __memoKey = 'ColumnAlias@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule ColumnAlias at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('ColumnAlias', this.position);
     }
@@ -8937,6 +10037,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('ColumnAlias', this.position);
@@ -8948,6 +10051,11 @@ class Parser {
     }
   }
   parseTableAlias() {
+    const __memoStart = this.position;
+    const __memoKey = 'TableAlias@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule TableAlias at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('TableAlias', this.position);
     }
@@ -8957,6 +10065,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('TableAlias', this.position);
@@ -8968,6 +10079,11 @@ class Parser {
     }
   }
   parseConstraintName() {
+    const __memoStart = this.position;
+    const __memoKey = 'ConstraintName@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule ConstraintName at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('ConstraintName', this.position);
     }
@@ -8977,6 +10093,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('ConstraintName', this.position);
@@ -8988,6 +10107,11 @@ class Parser {
     }
   }
   parseCollationName() {
+    const __memoStart = this.position;
+    const __memoKey = 'CollationName@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule CollationName at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('CollationName', this.position);
     }
@@ -8997,6 +10121,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('CollationName', this.position);
@@ -9008,6 +10135,11 @@ class Parser {
     }
   }
   parseForeignTable() {
+    const __memoStart = this.position;
+    const __memoKey = 'ForeignTable@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule ForeignTable at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('ForeignTable', this.position);
     }
@@ -9017,6 +10149,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('ForeignTable', this.position);
@@ -9028,6 +10163,11 @@ class Parser {
     }
   }
   parseSavepointName() {
+    const __memoStart = this.position;
+    const __memoKey = 'SavepointName@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule SavepointName at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('SavepointName', this.position);
     }
@@ -9037,6 +10177,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('SavepointName', this.position);
@@ -9048,6 +10191,11 @@ class Parser {
     }
   }
   parsePragmaName() {
+    const __memoStart = this.position;
+    const __memoKey = 'PragmaName@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule PragmaName at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('PragmaName', this.position);
     }
@@ -9057,6 +10205,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('PragmaName', this.position);
@@ -9068,6 +10219,11 @@ class Parser {
     }
   }
   parseModuleName() {
+    const __memoStart = this.position;
+    const __memoKey = 'ModuleName@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule ModuleName at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('ModuleName', this.position);
     }
@@ -9077,6 +10233,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('ModuleName', this.position);
@@ -9088,6 +10247,11 @@ class Parser {
     }
   }
   parseTableFunctionName() {
+    const __memoStart = this.position;
+    const __memoKey = 'TableFunctionName@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule TableFunctionName at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('TableFunctionName', this.position);
     }
@@ -9097,6 +10261,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('TableFunctionName', this.position);
@@ -9108,6 +10275,11 @@ class Parser {
     }
   }
   parseFunctionName() {
+    const __memoStart = this.position;
+    const __memoKey = 'FunctionName@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule FunctionName at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('FunctionName', this.position);
     }
@@ -9117,6 +10289,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('FunctionName', this.position);
@@ -9128,6 +10303,11 @@ class Parser {
     }
   }
   parseWindowName() {
+    const __memoStart = this.position;
+    const __memoKey = 'WindowName@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule WindowName at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('WindowName', this.position);
     }
@@ -9137,6 +10317,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('WindowName', this.position);
@@ -9148,6 +10331,11 @@ class Parser {
     }
   }
   parseBaseWindowName() {
+    const __memoStart = this.position;
+    const __memoKey = 'BaseWindowName@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule BaseWindowName at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('BaseWindowName', this.position);
     }
@@ -9157,6 +10345,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('BaseWindowName', this.position);
@@ -9168,6 +10359,11 @@ class Parser {
     }
   }
   parseFilename() {
+    const __memoStart = this.position;
+    const __memoKey = 'Filename@' + __memoStart;
+    if (this.failureMemo.has(__memoKey)) {
+      throw new Error('Previously failed rule Filename at position ' + __memoStart);
+    }
     if (this.eventHandler && typeof this.eventHandler.startNonterminal === 'function') {
       this.eventHandler.startNonterminal('Filename', this.position);
     }
@@ -9201,6 +10397,9 @@ class Parser {
 
       __ok = true;
     } finally {
+      if (!__ok) {
+        this.failureMemo.add(__memoKey);
+      }
       if (this.eventHandler) {
         if (__ok && typeof this.eventHandler.endNonterminal === 'function') {
           this.eventHandler.endNonterminal('Filename', this.position);
